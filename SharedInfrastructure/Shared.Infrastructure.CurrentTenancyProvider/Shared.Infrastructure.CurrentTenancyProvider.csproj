@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>ICurrentTenancyProvider for multi-tenant apps, tenant switching and a no-tenancy default.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared.Infrastructure.CurrentUserProvider\Shared.Infrastructure.CurrentUserProvider.csproj" />
+    <ProjectReference Include="..\Shared.Infrastructure.IoC\Shared.Infrastructure.IoC.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/SharedInfrastructure/">
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.AppUser.Identity/Shared.Infrastructure.AppUser.Identity.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.AppUser/Shared.Infrastructure.AppUser.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.Authentication.Entra/Shared.Infrastructure.Authentication.Entra.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.CurrentTenancyProvider/Shared.Infrastructure.CurrentTenancyProvider.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.CurrentUserProvider.HttpContext/Shared.Infrastructure.CurrentUserProvider.HttpContext.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.CurrentUserProvider/Shared.Infrastructure.CurrentUserProvider.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.Initializer/Shared.Infrastructure.Initializer.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.IoC/Shared.Infrastructure.IoC.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.LeaderElection/Shared.Infrastructure.LeaderElection.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.Persistence.EF.Identity/Shared.Infrastructure.Persistence.EF.Identity.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.Persistence.Marten/Shared.Infrastructure.Persistence.Marten.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.Persistence/Shared.Infrastructure.Persistence.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.UIException/Shared.Infrastructure.UIException.csproj" />
+    <Project Path="SharedInfrastructure/Shared.Infrastructure.UnitOfWork/Shared.Infrastructure.UnitOfWork.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+  </Folder>
+  <Folder Name="/tests/">
+  </Folder>
+</Solution>
