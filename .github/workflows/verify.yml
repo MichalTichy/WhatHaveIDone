@@ -33,4 +33,5 @@ jobs:
       - run: dotnet restore WhatHaveIDone.slnx
       - run: dotnet build WhatHaveIDone.slnx --no-restore -warnaserror
       - run: dotnet test WhatHaveIDone.slnx --no-build
+      - run: node --test tests/calendar-behavior.test.mjs
       - run: dotnet publish src/WhatHaveIDone.API -c Release --no-restore -o artifacts/publish -warnaserror
