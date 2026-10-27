@@ -1,0 +1,33 @@
+@page "/projects"
+@inherits AppComponentBase
+<PageTitle>@Strings.Projects · @Strings.AppName</PageTitle>
+<div class="page-header"><h1>@Strings.Projects</h1><AppActionButton OnClick="Add">＋ @Strings.AddProject</AppActionButton></div>
+@if (Error is not null) { <p class="alert error" role="alert">@Error <button @onclick="LoadAsync">@Strings.Reload</button></p> }
+<div class="toolbar"><label class="grow">@Strings.Search<input @bind="search" @bind:event="oninput" /></label><div class="tabs"><button class="@(!archived ? "active" : "")" @onclick="() => archived = false">@Strings.Active</button><button class="@(archived ? "active" : "")" @onclick="() => archived = true">@Strings.Archived</button></div></div>
+@if (!loaded && Busy) { <Loading /> }
+else if (loaded)
+{
+    <details class="surface client-management">
+        <summary>@Strings.Clients</summary>
+        <div class="client-list">
+            @foreach(var client in User.Clients)
+            {
+                <div class="project-row"><span class="grow">@client.Name @if(client.IsDefault){<small class="muted">· @Strings.DefaultClient</small>}</span><button type="button" class="secondary" disabled="@Busy" @onclick="() => RenameClient(client)">@Strings.Rename</button></div>
+            }
+            @if(editingClient is not null)
+            {
+                <form class="stack client-form" @onsubmit="SaveClientAsync" @onsubmit:preventDefault>
+                    <label>@Strings.ClientName<input @bind="editingClient.Name" required maxlength="200" /></label>
+                    <div class="actions"><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@(addingClient ? Strings.AddClient : Strings.Save)</AppActionButton><button type="button" class="secondary" disabled="@Busy" @onclick="() => editingClient = null">@Strings.Cancel</button></div>
+                </form>
+            }
+            else { <button type="button" class="secondary" @onclick="AddClient">＋ @Strings.AddClient</button> }
+        </div>
+    </details>
+    <section class="surface">@if (!Visible.Any()){<p class="empty">@Strings.NoProjects</p>}@foreach(var project in Visible)
+    { <div class="project-row"><span class="swatch" style="--project-color:@project.Color"></span><button class="entry-open grow" @onclick="() => Edit(project)"><strong>@project.Name</strong><small>@User.ClientName(project.ClientId)</small></button><button class="secondary" disabled="@Busy" @onclick="() => ToggleArchiveAsync(project)">@(project.Archived ? Strings.Restore : Strings.Archive)</button></div> }</section>
+}
+@if (editing is not null)
+{
+    <dialog class="drawer" @ref="dialog" aria-labelledby="project-title"><form class="drawer-content" @onsubmit="SaveAsync" @onsubmit:preventDefault><header class="drawer-header"><h2 id="project-title">@Strings.Project</h2><button type="button" class="secondary" aria-label="@Strings.Close" @onclick="CloseAsync">×</button></header><div class="drawer-body"><AppTextbox Label="@Strings.Name" aria-label="@Strings.Name" @bind-Value="editing.Name" /><ClientPicker @bind-Value="editing.ClientId" /><ProjectColorPicker @bind-Value="editing.Color" />@if(Error is not null){<p class="alert error">@Error</p>}</div><footer class="drawer-footer"><span class="spacer"></span><button type="button" class="secondary" @onclick="CloseAsync">@Strings.Cancel</button><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.Save</AppActionButton></footer></form></dialog>
+}
