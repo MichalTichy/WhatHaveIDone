@@ -75,6 +75,24 @@ public sealed class TrackingApiTests(IntegrationFixture fixture)
         Assert.Equal(HttpStatusCode.BadRequest,(await owner.Http.PostAsJsonAsync("/api/v1/timer/start",new EditTimeEntry{ProjectId=projectId})).StatusCode);
         var changed=await owner.PutAsync<TimeEntryModel>("time-entries/"+Uri.EscapeDataString(entry.Id),input with{Version=entry.Version,Description="Still belongs here"});Assert.Equal(projectId,changed.ProjectId);
     }
+    [Fact] public async Task CompatibilitySnapshotIgnoresWorkspaceAndDoesNotTruncateAsync()
+    {
+        using var owner=await fixture.CreateOwnerAsync();
+        await using(var scope=fixture.App.Services.CreateAsyncScope())
+        {
+            await using var session=scope.ServiceProvider.GetRequiredService<IDocumentStore>().LightweightSession();
+            for(var i=0;i<1005;i++)session.Store(new TimeEntry{Id=Guid.NewGuid().ToString("N"),OwnerId=owner.Owner,CompatibilityId=100+i,Description="Fixture",Start=DateTimeOffset.Parse("2026-10-26T09:00Z"),End=DateTimeOffset.Parse("2026-10-26T10:00Z")});
+            await session.SaveChangesAsync();
+        }
+        var token=await owner.PostAsync<CreatedApiToken>("tokens",new CreateApiKeyRequest("IS"));using var api=fixture.App.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions{HandleCookies=false});
+        api.DefaultRequestHeaders.Authorization=new AuthenticationHeaderValue("Basic",Convert.ToBase64String(Encoding.UTF8.GetBytes(token.Token+":api_token")));
+        var first=await api.GetStringAsync("/api/v9/workspaces/123/projects");Assert.Equal(first,await api.GetStringAsync("/api/v9/workspaces/ignored/projects"));
+        Assert.Single((await api.GetFromJsonAsync<List<System.Text.Json.JsonElement>>("/api/v9/workspaces/999/clients"))!);
+        var imported=await api.GetFromJsonAsync<List<System.Text.Json.JsonElement>>("/api/v9/me/time_entries?start_date=2026-10-26T00%3A00%3A00Z&end_date=2026-10-27T00%3A00%3A00Z");Assert.Equal(1005,imported!.Count);
+        using var create=await api.PostAsJsonAsync("/api/v9/workspaces/anything/tags",new{name="Unused tag"});Assert.Equal(HttpStatusCode.NotFound,create.StatusCode);
+        Assert.Empty(await owner.GetAsync<List<string>>("tags"));
+        (await owner.Http.DeleteAsync("/api/v1/tokens/"+token.Id)).EnsureSuccessStatusCode();Assert.Equal(HttpStatusCode.Unauthorized,(await api.GetAsync("/api/v9/workspaces")).StatusCode);
+    }
     [Fact] public async Task ReportsClipMidnightAndDstAndCsvUsesTheSameSelectionAsync()
     {
         using var owner=await fixture.CreateOwnerAsync();var input=Input("DST")with{Start=DateTimeOffset.Parse("2026-03-29T00:00:00+01:00"),End=DateTimeOffset.Parse("2026-03-30T00:00:00+02:00"),Tags=["filter"]};
@@ -87,6 +105,18 @@ public sealed class TrackingApiTests(IntegrationFixture fixture)
     {
         using var owner=await fixture.CreateOwnerAsync();var midnight=DateTimeOffset.Parse("2026-10-26T00:00Z");await owner.PostAsync<TimeEntryModel>("time-entries",Input()with{Start=midnight,End=midnight});
         Assert.Single(await owner.GetAsync<List<TimeEntryModel>>("time-entries?from=2026-10-26T00%3A00%3A00Z&to=2026-10-27T00%3A00%3A00Z"));
+    }
+    [Fact] public async Task CompatibilityDeserializesLegacyStringIdsAndRunningDurationAsync()
+    {
+        using var owner=await fixture.CreateOwnerAsync();
+        var projectId=await owner.PostAsync<string>("projects",new ProjectModel{Name="Legacy",Color="#123abc"});
+        var stopped=await owner.PostAsync<TimeEntryModel>("time-entries",Input("Completed",projectId)with{Tags=["Legacy tag"]});
+        var running=await owner.PostAsync<TimeEntryModel>("timer/start",new EditTimeEntry{Description="Running",ProjectId=projectId});
+        var project=Newtonsoft.Json.JsonConvert.DeserializeObject<List<LegacyProject>>(await owner.Http.GetStringAsync("/api/v9/workspaces/anything/projects"))!.Single();
+        Assert.Equal("1",project.WorkspaceId);Assert.Equal((await owner.GetAsync<List<ClientModel>>("clients")).Single().CompatibilityId.ToString(),project.ClientId);Assert.Equal("#123abc",project.HexColor);
+        var rows=Newtonsoft.Json.JsonConvert.DeserializeObject<List<LegacyEntry>>(await owner.Http.GetStringAsync("/api/v9/me/time_entries?start_date=2026-10-26T00%3A00%3A00Z&end_date=2026-10-27T00%3A00%3A00Z"))!;
+        var complete=rows.Single(e=>e.Id==stopped.CompatibilityId.ToString());Assert.Equal(project.Id,complete.ProjectId);Assert.Equal("1",complete.WorkspaceId);Assert.Equal(3600,complete.Duration);Assert.Equal(["Legacy tag"],complete.Tags);
+        var active=rows.Single(e=>e.Id==running.CompatibilityId.ToString());Assert.Null(active.Stop);Assert.Equal(-running.Start.ToUnixTimeSeconds(),active.Duration);
     }
     private sealed class LegacyProject
     {
