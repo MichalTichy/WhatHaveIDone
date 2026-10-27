@@ -41,6 +41,10 @@ Integrační testy vytvářejí a odstraňují vlastní databázi `whid_tests_<g
 
 `src/` obsahuje Web, API, API.Toggl, API.Models, Models, Logic a dva konkrétní persistence/Identity adaptéry. API hostuje nativní rozhraní pro frontend; samostatná knihovna API.Toggl vlastní kompatibilní v9 endpointy, DTO a formát chyb. Nativní API, Toggl adaptér i MCP v API/Mcp používají stejnou Logic a běží v jednom serveru. Čtrnáct potřebných projektů v `SharedInfrastructure/` jsou lokální kopie. Zápisy jdou přes use cases, čtení přes specifikace; WASM zná jen vlastní HTTP kontrakty.
 
+Soubory uvnitř projektů jsou seskupené podle funkcí, například `TimeEntries`, `Projects`, `Import` a `Settings`. API DTO jsou v odpovídajících složkách `API.Models`, doménové dokumenty v `Models` a use cases se specifikacemi v `Logic`. Společné modelové namespaces zůstávají stabilní, včetně identit uložených dokumentů.
+
+Ve Webu jsou stránky i jejich související komponenty ve `Features/Authentication`, `Time`, `Projects`, `Reporting`, `Import` a `Settings`. Například `Features/Time` obsahuje stránku Čas, editor záznamu i zdrojové skripty kalendáře; `Features/Settings` obsahuje také MCP dialog. Znovupoužitelné UI zůstává v `Components`, shell v `Layout`. API testy mají stejné funkční členění a společnou testovací infrastrukturu ve složce `Support`.
+
 
 - [Plánovací návrh stránky Čas a jeho omezení](prototype/doc/components.md)
 - [Pravidla repozitáře](AGENTS.md)

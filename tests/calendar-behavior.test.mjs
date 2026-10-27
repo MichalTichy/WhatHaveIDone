@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {shortGapAt,snapToNeighbors} from '../src/WhatHaveIDone.Web/Scripts/calendar-behavior.mjs';
+import {shortGapAt,snapToNeighbors} from '../src/WhatHaveIDone.Web/Features/Time/calendar-behavior.mjs';
 const minute=60*1000;
 const interval=(start,end)=>({start:start*minute,end:end*minute});
 

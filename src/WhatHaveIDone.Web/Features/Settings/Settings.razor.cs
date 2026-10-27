@@ -3,7 +3,7 @@ using Microsoft.JSInterop;
 using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Web.Resources;
 
-namespace WhatHaveIDone.Web.Pages;
+namespace WhatHaveIDone.Web.Features.Settings;
 
 public partial class Settings
 {

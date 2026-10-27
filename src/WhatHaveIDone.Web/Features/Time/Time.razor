@@ -1,7 +1,6 @@
 @page "/"
 @page "/time"
 @inherits AppComponentBase
-@using WhatHaveIDone.Web.Features.Time
 <PageTitle>@Strings.Time · @Strings.AppName</PageTitle>
 <div class="page-header"><div><h1>@Strings.Time</h1><p class="page-subtitle">@Strings.TimeSubtitle</p></div><span class="timezone-label">@User.Settings.TimeZone</span></div>
 @if (Error is not null) { <div class="alert error" role="alert">@Error <button class="quiet" @onclick="LoadAsync">@Strings.Retry</button></div> }

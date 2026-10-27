@@ -5,7 +5,7 @@ using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Web.Resources;
 using WhatHaveIDone.Web.Services;
 
-namespace WhatHaveIDone.Web.Pages;
+namespace WhatHaveIDone.Web.Features.Time;
 
 public partial class Time : IAsyncDisposable
 {

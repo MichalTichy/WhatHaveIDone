@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using WhatHaveIDone.API.Models;
 
-namespace WhatHaveIDone.Web.Pages;
+namespace WhatHaveIDone.Web.Features.Projects;
 
 public partial class Projects : IAsyncDisposable
 {

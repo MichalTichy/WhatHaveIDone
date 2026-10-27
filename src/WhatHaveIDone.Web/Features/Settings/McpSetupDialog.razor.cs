@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using WhatHaveIDone.Web.Resources;
 
-namespace WhatHaveIDone.Web.Pages;
+namespace WhatHaveIDone.Web.Features.Settings;
 
 public partial class McpSetupDialog
 {

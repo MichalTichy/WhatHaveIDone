@@ -13,6 +13,7 @@
 - When a small requirement introduces substantial complexity, explain the concrete cost and propose a simpler approach. Do not silently drop accepted functionality; the first release includes an editable calendar.
 - Add a project, abstraction, helper, service or component split only for a concrete dependency boundary, current consumer or meaningful duplication. Do not add layers that only forward equivalent calls.
 - Keep each operation and its UI state together. Extract shared behavior when there is an actual shared responsibility.
+- Group files by existing feature inside each project. Keep a web page, its code-behind, feature components and scripts together under `Web/Features`; reserve `Web/Components` for reused UI. Keep shared model namespaces stable when moving files, especially persisted document types.
 - Add notifications, hooks, retries, queues, caching and concurrency mechanisms only for actual requirements. One running timer per user, repeatable imports and protection against stale edits are actual requirements; a general event platform is not.
 - Do not add infrastructure or views for future work-evidence collection to the initial release. Preserve the plan's extension boundaries without empty projects or placeholder navigation.
 - The first feature after MVP is timesheet drafts. Keep draft records separate from confirmed TimeEntry documents and reports; reuse the actual time-entry rules and editor where appropriate. Do not add draft flags, workflow frameworks or empty draft projects to MVP.

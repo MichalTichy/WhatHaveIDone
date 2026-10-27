@@ -1,7 +1,7 @@
 using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Web.Resources;
 
-namespace WhatHaveIDone.Web.Pages;
+namespace WhatHaveIDone.Web.Features.Authentication;
 
 public partial class Account
 {
