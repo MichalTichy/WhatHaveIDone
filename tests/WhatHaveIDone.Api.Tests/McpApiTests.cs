@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc.Testing;
 using ModelContextProtocol.Client;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 
 namespace WhatHaveIDone.Api.Tests;
 

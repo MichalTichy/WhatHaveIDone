@@ -1,5 +1,5 @@
 using MediatR;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Logic.Execution;
 
 namespace WhatHaveIDone.Logic.Authentication;

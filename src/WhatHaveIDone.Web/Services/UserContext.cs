@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Net.Http.Headers;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 
 namespace WhatHaveIDone.Web.Services;
 

@@ -1,6 +1,6 @@
 using JasperFx;
 using Npgsql;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Logic.Execution;
 using WhatHaveIDone.Logic.Resources;
 

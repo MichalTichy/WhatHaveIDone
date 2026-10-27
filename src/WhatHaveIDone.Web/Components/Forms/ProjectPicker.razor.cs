@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 
 namespace WhatHaveIDone.Web.Components.Forms;
 

@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Web.Resources;
 
 namespace WhatHaveIDone.Web.Services;

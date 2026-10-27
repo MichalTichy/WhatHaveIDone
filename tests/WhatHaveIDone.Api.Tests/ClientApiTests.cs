@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Infrastructure.Persistence.Migrations;
 using WhatHaveIDone.Models;
 

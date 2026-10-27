@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Infrastructure.Identity;
 using WhatHaveIDone.Logic.Authentication;
 using WhatHaveIDone.Logic.Execution;

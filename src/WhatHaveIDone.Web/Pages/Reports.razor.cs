@@ -1,4 +1,4 @@
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Web.Resources;
 using WhatHaveIDone.Web.Services;
 

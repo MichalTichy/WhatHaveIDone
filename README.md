@@ -39,7 +39,7 @@ dotnet publish src/WhatHaveIDone.API -c Release -o artifacts/publish -warnaserro
 
 Integrační testy vytvářejí a odstraňují vlastní databázi `whid_tests_<guid>`. Čtou lokální `.env`, případně `WHID_TEST_CONNECTION`; připojení potřebuje oprávnění vytvořit databázi. Nepoužívejte produkční účet. Build zahrnuje npm/CSS a nepoužívá interní NuGet feed ani zdrojové checkouty RSM/Edifio.
 
-`src/` obsahuje Web, API, API.Toggl, Contracts, Models, Logic a dva konkrétní persistence/Identity adaptéry. API hostuje nativní rozhraní pro frontend; samostatná knihovna API.Toggl vlastní kompatibilní v9 endpointy, DTO a formát chyb. Nativní API, Toggl adaptér i MCP v API/Mcp používají stejnou Logic a běží v jednom serveru. Čtrnáct potřebných projektů v `SharedInfrastructure/` jsou lokální kopie. Zápisy jdou přes use cases, čtení přes specifikace; WASM zná jen vlastní HTTP kontrakty.
+`src/` obsahuje Web, API, API.Toggl, API.Models, Models, Logic a dva konkrétní persistence/Identity adaptéry. API hostuje nativní rozhraní pro frontend; samostatná knihovna API.Toggl vlastní kompatibilní v9 endpointy, DTO a formát chyb. Nativní API, Toggl adaptér i MCP v API/Mcp používají stejnou Logic a běží v jednom serveru. Čtrnáct potřebných projektů v `SharedInfrastructure/` jsou lokální kopie. Zápisy jdou přes use cases, čtení přes specifikace; WASM zná jen vlastní HTTP kontrakty.
 
 
 - [Plánovací návrh stránky Čas a jeho omezení](prototype/doc/components.md)

@@ -1,6 +1,6 @@
 using MediatR;
 using Shared.Infrastructure.CurrentUserProvider;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Logic.Execution;
 
 namespace WhatHaveIDone.Logic.Authentication;

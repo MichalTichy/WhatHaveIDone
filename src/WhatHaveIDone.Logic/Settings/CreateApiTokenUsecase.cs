@@ -3,7 +3,7 @@ using System.Text;
 using MediatR;
 using Shared.Infrastructure.CurrentUserProvider;
 using Shared.Infrastructure.Persistence.Repositories;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Logic.Execution;
 using WhatHaveIDone.Models;
 

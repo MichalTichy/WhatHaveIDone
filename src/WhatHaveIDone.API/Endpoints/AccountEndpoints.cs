@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Shared.Infrastructure.CurrentUserProvider;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Infrastructure.Identity;
 using WhatHaveIDone.Logic.Authentication;
 using WhatHaveIDone.Logic.Settings;

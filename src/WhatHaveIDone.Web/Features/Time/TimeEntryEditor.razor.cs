@@ -2,7 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Web.Resources;
 using WhatHaveIDone.Web.Services;
 

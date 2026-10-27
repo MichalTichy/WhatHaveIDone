@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 
 namespace WhatHaveIDone.Api.Tests;
 

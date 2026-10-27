@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="../WhatHaveIDone.Models/WhatHaveIDone.Models.csproj" />
-    <ProjectReference Include="../WhatHaveIDone.Contracts/WhatHaveIDone.Contracts.csproj" />
+    <ProjectReference Include="../WhatHaveIDone.API.Models/WhatHaveIDone.API.Models.csproj" />
     <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.CurrentUserProvider/Shared.Infrastructure.CurrentUserProvider.csproj" />
     <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Persistence.Marten/Shared.Infrastructure.Persistence.Marten.csproj" />
     <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.UIException/Shared.Infrastructure.UIException.csproj" />

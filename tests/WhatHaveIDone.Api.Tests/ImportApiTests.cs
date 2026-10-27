@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Shared.Infrastructure.LeaderElection;
 using Shared.Infrastructure.Persistence.Repositories;
 using WhatHaveIDone.API.Import;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Logic.Execution;
 using WhatHaveIDone.Models;
 

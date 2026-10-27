@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 
 namespace WhatHaveIDone.Web.Pages;
 

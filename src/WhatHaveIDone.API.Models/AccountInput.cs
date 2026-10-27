@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace WhatHaveIDone.Contracts;
+namespace WhatHaveIDone.API.Models;
 
 public sealed class AccountInput
 {

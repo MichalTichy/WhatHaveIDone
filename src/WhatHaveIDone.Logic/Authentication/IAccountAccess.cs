@@ -1,4 +1,4 @@
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 
 namespace WhatHaveIDone.Logic.Authentication;
 

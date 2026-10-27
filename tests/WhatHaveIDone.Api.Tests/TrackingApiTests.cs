@@ -5,7 +5,7 @@ using System.Text;
 using Marten;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Infrastructure.Identity;
 using WhatHaveIDone.Models;
 

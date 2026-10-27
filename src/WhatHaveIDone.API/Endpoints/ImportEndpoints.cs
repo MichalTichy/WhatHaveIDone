@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Shared.Infrastructure.CurrentUserProvider;
 using Shared.Infrastructure.Persistence.Repositories;
 using WhatHaveIDone.API.Import;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Logic.Execution;
 using WhatHaveIDone.Logic.Import;
 using WhatHaveIDone.Models;

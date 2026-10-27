@@ -1,5 +1,5 @@
 using System.Net.Http.Json;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 
 namespace WhatHaveIDone.Api.Tests;
 

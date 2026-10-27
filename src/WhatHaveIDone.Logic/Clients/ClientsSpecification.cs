@@ -1,6 +1,6 @@
 using Marten;
 using Shared.Infrastructure.Persistence.Specifications;
-using WhatHaveIDone.Contracts;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Models;
 
 namespace WhatHaveIDone.Logic.Clients;
