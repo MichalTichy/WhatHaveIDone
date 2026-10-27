@@ -23,6 +23,7 @@
     <Project Path="src/WhatHaveIDone.Infrastructure.Persistence/WhatHaveIDone.Infrastructure.Persistence.csproj" />
     <Project Path="src/WhatHaveIDone.Logic/WhatHaveIDone.Logic.csproj" />
     <Project Path="src/WhatHaveIDone.Models/WhatHaveIDone.Models.csproj" />
+    <Project Path="src/WhatHaveIDone.Web/WhatHaveIDone.Web.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/WhatHaveIDone.Api.Tests/WhatHaveIDone.Api.Tests.csproj" />
