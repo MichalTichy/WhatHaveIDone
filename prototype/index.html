@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Čas · WhatHaveIDone</title><link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/css/site.css"><link rel="stylesheet" href="index.css">
+  <script src="index.js" defer></script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" aria-label="Hlavní navigace">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">W</span><span>WhatHaveIDone</span></div>
+    <nav><span class="nav-item active" aria-current="page">◷ <span>Čas</span></span>
+      <button class="nav-item" disabled>Přehledy</button><button class="nav-item" disabled>Projekty</button>
+      <button class="nav-item" disabled>Import z Togglu</button><button class="nav-item" disabled>Nastavení</button></nav>
+    <div class="account"><span class="avatar">JK</span><span>Jan Novák<small>Osobní účet</small></span></div>
+  </aside>
+  <main>
+    <header class="page-header"><div><div class="eyebrow">WhatHaveIDone</div><h1>Čas</h1></div><span class="zone">Europe/Prague</span></header>
+    <section class="timer surface" aria-label="Časovač">
+      <label class="description">Na čem pracujete?<input id="timer-description" placeholder="Popis činnosti (volitelné)"></label>
+      <div class="timer-fields"><label>Projekt<select id="timer-project"><option value="">Bez projektu</option><option>WhatHaveIDone</option><option>RSM</option></select></label>
+      <label>Tagy<input id="timer-tags" list="tags" placeholder="Přidat tagy"></label>
+      <div class="timer-action"><output id="elapsed" aria-label="Délka běžícího záznamu">00:00:00</output><button id="timer-new" class="secondary" hidden>Spustit novou</button><button id="timer-toggle" class="primary">▶ Spustit</button></div></div>
+      <div id="running-info" class="muted" hidden></div>
+    </section>
+    <div class="toolbar"><div class="tabs" aria-label="Zobrazení"><button id="calendar-tab" aria-pressed="false">Kalendář</button><button id="list-tab" aria-pressed="true">Seznam</button></div><button class="secondary" id="add">＋ Přidat záznam</button></div>
+    <div class="period"><div class="period-actions"><button id="previous" class="icon" aria-label="Předchozí období">‹</button><button id="today" class="secondary">Dnes</button><button id="next" class="icon" aria-label="Další období">›</button></div><h2 id="period-title"></h2><span id="period-total" class="total"></span></div>
+    <section id="calendar-view" class="surface" aria-label="Kalendář" hidden><div id="day-heads" class="day-heads"></div><div class="calendar-scroll" id="calendar-scroll"><div id="calendar" class="calendar"></div></div></section>
+    <section id="list-view" class="surface" aria-label="Seznam záznamů"></section>
+  </main>
+  <dialog id="editor" class="drawer" aria-labelledby="editor-title">
+    <form id="entry-form"><header class="drawer-header"><h2 id="editor-title">Upravit záznam</h2><button type="button" class="icon" id="close-editor" aria-label="Zavřít editor">×</button></header>
+    <div class="drawer-body"><label>Popis<input id="entry-description" placeholder="Bez popisu"></label><label>Projekt<select id="entry-project"><option value="">Bez projektu</option><option>WhatHaveIDone</option><option>RSM</option></select></label>
+    <label>Tagy<input id="entry-tags" list="tags" placeholder="Např. vývoj, schůzka"><small>Více tagů oddělte čárkou.</small></label>
+    <label>Začátek<input id="entry-start" type="datetime-local" required step="1"></label><label>Konec<input id="entry-end" type="datetime-local" required step="1"></label>
+    <p class="muted">Europe/Prague</p><p id="overlap" class="alert" hidden>Čas se překrývá s jiným záznamem. Uložení je povolené.</p><p id="form-error" class="error" role="alert" hidden></p></div>
+    <footer class="drawer-footer"><span id="save-status" class="muted" role="status"></span><span class="spacer"></span><button type="button" class="danger" id="delete-entry">Smazat</button><button type="submit" class="primary" id="create-entry">Vytvořit záznam</button><button type="button" class="secondary" id="finish-editor">Zavřít</button></footer></form>
+  </dialog>
+  <dialog id="confirmation" class="confirmation" aria-labelledby="confirmation-title"><h2 id="confirmation-title"></h2><p id="confirmation-message"></p><div class="actions"><button id="confirmation-cancel" class="secondary">Zůstat</button><button id="confirmation-accept" class="primary">Zahodit změny</button></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <datalist id="tags"><option value="vývoj"><option value="schůzka"><option value="plánování"></datalist>
+</div>
+</body></html>

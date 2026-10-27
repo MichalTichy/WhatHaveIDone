@@ -1,0 +1,16 @@
+@inherits LayoutComponentBase
+<div class="app-shell">
+    <aside class="sidebar @(menuOpen ? "expanded" : "")">
+        <a class="brand" href="/time"><span class="brand-mark" aria-hidden="true">W</span><span class="brand-name">@Strings.AppName</span></a>
+        <p class="brand-caption">@Strings.PersonalTimeTracking</p>
+        <nav aria-label="@Strings.Menu">
+            <NavLink href="/time" @onclick="CloseMenu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>@Strings.Time</NavLink>
+            <NavLink href="/reports" @onclick="CloseMenu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V9m7 10V5m7 14v-7"/></svg>@Strings.Reports</NavLink>
+            <NavLink href="/projects" @onclick="CloseMenu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V5h7l2 3h9v11H3Z"/></svg>@Strings.Projects</NavLink>
+            <NavLink href="/settings" @onclick="CloseMenu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg>@Strings.Settings</NavLink>
+        </nav>
+        <div class="account"><span>@User.Session.Email</span><button class="quiet" @onclick="SignOutAsync">@Strings.SignOut</button></div>
+    </aside>
+    <div class="app-content"><header class="mobile-header"><button class="secondary" aria-expanded="@menuOpen" @onclick="ToggleMenu">☰ @Strings.Menu</button><span>@Strings.AppName</span></header>@if(updateAvailable){<div class="alert" role="status">@Strings.UpdateAvailable <button class="secondary" @onclick="UpdateAsync">@Strings.Reload</button></div>}<main>@Body</main></div>
+</div>
+@if (Feedback.Message is { } message) { <div class="toast" role="status">@message<button aria-label="@Strings.Close" @onclick="Feedback.Clear">×</button></div> }

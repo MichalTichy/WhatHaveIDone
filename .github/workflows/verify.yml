@@ -1,0 +1,53 @@
+name: Verify
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17.6
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: whid_test
+          POSTGRES_PASSWORD: synthetic-ci-only
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U whid_test -d postgres"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      WHID_TEST_CONNECTION: Host=localhost;Port=5432;Database=postgres;Username=whid_test;Password=synthetic-ci-only
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/WhatHaveIDone.Web/package-lock.json
+      - run: dotnet restore WhatHaveIDone.slnx
+      - run: dotnet build WhatHaveIDone.slnx --no-restore -warnaserror
+      - run: dotnet test WhatHaveIDone.slnx --no-build --logger trx --results-directory artifacts/test-results
+      - run: node --test tests/calendar-behavior.test.mjs
+      - run: dotnet publish src/WhatHaveIDone.API -c Release --no-restore -o artifacts/publish -warnaserror
+      - name: Compose production smoke
+        env:
+          POSTGRES_PASSWORD: synthetic-compose-ci-only
+          APP_PORT: 5088
+          POSTGRES_PORT: 55432
+        run: |
+          docker compose --profile app up -d --build --wait
+          curl --fail --retry 30 --retry-delay 2 --retry-all-errors http://localhost:5088/health
+          curl --fail http://localhost:5088/manifest.webmanifest
+          curl --fail http://localhost:5088/calendar.js -o /dev/null
+          docker compose --profile app down
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: artifacts/test-results

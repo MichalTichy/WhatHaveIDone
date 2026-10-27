@@ -1,0 +1,58 @@
+@page "/"
+@page "/time"
+@inherits AppComponentBase
+@using WhatHaveIDone.Web.Features.Time
+<PageTitle>@Strings.Time · @Strings.AppName</PageTitle>
+<div class="page-header"><div><h1>@Strings.Time</h1><p class="page-subtitle">@Strings.TimeSubtitle</p></div><span class="timezone-label">@User.Settings.TimeZone</span></div>
+@if (Error is not null) { <div class="alert error" role="alert">@Error <button class="quiet" @onclick="LoadAsync">@Strings.Retry</button></div> }
+<section class="surface timer-card @(runningEntry is not null ? "is-running" : "")">
+    <div class="timer-main">
+        <div class="timer-description"><span class="timer-caption"><span class="timer-indicator" aria-hidden="true"></span>@Strings.Timer</span><AppTextbox Label="@Strings.Description" aria-label="@Strings.Description" Placeholder="@Strings.WorkingOn" @bind-Value="description" /></div>
+        <div class="timer-action"><output>@(runningEntry is null ? "0:00:00" : UserTime.Duration((now - runningEntry.Start).TotalSeconds))</output>
+            @if (runningEntry is not null) { <button class="secondary" disabled="@Busy" @onclick="StartAsync">@Strings.StartNew</button><AppStatusButton Active="true" Disabled="Busy" OnClick="StopAsync">@Strings.StopTimer</AppStatusButton> }
+            else { <AppActionButton Class="timer-start" Disabled="Busy" OnClick="StartAsync">▶ @Strings.StartTimer</AppActionButton> }
+        </div>
+    </div>
+    <div class="timer-fields">
+        <ProjectPicker @bind-Value="projectId" />
+        <TagInput @bind-Value="selectedTags" ProjectId="@projectId" />
+    </div>
+    @if (runningEntry is not null) { <p class="muted" style="margin:12px 0 0">@Strings.Running: @(string.IsNullOrEmpty(runningEntry.Description) ? Strings.NoDescription : runningEntry.Description) · @User.ProjectName(runningEntry.ProjectId)</p> }
+</section>
+<div class="toolbar"><div class="tabs"><button class="@(!calendarView ? "active" : "")" aria-pressed="@(!calendarView)" @onclick="ShowList">@Strings.List</button><button class="@(calendarView ? "active" : "")" aria-pressed="@calendarView" @onclick="ShowCalendar">@Strings.Calendar</button></div><AppActionButton OnClick="AddAsync">＋ @Strings.AddEntry</AppActionButton></div>
+<div class="period"><div class="actions"><button class="secondary" aria-label="@Strings.Previous" @onclick="PreviousAsync">‹</button><button class="secondary" @onclick="TodayAsync">@Strings.Today</button><button class="secondary" aria-label="@Strings.Next" @onclick="NextAsync">›</button><input aria-label="@Strings.Period" class="date-input" type="date" @bind="selectedDay" @bind:format="yyyy-MM-dd" @bind:after="LoadAsync" /></div><strong class="period-total"><span>@Strings.Total</span> @UserTime.Duration(TotalSeconds())</strong></div>
+@if (loading && !loaded) { <Loading /> }
+else if (loaded)
+{
+    @if (calendarView) { <section class="surface"><div @ref="calendarElement"></div></section> }
+    else if (entries.Count == 0) { <section class="surface empty">@Strings.EmptyTime</section> }
+    else
+    {
+        <section class="surface entries">@foreach(var day in Days())
+        {
+            var daily = DayEntries(day).ToList();
+            @if (daily.Count > 0)
+            {
+                <div class="entry-day"><strong>@day.ToString("ddd d. M.")</strong><strong>@UserTime.Duration(DaySeconds(day, daily))</strong></div>
+                @foreach(var row in DayRows(day, daily))
+                {
+                    @if (row.Entry is { } entry)
+                    {
+                        <div class="entry-row" style="--project-color:@User.ProjectColor(entry.ProjectId)" @key="(entry.Id,day)"><button class="entry-open" @onclick="() => OpenAsync(entry.Id)"><strong>@(string.IsNullOrEmpty(entry.Description) ? Strings.NoDescription : entry.Description)</strong><small class="entry-subline"><span>@User.ProjectName(entry.ProjectId)</span>@foreach(var tag in entry.Tags){<span class="entry-tag">@tag</span>}</small>@if (Overlaps(entry)){<small class="warning-text">⚠ @Strings.OverlapShort</small>}</button><div class="entry-meta"><strong>@UserTime.Duration(((entry.End ?? now) - entry.Start).TotalSeconds)</strong>@UserTime.Local(entry.Start, User.Settings.TimeZone).ToString("HH:mm")–@(entry.End.HasValue ? UserTime.Local(entry.End.Value, User.Settings.TimeZone).ToString("HH:mm") : Strings.Running)</div><button class="secondary entry-continue" aria-label="@(Strings.Continue + ": " + entry.Description)" disabled="@Busy" @onclick="() => ContinueAsync(entry)">▶</button></div>
+                    }
+                    else
+                    {
+                        <button class="entry-gap" @key="(day,row.Start,row.End)" disabled="@loading"
+                                aria-label="@string.Format(Strings.FillGap, GapTime(row.Start), GapTime(row.End), UserTime.Duration((row.End-row.Start).TotalSeconds))"
+                                @onclick="() => FillGap(row.Start, row.End)">
+                            <span class="gap-icon" aria-hidden="true">＋</span>
+                            <span class="gap-label"><strong>@Strings.UntrackedTime</strong><small>@GapTime(row.Start)–@GapTime(row.End) · @UserTime.Duration((row.End-row.Start).TotalSeconds)</small></span>
+                            <span class="gap-action">@Strings.AddEntry</span>
+                        </button>
+                    }
+                }
+            }
+        }</section>
+    }
+}
+@if (editorOpen) { <TimeEntryEditor @key="editorKey" Entry="editingEntry" InitialStart="editorStart" InitialEnd="editorEnd" CreateOnOpen="createEditorEntry" Saved="OnSavedAsync" Closed="OnClosedAsync" /> }

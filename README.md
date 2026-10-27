@@ -1,26 +1,56 @@
 # What Have I Done?!
 
-Application foundation for a minimal personal time tracker built with .NET 10 and PostgreSQL. Every user owns their data; the product has no workspaces or company tenancy.
+Minimalistická osobní evidence času: .NET 10, Blazor WebAssembly/PWA, Lumex UI, PostgreSQL a Marten. Jeden API host obsluhuje také web. Každý uživatel má vlastní data, bez organizací a workspaces.
 
-This layer contains the domain models, browser-compatible contracts, intention-named MediatR use cases, read specifications and the required locally copied Shared.Infrastructure projects. Business rules cover timers, time entries, projects/clients, implicit tags, reporting and repeatable imports. The executable API is included in this layer. The following stack layers add Web/PWA and MCP.
+Implementováno je přihlášení/registrace, serverové Entra SSO pro jeden tenant, časovač, seznam s automatickým ukládáním, editovatelný kalendář, projekty, dynamické tagy, přehledy/CSV, API klíče a import na pozadí přes Toggl API nebo podporované CSV. Vybraný profil Toggl v9 slouží pro navazující úpravu Riganti IS; nejde o úplnou kopii Togglu. Emailing, reset hesla a offline editace nejsou součástí první verze.
+
+## Lokální start
+
+Potřebujete SDK z [global.json](global.json), Node.js 24/npm a Docker s Compose. V PowerShellu z kořene:
 
 ```powershell
-dotnet build WhatHaveIDone.slnx -warnaserror
-dotnet test tests/WhatHaveIDone.Tests -warnaserror
+./eng/start.ps1
 ```
 
-Use the SDK pinned in global.json. All feeds are public; no source RSM checkout is needed. Shared infrastructure is copied locally, with its origin and adaptations in [SharedInfrastructure/PROVENANCE.md](SharedInfrastructure/PROVENANCE.md). Distribution rights and the final application license remain a separate release check.
-
-Planning and verification notes in docs/ are intentionally local and excluded from Git. [AGENTS.md](AGENTS.md) and the architecture skills describe the repository conventions. The next domain feature after MVP remains a separate timesheet draft, outside confirmed TimeEntry records and reports.
-## Server
-
-ASP.NET Core hosts the native /api/v1 API and a separate Toggl v9 compatibility library under /api/v9. Identity/Entra authentication, PostgreSQL persistence, background API/CSV import, reports and owner-scoped API keys use the shared application rules.
-
-The server requires ConnectionStrings__DB. DataProtection__Path and Import__Path should point to persistent private directories. To run PostgreSQL locally, copy .env.example to an ignored .env, replace its password and run `docker compose up -d db`.
+Skript vytvoří ignorovaný `.env` s náhodným heslem, spustí PostgreSQL a aplikaci na **http://localhost:5088**. Restore a sestavení CSS/kalendáře jsou součástí .NET buildu. Ve druhém terminálu lze založit syntetická data:
 
 ```powershell
+./eng/seed.ps1
+```
+
+Účet je `demo@example.test`; jeho vygenerované heslo najdete pouze v lokálním `.env` jako `DEMO_PASSWORD`. Seed lze opakovat, existující změny nepřepisuje. Nový vlastní účet můžete založit přímo v aplikaci. Při prvním přihlášení se otevře Import, který lze přeskočit.
+
+Celá aplikace v kontejnerech, bez lokálního SDK/Node:
+
+```powershell
+# Poprvé: Copy-Item .env.example .env a nastavte vlastní heslo.
+docker compose --profile app up -d --build --wait
+```
+
+Na portu 5088 smí běžet jen jedna z variant. Data i ochranné klíče mají persistentní volumes.
+
+## Ověření a struktura
+
+```powershell
+./eng/start.ps1 -DatabaseOnly
 dotnet test WhatHaveIDone.slnx -warnaserror
-dotnet run --project src/WhatHaveIDone.API
+dotnet publish src/WhatHaveIDone.API -c Release -o artifacts/publish -warnaserror
 ```
 
-Integration tests accept WHID_TEST_CONNECTION and create/drop an isolated whid_tests_<guid> database. Use a development PostgreSQL account that may create databases. This layer intentionally serves the APIs without a frontend. Real Toggl/Entra/IS integration still needs configured external validation.
+Integrační testy vytvářejí a odstraňují vlastní databázi `whid_tests_<guid>`. Čtou lokální `.env`, případně `WHID_TEST_CONNECTION`; připojení potřebuje oprávnění vytvořit databázi. Nepoužívejte produkční účet. Build zahrnuje npm/CSS a nepoužívá interní NuGet feed ani zdrojové checkouty RSM/Edifio.
+
+`src/` obsahuje Web, API, API.Toggl, Contracts, Models, Logic a dva konkrétní persistence/Identity adaptéry. API hostuje nativní rozhraní pro frontend; samostatná knihovna API.Toggl vlastní kompatibilní v9 endpointy, DTO a formát chyb. Nativní API a Toggl adaptér používají stejnou Logic a běží v jednom serveru. Čtrnáct potřebných projektů v `SharedInfrastructure/` jsou lokální kopie. Zápisy jdou přes use cases, čtení přes specifikace; WASM zná jen vlastní HTTP kontrakty.
+
+
+- [Plánovací návrh stránky Čas a jeho omezení](prototype/doc/components.md)
+- [Pravidla repozitáře](AGENTS.md)
+- [Architektonický skill](.agents/Skills/dotnet-application-architecture/SKILL.md)
+- [Práce s lokální Shared.Infrastructure](.agents/Skills/shared-infra/SKILL.md)
+
+Plánovací a ověřovací poznámky ve složce `docs/` zůstávají lokální a nejsou součástí repozitáře.
+
+Lokálně kopírované infrastrukturní projekty mají vlastní [manifest původu](SharedInfrastructure/PROVENANCE.md). UI komponenty a serverový auth tok vycházejí z RSM commitu `7eb0637e06fdafc53469c66b3650db0e16af2b06` a jsou přizpůsobené WASM a osobním účtům. DM Sans v `src/WhatHaveIDone.Web/wwwroot/fonts/` pochází z google/fonts commitu `e7db6ca603fd4862010383ff17ffd6cc4ffac1c0`; původní SIL OFL 1.1 je přiložená u fontu. Timely a Timemator jsou vizuální inspirací, jejich kód ani značkové podklady se nekopírují.
+
+První navazující funkcí je **draft výkazu**, oddělený od potvrzených záznamů a reportů. MVP kvůli němu neobsahuje prázdné projekty, sběrače ani menu.
+
+Přenos se skutečným Toggl účtem, přihlášení přes skutečného Entra poskytovatele a synchronizace s upraveným Riganti IS vyžadují ověření v nakonfigurovaném prostředí. Lokálně jsou pokryté protokolové odpovědi, kvóty, obnovování importu a provisioning účtů. Před veřejným open-source vydáním zbývá vyřešit distribuční práva převzatého interního kódu a licenci výsledné aplikace; zdrojový checkout licenci neposkytoval.

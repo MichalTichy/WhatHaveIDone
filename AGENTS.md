@@ -5,7 +5,7 @@
 - Local planning and verification notes under `docs/` are intentionally excluded from Git. When available, read `docs/implementation-plan.md` before starting a feature, preserve accepted decisions and update it when implementation changes them. Check off work only after its acceptance criteria are met. In a clean clone, use this file, README.md, the architecture skills and executable tests as the source of truth.
 - Apply [dotnet-application-architecture](.agents/Skills/dotnet-application-architecture/SKILL.md) for .NET design, implementation and architecture reviews. Apply [shared-infra](.agents/Skills/shared-infra/SKILL.md) when selecting, copying or modifying infrastructure.
 - These are project-specific adaptations of RSM guidance. Explicit user decisions and this repository's conventions take precedence over inherited source conventions.
-- This stack builds the application MVP; consult each layer's PR description for its implemented boundary. When available, read the local verification notes and plan for tested capabilities and pending external integration/release checks. Do not describe actual Toggl/Entra/IS integration, physical-device PWA installation or public licensing as verified when they remain pending.
+- The application MVP is implemented. When available, read the local verification notes and plan for tested capabilities and pending external integration/release checks. Do not describe actual Toggl/Entra/IS integration, physical-device PWA installation or public licensing as verified when they remain pending.
 
 ## Keep it simple (KISS)
 

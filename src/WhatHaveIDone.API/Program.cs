@@ -65,6 +65,8 @@ if (knownProxies.Length > 0) app.UseForwardedHeaders();
 app.UseMiddleware<ApiExceptionMiddleware>();
 app.UseMiddleware<TogglApiExceptionMiddleware>();
 app.UseRequestLocalization();
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -86,6 +88,7 @@ app.MapTogglEndpoints();
 app.MapImportEndpoints();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 app.Map("/api/{**path}", () => Results.NotFound()).AllowAnonymous();
+app.MapFallbackToFile("index.html");
 await using (var scope = app.Services.CreateAsyncScope())
 {
     await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database.MigrateAsync();

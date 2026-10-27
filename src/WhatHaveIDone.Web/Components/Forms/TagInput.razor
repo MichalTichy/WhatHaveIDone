@@ -1,0 +1,33 @@
+@inherits AppComponentBase
+<div class="tag-field">
+    <label for="@inputId">@Strings.Tags</label>
+    <div class="tag-input">
+        @foreach (var tag in Value)
+        {
+            <span class="tag-pill" @key="tag"><span>@tag</span><button type="button" aria-label="@string.Format(Strings.RemoveTag, tag)" @onclick="() => RemoveAsync(tag)">×</button></span>
+        }
+        <input id="@inputId" @ref="input" value="@text" @oninput="InputChanged" @onchange="CommitAsync" @onkeydown="KeyDownAsync"
+               list="@(inputId + "-options")" placeholder="@Strings.AddTag" autocomplete="off" maxlength="100" />
+        <button type="button" class="secondary" aria-label="@Strings.AddTag" disabled="@string.IsNullOrWhiteSpace(text)" @onclick="CommitAsync">＋</button>
+    </div>
+    <datalist id="@(inputId + "-options")">
+        @foreach (var tag in User.Tags.Where(t => !Value.Contains(t.Name, StringComparer.OrdinalIgnoreCase) && t.Name.Contains(text.Trim(), StringComparison.OrdinalIgnoreCase)))
+        { <option value="@tag.Name"></option> }
+    </datalist>
+    @if (!string.IsNullOrEmpty(ProjectId))
+    {
+        @if (loadingSuggestions) { <small class="muted" role="status">@Strings.Loading</small> }
+        else if (suggestionError is not null)
+        { <div class="suggestion-error"><small role="alert">@suggestionError</small><button type="button" class="text-action" @onclick="LoadSuggestionsAsync">@Strings.Retry</button></div> }
+        else if (recentTags.Count == 0) { <small class="muted">@Strings.NoRecentProjectTags</small> }
+        else if (SuggestedTags.Any())
+        {
+            <div class="suggestion-badges tag-suggestions" role="group" aria-label="@Strings.RecentProjectTags">
+                @foreach (var tag in SuggestedTags)
+                {
+                    <button type="button" class="suggestion-badge" aria-label="@string.Format(Strings.AddSuggestedTag, tag)" @onclick="() => AddAsync([tag])">＋ @tag</button>
+                }
+            </div>
+        }
+    }
+</div>
