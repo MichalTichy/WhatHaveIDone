@@ -14,6 +14,7 @@ using WhatHaveIDone.API.Authentication;
 using WhatHaveIDone.API.Endpoints;
 using WhatHaveIDone.API.Toggl;
 using WhatHaveIDone.API.Import;
+using WhatHaveIDone.API.Mcp;
 using Shared.Infrastructure.LeaderElection;
 using WhatHaveIDone.Infrastructure.Identity;
 using WhatHaveIDone.Infrastructure.Persistence;
@@ -45,6 +46,7 @@ builder.Services.AddAuthentication(o => { o.DefaultScheme = "Combined"; o.Defaul
     .AddPolicyScheme("Combined", null, o => o.ForwardDefaultSelector = http => http.Request.Headers.Authorization.Count > 0 ? ApiTokenHandler.SchemeName : IdentityConstants.ApplicationScheme)
     .AddScheme<AuthenticationSchemeOptions, ApiTokenHandler>(ApiTokenHandler.SchemeName, _ => { });
 builder.Services.AddAuthorization();
+builder.Services.AddTrackingMcp();
 builder.Services.AddAntiforgery(o => { o.HeaderName = "X-CSRF-TOKEN"; o.Cookie.Name = "whid.csrf"; o.Cookie.HttpOnly = true; });
 var keyPath = builder.Configuration["DataProtection:Path"] ?? Path.Combine(builder.Environment.ContentRootPath, "data", "keys");
 Directory.CreateDirectory(keyPath);
@@ -68,6 +70,17 @@ app.UseRequestLocalization();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 app.UseRouting();
+app.Use(async (http, next) =>
+{
+    if (http.Request.Path.StartsWithSegments("/mcp"))
+    {
+        http.Response.Headers.CacheControl = "no-store";
+        var origin = http.Request.Headers.Origin;
+        if (origin.Count > 0 && (origin.Count != 1 || !string.Equals(origin[0], $"{http.Request.Scheme}://{http.Request.Host}", StringComparison.OrdinalIgnoreCase)))
+        { http.Response.StatusCode = StatusCodes.Status403Forbidden; return; }
+    }
+    await next(http);
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
@@ -86,6 +99,7 @@ app.MapTrackingEndpoints();
 app.MapReportEndpoints();
 app.MapTogglEndpoints();
 app.MapImportEndpoints();
+app.MapTrackingMcp();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 app.Map("/api/{**path}", () => Results.NotFound()).AllowAnonymous();
 app.MapFallbackToFile("index.html");

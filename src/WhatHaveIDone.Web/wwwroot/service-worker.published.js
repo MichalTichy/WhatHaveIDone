@@ -6,6 +6,6 @@ self.addEventListener('install',event=>event.waitUntil(caches.open(cacheName).th
 self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith('whid-')&&key!==cacheName)await caches.delete(key);await self.clients.claim();})()));
 self.addEventListener('fetch',event=>{
  const request=event.request,url=new URL(request.url);
- if(request.method!=='GET'||url.origin!==self.location.origin||url.pathname.startsWith('/api/')||url.pathname.startsWith('/auth/')||url.pathname.startsWith('/signin-'))return;
+ if(request.method!=='GET'||url.origin!==self.location.origin||url.pathname.startsWith('/api/')||url.pathname==='/mcp'||url.pathname.startsWith('/mcp/')||url.pathname.startsWith('/auth/')||url.pathname.startsWith('/signin-'))return;
  event.respondWith((async()=>{const cache=await caches.open(cacheName);const key=request.mode==='navigate'?'index.html':request;return await cache.match(key)||fetch(request);})());
 });

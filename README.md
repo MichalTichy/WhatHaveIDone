@@ -2,7 +2,7 @@
 
 Minimalistická osobní evidence času: .NET 10, Blazor WebAssembly/PWA, Lumex UI, PostgreSQL a Marten. Jeden API host obsluhuje také web. Každý uživatel má vlastní data, bez organizací a workspaces.
 
-Implementováno je přihlášení/registrace, serverové Entra SSO pro jeden tenant, časovač, seznam s automatickým ukládáním, editovatelný kalendář, projekty, dynamické tagy, přehledy/CSV, API klíče a import na pozadí přes Toggl API nebo podporované CSV. Vybraný profil Toggl v9 slouží pro navazující úpravu Riganti IS; nejde o úplnou kopii Togglu. Emailing, reset hesla a offline editace nejsou součástí první verze.
+Implementováno je přihlášení/registrace, serverové Entra SSO pro jeden tenant, časovač, seznam s automatickým ukládáním, editovatelný kalendář, projekty, dynamické tagy, přehledy/CSV, API klíče, MCP připojení AI asistenta a import na pozadí přes Toggl API nebo podporované CSV. Vybraný profil Toggl v9 slouží pro navazující úpravu Riganti IS; nejde o úplnou kopii Togglu. Emailing, reset hesla a offline editace nejsou součástí první verze.
 
 ## Lokální start
 
@@ -39,7 +39,7 @@ dotnet publish src/WhatHaveIDone.API -c Release -o artifacts/publish -warnaserro
 
 Integrační testy vytvářejí a odstraňují vlastní databázi `whid_tests_<guid>`. Čtou lokální `.env`, případně `WHID_TEST_CONNECTION`; připojení potřebuje oprávnění vytvořit databázi. Nepoužívejte produkční účet. Build zahrnuje npm/CSS a nepoužívá interní NuGet feed ani zdrojové checkouty RSM/Edifio.
 
-`src/` obsahuje Web, API, API.Toggl, API.Models, Models, Logic a dva konkrétní persistence/Identity adaptéry. API hostuje nativní rozhraní pro frontend; samostatná knihovna API.Toggl vlastní kompatibilní v9 endpointy, DTO a formát chyb. Nativní API a Toggl adaptér používají stejnou Logic a běží v jednom serveru. Čtrnáct potřebných projektů v `SharedInfrastructure/` jsou lokální kopie. Zápisy jdou přes use cases, čtení přes specifikace; WASM zná jen vlastní HTTP kontrakty.
+`src/` obsahuje Web, API, API.Toggl, API.Models, Models, Logic a dva konkrétní persistence/Identity adaptéry. API hostuje nativní rozhraní pro frontend; samostatná knihovna API.Toggl vlastní kompatibilní v9 endpointy, DTO a formát chyb. Nativní API, Toggl adaptér i MCP v API/Mcp používají stejnou Logic a běží v jednom serveru. Čtrnáct potřebných projektů v `SharedInfrastructure/` jsou lokální kopie. Zápisy jdou přes use cases, čtení přes specifikace; WASM zná jen vlastní HTTP kontrakty.
 
 Soubory uvnitř projektů jsou seskupené podle funkcí, například `TimeEntries`, `Projects`, `Import` a `Settings`. API DTO jsou v odpovídajících složkách `API.Models`, doménové dokumenty v `Models` a use cases se specifikacemi v `Logic`. Společné modelové namespaces zůstávají stabilní, včetně identit uložených dokumentů.
 
@@ -51,7 +51,7 @@ Ve Webu jsou stránky i jejich související komponenty ve `Features/Authenticat
 - [Architektonický skill](.agents/Skills/dotnet-application-architecture/SKILL.md)
 - [Práce s lokální Shared.Infrastructure](.agents/Skills/shared-infra/SKILL.md)
 
-Plánovací a ověřovací poznámky ve složce `docs/` zůstávají lokální a nejsou součástí repozitáře.
+Plánovací a ověřovací poznámky ve složce `docs/` zůstávají lokální a nejsou součástí repozitáře. Nastavení MCP je dostupné přímo v **Nastavení → API klíče → Připojit AI / MCP**. Nabízí prompt pro AI a konfigurace VS Code, Cursor a Claude Code pro adresu `/mcp`. Klíč nastavte soukromě jako `WHID_API_KEY` v prostředí AI klienta; prompt ani konfigurace skutečný klíč neobsahují. MCP používá Bearer klíč a stejná aplikační pravidla jako GUI.
 
 Lokálně kopírované infrastrukturní projekty mají vlastní [manifest původu](SharedInfrastructure/PROVENANCE.md). UI komponenty a serverový auth tok vycházejí z RSM commitu `7eb0637e06fdafc53469c66b3650db0e16af2b06` a jsou přizpůsobené WASM a osobním účtům. DM Sans v `src/WhatHaveIDone.Web/wwwroot/fonts/` pochází z google/fonts commitu `e7db6ca603fd4862010383ff17ffd6cc4ffac1c0`; původní SIL OFL 1.1 je přiložená u fontu. Timely a Timemator jsou vizuální inspirací, jejich kód ani značkové podklady se nekopírují.
 

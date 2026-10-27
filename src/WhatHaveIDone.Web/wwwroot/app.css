@@ -274,3 +274,16 @@ p { margin: 0 0 16px; }
 @media (prefers-reduced-motion: reduce) {
     * { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
 }
+.mcp-settings-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.mcp-settings-heading h2 { margin: 0; }
+.mcp-dialog { width: min(800px,calc(100% - 32px)); }
+.mcp-dialog[open] { display: flex; flex-direction: column; }
+.mcp-dialog .drawer-body { min-height: 0; }
+.mcp-dialog p { margin-bottom: 0; }
+.mcp-tabs { width: fit-content; max-width: 100%; flex-wrap: wrap; }
+.mcp-tabs button { padding-inline: 13px; }
+.mcp-config { margin: 14px 0 0; padding: 18px; background: #f8f6fb; border: 1px solid var(--line); border-radius: 10px; font-family: Consolas, monospace; font-size: 12px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 2; }
+.mcp-dialog .drawer-footer { flex-shrink: 0; }
+@media (max-width: 500px) { .mcp-config { padding: 12px; font-size: 11px; } .mcp-tabs { width: 100%; } .mcp-tabs button { flex: 1 1 40%; } }
+
+@media (max-width: 500px) { .mcp-dialog .drawer-footer { flex-wrap: nowrap; } .mcp-dialog .drawer-footer .spacer { display: none; } .mcp-dialog .drawer-footer button { padding-inline: 10px; } .mcp-dialog .drawer-footer button:last-child { margin-left: auto; font-size: 12px; } }
