@@ -17,6 +17,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/WhatHaveIDone.API/WhatHaveIDone.API.csproj" />
+    <Project Path="src/WhatHaveIDone.API.Toggl/WhatHaveIDone.API.Toggl.csproj" />
     <Project Path="src/WhatHaveIDone.API.Models/WhatHaveIDone.API.Models.csproj" />
     <Project Path="src/WhatHaveIDone.Infrastructure.Identity/WhatHaveIDone.Infrastructure.Identity.csproj" />
     <Project Path="src/WhatHaveIDone.Infrastructure.Persistence/WhatHaveIDone.Infrastructure.Persistence.csproj" />
