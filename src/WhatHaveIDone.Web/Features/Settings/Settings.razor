@@ -1,0 +1,26 @@
+@page "/settings"
+@inherits AppComponentBase
+<PageTitle>@Strings.Settings · @Strings.AppName</PageTitle>
+<div class="page-header"><h1>@Strings.Settings</h1></div>
+@if(Error is not null){<div class="alert error" role="alert">@Error<button class="quiet" @onclick="LoadAsync">@Strings.Reload</button></div>}
+@if(!loaded && Busy){<Loading />}
+else if(loaded)
+{
+    <div class="settings-sections">
+        <form class="surface stack" @onsubmit="SaveSettingsAsync" @onsubmit:preventDefault><h2>@Strings.Profile</h2><p>@User.Session.Email</p><div class="form-grid"><label>@Strings.Language<select @bind="settings.Language"><option value="cs">Čeština</option><option value="en">English</option></select></label><label>@Strings.WeekStart<select @bind="settings.FirstDayOfWeek"><option value="1">@Strings.Monday</option><option value="0">@Strings.Sunday</option></select></label><label>@Strings.TimeZone<input @bind="settings.TimeZone" list="time-zones" required /></label></div><datalist id="time-zones">@foreach(var zone in TimeZoneInfo.GetSystemTimeZones()){<option value="@zone.Id"></option>}</datalist><div><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.Save</AppActionButton></div></form>
+        @if(User.Session.HasPassword)
+        {
+            <form class="surface stack" @onsubmit="ChangePasswordAsync" @onsubmit:preventDefault><h2>@Strings.ChangePassword</h2><div class="form-grid"><label>@Strings.CurrentPassword<input type="password" autocomplete="current-password" @bind="currentPassword" required /></label><label>@Strings.NewPassword<input type="password" autocomplete="new-password" @bind="newPassword" minlength="10" maxlength="128" required /></label></div><div><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.ChangePassword</AppActionButton></div></form>
+        }
+        else { <section class="surface"><h2>@Strings.SsoAccount</h2></section> }
+        <section class="surface stack"><h2>@Strings.ApiKeys</h2>
+            @if(importActive){<p class="alert">@Strings.ImportWarning <a href="/import">@Strings.Import</a></p>}
+            <label>@Strings.ApiUrl<input readonly value="@ApiUrl" /></label><p class="muted">@Strings.IsInstructions</p>
+            <form class="actions" @onsubmit="CreateTokenAsync" @onsubmit:preventDefault><label class="grow">@Strings.Name<input @bind="tokenName" required maxlength="100" /></label><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.CreateKey</AppActionButton></form>
+            @if(newToken is not null){<div class="alert success"><p>@Strings.KeyOnce</p><p class="secret">@newToken</p><button class="secondary" @onclick="CopyAsync">@Strings.Copy</button></div>}
+            @foreach(var token in tokens){<div class="token-row"><div class="grow"><strong>@token.Name</strong><small class="muted"> · …@token.Suffix · @UserTime.Local(token.CreatedAt,User.Settings.TimeZone).ToString("d")</small></div>@if(token.RevokedAt is null){<button class="secondary" disabled="@Busy" @onclick="() => RevokeAsync(token)">@Strings.Revoke</button>}else{<span class="muted">@Strings.Revoked · @UserTime.Local(token.RevokedAt.Value,User.Settings.TimeZone).ToString("d")</span>}</div>}
+        </section>
+        <section class="surface stack"><h2>@Strings.Import</h2><p class="muted">@Strings.ImportSettingsDescription</p><div><a class="button secondary" href="/import">@Strings.OpenImport</a></div></section>
+        <section class="surface"><h2>@Strings.DataExport</h2><a class="button secondary" href="/reports">@Strings.ExportCsv</a></section>
+    </div>
+}
