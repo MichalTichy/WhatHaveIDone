@@ -41,5 +41,5 @@ public sealed class ApiTokenHandler(IOptionsMonitor<AuthenticationSchemeOptions>
         return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName));
     }
     protected override Task HandleChallengeAsync(AuthenticationProperties properties)
-    { Response.StatusCode = 401; Response.Headers.WWWAuthenticate = "Basic realm=\"WhatHaveIDone\""; return Task.CompletedTask; }
+    { Response.StatusCode = 401; Response.Headers.WWWAuthenticate = Request.Path.StartsWithSegments("/mcp") ? "Bearer realm=\"WhatHaveIDone\"" : "Basic realm=\"WhatHaveIDone\""; return Task.CompletedTask; }
 }

@@ -1,0 +1,23 @@
+@inherits AppComponentBase
+<dialog class="help-dialog mcp-dialog" @ref="dialog" aria-labelledby="mcp-setup-title">
+    <header class="drawer-header"><h2 id="mcp-setup-title">@Strings.SetupMcp</h2><button type="button" class="secondary" aria-label="@Strings.Close" @onclick="RequestCloseAsync">×</button></header>
+    <div class="drawer-body">
+        <p class="muted">@Strings.McpSetupDescription</p>
+        <label>@Strings.McpServerUrl<input readonly value="@Endpoint" /></label>
+        <p class="muted">@Strings.McpKeyHelp</p>
+        <div class="tabs mcp-tabs" role="tablist" aria-label="@Strings.McpSetupMethod">
+            @for (var i = 0; i < Methods.Length; i++)
+            {
+                var index = i;
+                <button type="button" role="tab" id="mcp-tab-@index" aria-selected="@(method == index ? "true" : "false")" aria-controls="mcp-setup-panel" tabindex="@(method == index ? 0 : -1)" class="@(method == index ? "active" : "")" @ref="tabElements[index]" @onclick="() => SelectMethod(index)" @onkeydown="args => TabKeyDownAsync(args, index)">@Methods[index]</button>
+            }
+        </div>
+        <section id="mcp-setup-panel" role="tabpanel" aria-labelledby="mcp-tab-@method" tabindex="0">
+            <p class="muted">@MethodHelp</p>
+            <pre class="mcp-config" tabindex="0" aria-label="@Strings.McpConfiguration"><code>@Configuration</code></pre>
+            @if (DocumentationUrl is { } url) { <a href="@url" target="_blank" rel="noopener noreferrer" class="text-action">@Strings.McpClientDocs ↗</a> }
+        </section>
+        @if (Error is not null) { <p role="alert" class="alert error">@Error</p> }
+    </div>
+    <footer class="drawer-footer"><button type="button" class="secondary" @onclick="RequestCloseAsync">@Strings.Close</button><span class="spacer"></span><AppActionButton Disabled="Busy" OnClick="CopyConfigurationAsync"><span aria-live="polite">@(copied ? Strings.Copied : method == 0 ? Strings.McpCopyPrompt : Strings.McpCopyConfiguration)</span></AppActionButton></footer>
+</dialog>
