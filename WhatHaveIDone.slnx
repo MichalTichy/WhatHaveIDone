@@ -16,6 +16,7 @@
     <Project Path="SharedInfrastructure/Shared.Infrastructure.UnitOfWork/Shared.Infrastructure.UnitOfWork.csproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/WhatHaveIDone.API/WhatHaveIDone.API.csproj" />
     <Project Path="src/WhatHaveIDone.API.Models/WhatHaveIDone.API.Models.csproj" />
     <Project Path="src/WhatHaveIDone.Infrastructure.Identity/WhatHaveIDone.Infrastructure.Identity.csproj" />
     <Project Path="src/WhatHaveIDone.Infrastructure.Persistence/WhatHaveIDone.Infrastructure.Persistence.csproj" />
@@ -23,6 +24,7 @@
     <Project Path="src/WhatHaveIDone.Models/WhatHaveIDone.Models.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/WhatHaveIDone.Api.Tests/WhatHaveIDone.Api.Tests.csproj" />
     <Project Path="tests/WhatHaveIDone.Tests/WhatHaveIDone.Tests.csproj" />
   </Folder>
 </Solution>
