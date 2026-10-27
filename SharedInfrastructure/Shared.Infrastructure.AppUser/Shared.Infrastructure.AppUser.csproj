@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Core user abstractions: IAppUser, IUserRole and IUserRoleManager with a UserRoleManagerBase.</Description>
+  </PropertyGroup>
+
+
+</Project>

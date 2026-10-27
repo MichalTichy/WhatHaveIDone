@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>UiException - exception whose message is safe to show to the user.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+  </ItemGroup>
+</Project>

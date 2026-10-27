@@ -1,0 +1,18 @@
+# Local verification output and user data must not enter the repository.
+artifacts/
+docs/
+data/
+backup/
+wwwroot/output.css
+wwwroot/calendar.js
+src/WhatHaveIDone.Web/wwwroot/output.css
+src/WhatHaveIDone.Web/wwwroot/calendar.js
+bin/
+obj/
+node_modules/
+.vs/
+*.user
+*.suo
+.env
+.env.*
+!.env.example

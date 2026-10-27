@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Persistence abstractions: IRepository / IReadOnlyRepository, specifications (ISpecification, IListSpecification) and IItemWithId.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Persistence\**" />
+    <EmbeddedResource Remove="Persistence\**" />
+    <None Remove="Persistence\**" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>
