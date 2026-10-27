@@ -14,3 +14,4 @@ jobs:
           global-json-file: global.json
       - run: dotnet restore WhatHaveIDone.slnx
       - run: dotnet build WhatHaveIDone.slnx --no-restore -warnaserror
+      - run: dotnet test WhatHaveIDone.slnx --no-build

@@ -16,7 +16,10 @@
     <Project Path="SharedInfrastructure/Shared.Infrastructure.UnitOfWork/Shared.Infrastructure.UnitOfWork.csproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/WhatHaveIDone.API.Models/WhatHaveIDone.API.Models.csproj" />
+    <Project Path="src/WhatHaveIDone.Models/WhatHaveIDone.Models.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/WhatHaveIDone.Tests/WhatHaveIDone.Tests.csproj" />
   </Folder>
 </Solution>

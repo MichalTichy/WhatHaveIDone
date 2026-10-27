@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Persistence/Shared.Infrastructure.Persistence.csproj" />
+</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Marten" Version="9.37.0" />
+</ItemGroup>
+</Project>
