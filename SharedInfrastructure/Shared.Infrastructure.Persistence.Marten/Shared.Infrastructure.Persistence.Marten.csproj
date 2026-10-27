@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+    <Description>Marten (PostgreSQL) repositories, storage configurations, multi-tenancy, migrations, event sourcing and UnitOfWorkProvider with transaction completion callbacks.</Description>
+    </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Shared.Infrastructure.Persistence.Marten.Tests" />
+    <InternalsVisibleTo Include="Shared.Infrastructure.Persistence.Marten.DDD.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
+        <PackageReference Include="Npgsql.DependencyInjection" Version="10.0.2" />
+        <PackageReference Include="Npgsql.Json.NET" Version="10.0.2" />
+		<PackageReference Include="Npgsql" Version="10.0.2" />
+		<PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
+    <PackageReference Include="Marten" Version="9.37.0" />
+    <PackageReference Include="Marten.Analyzers" Version="1.5.0" />
+    <PackageReference Include="Marten.Newtonsoft" Version="9.37.0" />
+    <PackageReference Include="Weasel.Core" Version="9.32.0" />
+    <PackageReference Include="Weasel.Postgresql" Version="9.32.0" />
+    <PackageReference Include="Polly" Version="8.6.5" />
+  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Shared.Infrastructure.CurrentTenancyProvider\Shared.Infrastructure.CurrentTenancyProvider.csproj" />
+		<ProjectReference Include="..\Shared.Infrastructure.Initializer\Shared.Infrastructure.Initializer.csproj" />
+		<ProjectReference Include="..\Shared.Infrastructure.Persistence\Shared.Infrastructure.Persistence.csproj" />
+		<ProjectReference Include="..\Shared.Infrastructure.UnitOfWork\Shared.Infrastructure.UnitOfWork.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Texts\ExceptionTexts.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>ExceptionTexts.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Texts\ExceptionTexts.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>ExceptionTexts.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	</ItemGroup>
+</Project>
