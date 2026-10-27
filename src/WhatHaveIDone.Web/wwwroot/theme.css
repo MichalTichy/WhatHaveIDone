@@ -1,0 +1,127 @@
+:root,
+.light {
+    --lumex-background: #f7f6f3;
+    --lumex-foreground: #332e3c;
+    --lumex-foreground-500: #736d7c;
+    --lumex-focus: #7056ad;
+    --lumex-divider: #e6e2e9;
+    --pm-color-action-active: var(--lumex-primary);
+    --pm-color-action-rgb: 112, 86, 173;
+    --lumex-opacity-divider: 100%;
+    --lumex-surface1: #fff;
+    --lumex-surface1-foreground: #332e3c;
+    --lumex-surface2: #f8f6fb;
+    --lumex-surface2-foreground: #332e3c;
+    --lumex-default-100: #f8f6fb;
+    --lumex-default-200: #e6e2e9;
+    --lumex-default-700: #332e3c;
+    --lumex-default: #e6e2e9;
+    --lumex-default-foreground: #332e3c;
+
+    --lumex-primary-50: #f1edf8;
+    --lumex-primary-100: #e4dbf2;
+    --lumex-primary-200: #c7b7df;
+    --lumex-primary-500: #7056ad;
+    --lumex-primary-600: #624799;
+    --lumex-primary-700: #624799;
+    --lumex-primary: #7056ad;
+    --lumex-primary-foreground: #fff;
+
+    --lumex-danger-50: #fff0f1;
+    --lumex-danger-100: #ffe0e2;
+    --lumex-danger-200: #f3b3b6;
+    --lumex-danger-500: #c8050b;
+    --lumex-danger-600: #c8050b;
+    --lumex-danger-700: #a00409;
+    --lumex-danger-800: #800307;
+    --lumex-danger: #c8050b;
+    --lumex-danger-foreground: #fff;
+
+    --lumex-warning-50: #fff7dd;
+    --lumex-warning-100: #fff0bf;
+    --lumex-warning-200: #e7ce8e;
+    --lumex-warning-500: #9c6500;
+    --lumex-warning-600: #9c6500;
+    --lumex-warning-700: #805300;
+    --lumex-warning-800: #704800;
+    --lumex-warning: #9c6500;
+    --lumex-warning-foreground: #fff;
+
+    --lumex-info-50: #f1edf8;
+    --lumex-info-100: #e4dbf2;
+    --lumex-info-200: #c7b7df;
+    --lumex-info-500: #624799;
+    --lumex-info-600: #624799;
+    --lumex-info-700: #543b83;
+    --lumex-info-800: #48316f;
+    --lumex-info: #624799;
+    --lumex-info-foreground: #fff;
+
+    --lumex-success-50: #e8f6ee;
+    --lumex-success-100: #d2edde;
+    --lumex-success-200: #a7d7b8;
+    --lumex-success-500: #167443;
+    --lumex-success-600: #167443;
+    --lumex-success-700: #0c5b31;
+    --lumex-success-800: #094827;
+    --lumex-success: #167443;
+    --lumex-success-foreground: #fff;
+
+    --lumex-text-tiny: 0.75rem;
+    --lumex-text-small: 0.875rem;
+    --lumex-radius-small: 0.375rem;
+    --lumex-radius-medium: 0.5rem;
+    --lumex-radius-large: 0.625rem;
+    --lumex-shadow-small: 0 1px 2px rgb(39 39 39 / 6%);
+    --lumex-shadow-medium: 0 2px 8px rgb(39 39 39 / 10%);
+
+
+}
+
+[data-sonner-toaster][data-sonner-theme='light'] {
+    --success-bg: var(--lumex-success-50);
+    --success-border: var(--lumex-success-200);
+    --success-text: var(--lumex-success-700);
+    --warning-bg: var(--lumex-warning-50);
+    --warning-border: var(--lumex-warning-200);
+    --warning-text: var(--lumex-warning-800);
+    --info-bg: var(--lumex-info-50);
+    --info-border: var(--lumex-info-200);
+    --info-text: var(--lumex-info-600);
+    --error-bg: var(--lumex-danger-50);
+    --error-border: var(--lumex-danger-200);
+    --error-text: var(--lumex-danger-600);
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'] {
+    padding-inline-end: 3rem;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-close-button] {
+    top: 50%;
+    right: 0.75rem;
+    left: auto;
+    width: 1.5rem;
+    height: 1.5rem;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    box-shadow: none;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-close-button]:hover {
+    background: transparent;
+    opacity: 0.75;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-close-button]:focus-visible {
+    outline: 2px solid var(--lumex-focus);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+html:has(dialog.detail-panel[open]) {
+    scrollbar-gutter: auto;
+}
