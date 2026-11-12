@@ -2,16 +2,17 @@
 
 A minimal personal time tracker built with .NET 10, Blazor WebAssembly and PostgreSQL. Every user owns their data; there are no product workspaces.
 
-This branch is layer 1 of 13: **Add build conventions and vendored shared infrastructure**. Review its diff against the preceding layer. Feature folders and the `WhatHaveIDone.API.Models` project use their accepted final names from their introduction.
+This branch is layer 2 of 13: **Add domain documents and native API models**. Review its diff against the preceding layer. Feature folders and the `WhatHaveIDone.API.Models` project use their accepted final names from their introduction.
 
 ```powershell
 dotnet build WhatHaveIDone.slnx -warnaserror
+dotnet test WhatHaveIDone.slnx --no-build
 ```
 
 ## Stack contents
 
 1. Add build conventions and vendored shared infrastructure (included)
-2. Add domain documents and native API models (later layer)
+2. Add domain documents and native API models (included)
 3. Add tracking use cases and read specifications (later layer)
 4. Add PostgreSQL persistence and ASP.NET Identity adapters (later layer)
 5. Add the authenticated native HTTP API (later layer)
@@ -27,3 +28,5 @@ dotnet build WhatHaveIDone.slnx -warnaserror
 The locally copied infrastructure is documented in [SharedInfrastructure/PROVENANCE.md](SharedInfrastructure/PROVENANCE.md). Build inputs and feeds are self-contained; no RSM checkout is needed. [AGENTS.md](AGENTS.md) and the architecture skills define repository conventions. The native DTO and persisted model namespaces remain stable within feature folders.
 
 `docs/` contains local planning and verification notes and is excluded from every commit in this stack. Real Toggl/Entra/IS integration, physical-device PWA installation and distribution rights/final licensing remain external release checks. Separate timesheet drafts remain the next domain feature; confirmed entries and reports contain no draft flag.
+
+The model uses user-scoped Marten tenancy: ordinary documents have Id and Version, with no OwnerId. ImportRun is embedded in UserProfile.Import with up to 19 compact prior results in ImportHistory. Settings and import progress have independent versions. The persistence and import workflow layers implement these boundaries.
