@@ -21,11 +21,12 @@ When infrastructure is involved, apply [shared-infra](../shared-infra/SKILL.md).
 
 - Name the request `<Intention>Usecase` and keep its handler in the matching file, as in RSM. A response used only by this operation may share that file. Specifications, shared result models and other top-level types normally have separate files.
 - Adapt the RSM `UsecaseHandlerBase` to explicitly validate access before execution; anonymous/system actions explicitly declare their allowed context. Keep permission checks read-only.
-- Resolve the acting user from trusted server context, not request data. Load and mutate only documents owned by that user; validate ownership of referenced projects and tags too.
+- Resolve the acting user from trusted server context, not request data. Marten conjoined tenancy uses that user's ID; load and mutate referenced documents through the same tenant session. Ordinary documents need no OwnerId or repeated owner predicate. API keys remain global for authentication and retain an explicit UserId check. Cross-tenant worker discovery and migrations are deliberate server-only exceptions.
 - Validate formal input and business rules on the server. Client validation helps presentation but cannot establish access or correctness.
 - Inject read-only repositories for reads and writable repositories inside write handlers. Keep Marten/configuration details out of endpoint and page code.
 - Make the transaction boundary clear. Related Marten changes, including timer switching, complete atomically. Identity EF operations have their own boundaries; do not silently assume a shared transaction with Marten.
 - Preserve concurrency only where required: one running timer per user, stale edit detection, tag deduplication and repeatable imports. A read-then-write check alone does not guarantee these under concurrency.
+- Embed the active/current import in UserProfile and keep compact history, rather than storing each run separately. Reload the profile on each batch, validate the embedded run version and commit it with related writes. Settings and import versions are independent so progress cannot invalidate an unrelated settings edit.
 - Add a notification only for a real current consumer. Publish completed facts after confirmed commit; do not introduce event sourcing, a bus or an outbox for unused extension points.
 
 ## Specifications and read models
