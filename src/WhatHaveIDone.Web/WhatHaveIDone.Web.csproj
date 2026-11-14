@@ -9,7 +9,7 @@
   <ItemGroup><EmbeddedResource Update="Resources/Strings.resx"><Generator /><StronglyTypedLanguage>C#</StronglyTypedLanguage><StronglyTypedNamespace>WhatHaveIDone.Web.Resources</StronglyTypedNamespace><StronglyTypedClassName>Strings</StronglyTypedClassName><StronglyTypedFileName>$(IntermediateOutputPath)Strings.Designer.cs</StronglyTypedFileName><PublicClass>true</PublicClass></EmbeddedResource></ItemGroup>
   <PropertyGroup><ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest><BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData></PropertyGroup>
   <ItemGroup><ServiceWorker Include="wwwroot/service-worker.js" PublishedContent="wwwroot/service-worker.published.js" /></ItemGroup>
-  <ItemGroup><Content Remove="wwwroot/output.css" /><Content Include="wwwroot/output.css" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>
+  <ItemGroup><Content Remove="wwwroot/output.css;wwwroot/calendar.js" /><Content Include="wwwroot/output.css;wwwroot/calendar.js" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>
   <Target Name="RestoreWebDependencies" Inputs="package.json;package-lock.json" Outputs="node_modules/.package-lock.json">
     <Exec Command="npm ci --no-audit --no-fund" />
   </Target>
