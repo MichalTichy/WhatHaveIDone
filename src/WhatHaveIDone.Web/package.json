@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "build": "tailwindcss -i Styles/input.css -o wwwroot/output.css --minify",
+    "build": "tailwindcss -i Styles/input.css -o wwwroot/output.css --minify && esbuild Features/Time/calendar.js --bundle --minify --format=esm --outfile=wwwroot/calendar.js",
     "watch:css": "tailwindcss -i Styles/input.css -o wwwroot/output.css --watch"
   },
   "dependencies": {
