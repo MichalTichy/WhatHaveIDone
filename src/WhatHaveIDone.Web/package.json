@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i Styles/input.css -o wwwroot/output.css --minify",
+    "watch:css": "tailwindcss -i Styles/input.css -o wwwroot/output.css --watch"
+  },
+  "dependencies": {
+    "@fullcalendar/core": "6.1.20", "@fullcalendar/timegrid": "6.1.20", "@fullcalendar/interaction": "6.1.20", "@fullcalendar/luxon3": "6.1.20", "luxon": "3.7.2"
+  },
+  "devDependencies": { "@tailwindcss/cli": "4.3.3", "tailwindcss": "4.3.3", "esbuild": "0.28.2" }
+}
