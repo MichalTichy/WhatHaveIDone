@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../WhatHaveIDone.Models/WhatHaveIDone.Models.csproj" />
+    <ProjectReference Include="../WhatHaveIDone.API.Models/WhatHaveIDone.API.Models.csproj" />
+    <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.CurrentUserProvider/Shared.Infrastructure.CurrentUserProvider.csproj" />
+    <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Persistence.Marten/Shared.Infrastructure.Persistence.Marten.csproj" />
+    <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.UIException/Shared.Infrastructure.UIException.csproj" />
+</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.5.0" />
+</ItemGroup>
+  <ItemGroup><EmbeddedResource Update="Resources/Strings.resx"><Generator /><StronglyTypedLanguage>C#</StronglyTypedLanguage><StronglyTypedNamespace>WhatHaveIDone.Logic.Resources</StronglyTypedNamespace><StronglyTypedClassName>Strings</StronglyTypedClassName><StronglyTypedFileName>$(IntermediateOutputPath)Strings.Designer.cs</StronglyTypedFileName><PublicClass>true</PublicClass></EmbeddedResource></ItemGroup>
+</Project>

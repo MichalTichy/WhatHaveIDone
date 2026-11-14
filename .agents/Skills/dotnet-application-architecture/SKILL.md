@@ -20,8 +20,9 @@ When infrastructure is involved, apply [shared-infra](../shared-infra/SKILL.md).
 ## Use cases and execution
 
 - Name the request `<Intention>Usecase` and keep its handler in the matching file, as in RSM. A response used only by this operation may share that file. Specifications, shared result models and other top-level types normally have separate files.
-- Adapt the RSM `UsecaseHandlerBase` to explicitly validate access before execution; anonymous/system actions explicitly declare their allowed context. Keep permission checks read-only.
+- Keep `UsecaseHandlerBase` limited to the Marten transaction and cancellation. Authenticated endpoints and tenant-scoped repositories enforce the common access boundary. Put operation-specific validation directly in the handler; do not introduce an owner base, cached actor ID or mandatory empty access-validation hooks.
 - Resolve the acting user from trusted server context, not request data. Marten conjoined tenancy uses that user's ID; load and mutate referenced documents through the same tenant session. Ordinary documents need no OwnerId or repeated owner predicate. API keys remain global for authentication and retain an explicit UserId check. Cross-tenant worker discovery and migrations are deliberate server-only exceptions.
+- Ordinary handlers load the tenant's single profile through `UserProfileSpecification` and do not resolve a user ID. Explicit identity is reserved for global API keys, provisioning and trusted background tenant selection. Retain stable document-ID formats when simplifying this plumbing.
 - Validate formal input and business rules on the server. Client validation helps presentation but cannot establish access or correctness.
 - Inject read-only repositories for reads and writable repositories inside write handlers. Keep Marten/configuration details out of endpoint and page code.
 - Make the transaction boundary clear. Related Marten changes, including timer switching, complete atomically. Identity EF operations have their own boundaries; do not silently assume a shared transaction with Marten.
@@ -49,6 +50,7 @@ When infrastructure is involved, apply [shared-infra](../shared-infra/SKILL.md).
 ## Identity and configuration
 
 - Complete password login, SSO challenge/callback and application cookie issuance in the server host. Keep secrets and provider tokens on the server.
+- Use ASP.NET Identity managers directly in account endpoints and standard OIDC events in Infrastructure.Identity. Authentication is the exception to tracking MediatR use cases: do not add authentication requests/handlers or account/provisioning services. Keep the small shared profile/default-client setup in a private sign-in method and commit its Marten transaction before issuing the cookie.
 - Preserve relevant RSM security-stamp, lockout, antiforgery, safe redirect and 401/403 handling. Remove payroll roles, company membership and server-circuit assumptions.
 - Expose only safe session/profile/bootstrap data to the client. Client authentication state is not authority for server operations.
 - Resolve SSO accounts by stable provider identity, not email-only account linking. After first account creation, onboarding is explicit persistent state, not inferred from each fresh SSO session.

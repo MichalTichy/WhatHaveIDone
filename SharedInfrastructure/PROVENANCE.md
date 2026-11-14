@@ -30,3 +30,5 @@ The application now explicitly enables Marten conjoined tenancy per authenticate
 Updated the locally copied Persistence.EF.Identity package references from EF Core 10.0.6 to 10.0.13 to match the application/runtime and avoid mixed public EF relational APIs. Session factories and document/event repositories now propagate cancellation into connection opening, transaction start, session opening and commit. Failed connection opening disposes the connection. Migration call sites retain the optional token default. No upstream checkout was modified.
 
 No root LICENSE/NOTICE/COPYING file was present in either source directory at the inspected commit. This manifest does not grant a license. Confirm distribution rights for the internally sourced components before public release; keep any subsequently supplied notices. No private feeds or credentials are copied.
+
+The application import worker no longer injects a single-instance leader-election abstraction or registers it explicitly. LeaderElection remains in the copied transitive dependency closure through Initializer; no distributed worker-coordination feature is activated.
