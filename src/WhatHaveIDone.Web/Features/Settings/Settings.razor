@@ -13,7 +13,8 @@ else if(loaded)
             <form class="surface stack" @onsubmit="ChangePasswordAsync" @onsubmit:preventDefault><h2>@Strings.ChangePassword</h2><div class="form-grid"><label>@Strings.CurrentPassword<input type="password" autocomplete="current-password" @bind="currentPassword" required /></label><label>@Strings.NewPassword<input type="password" autocomplete="new-password" @bind="newPassword" minlength="10" maxlength="128" required /></label></div><div><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.ChangePassword</AppActionButton></div></form>
         }
         else { <section class="surface"><h2>@Strings.SsoAccount</h2></section> }
-        <section class="surface stack"><h2>@Strings.ApiKeys</h2>
+        <section class="surface stack"><div class="mcp-settings-heading"><h2>@Strings.ApiKeys</h2><button type="button" class="secondary" @onclick="() => mcpSetupOpen = true">@Strings.SetupMcp</button></div>
+            <p class="muted">@Strings.McpSettingsDescription</p>
             @if(importActive){<p class="alert">@Strings.ImportWarning <a href="/import">@Strings.Import</a></p>}
             <label>@Strings.ApiUrl<input readonly value="@ApiUrl" /></label><p class="muted">@Strings.IsInstructions</p>
             <form class="actions" @onsubmit="CreateTokenAsync" @onsubmit:preventDefault><label class="grow">@Strings.Name<input @bind="tokenName" required maxlength="100" /></label><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.CreateKey</AppActionButton></form>
@@ -24,3 +25,4 @@ else if(loaded)
         <section class="surface"><h2>@Strings.DataExport</h2><a class="button secondary" href="/reports">@Strings.ExportCsv</a></section>
     </div>
 }
+@if (mcpSetupOpen) { <McpSetupDialog Endpoint="@McpUrl" Closed="() => mcpSetupOpen = false" /> }
