@@ -13,6 +13,7 @@ using WhatHaveIDone.API;
 using WhatHaveIDone.API.Authentication;
 using WhatHaveIDone.API.Endpoints;
 using WhatHaveIDone.API.Toggl;
+using WhatHaveIDone.API.Import;
 using WhatHaveIDone.Infrastructure.Identity;
 using WhatHaveIDone.Infrastructure.Persistence;
 using WhatHaveIDone.Logic.Execution;
@@ -31,6 +32,10 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddMediatR(o => o.RegisterServicesFromAssemblyContaining<SaveTimeEntryUsecase>());
 builder.Services.AddScoped<TagCatalog>();
 builder.Services.AddScoped<ReportQuery>();
+builder.Services.AddSingleton<ImportStorage>();
+builder.Services.AddScoped<TogglCsvReader>();
+builder.Services.AddHttpClient<TogglImportClient>(http=>{http.BaseAddress=new Uri("https://api.track.toggl.com/");http.Timeout=TimeSpan.FromSeconds(60);});
+if(builder.Configuration.GetValue<bool?>("Import:WorkerEnabled")!=false)builder.Services.AddHostedService<ImportWorker>();
 builder.Services.AddTrackingPersistence(connection);
 builder.Services.AddTrackingIdentity(builder.Configuration, connection);
 builder.Services.AddAuthentication(o => { o.DefaultScheme = "Combined"; o.DefaultAuthenticateScheme = "Combined"; o.DefaultChallengeScheme = "Combined"; o.DefaultForbidScheme = "Combined"; })
@@ -75,6 +80,7 @@ app.MapAccountEndpoints();
 app.MapTrackingEndpoints();
 app.MapReportEndpoints();
 app.MapTogglEndpoints();
+app.MapImportEndpoints();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 app.Map("/api/{**path}", () => Results.NotFound()).AllowAnonymous();
 await using (var scope = app.Services.CreateAsyncScope())
