@@ -40,7 +40,7 @@ When infrastructure is involved, apply [shared-infra](../shared-infra/SKILL.md).
 ## Presentation and HTTP boundaries
 
 - Pair `.razor` and `.razor.cs`; colocate page styles, scripts and feature-specific components. Markup stays declarative.
-- Reuse the selected RSM/Lumex shell, buttons, form wrappers, detail panels and feedback before adding alternatives. Keep them in Web until another actual consumer justifies a library.
+- Use Blazor Blueprint for library controls and preserve the RSM-derived AppComponentBase, shared action button, shell and feedback. Keep native controls/dialogs where they already satisfy the feature instead of adding compatibility wrappers. Keep them in Web until another actual consumer justifies a library.
 - WASM communicates through a typed native HTTP client. It does not dispatch server use cases or reference server Identity/persistence implementations.
 - Adapt `AppComponentBase` to HTTP outcomes and safe API errors; retain validation feedback, cancellation and protection against updating disposed or obsolete UI. Handle authentication expiration without treating an HTML login page as a successful API response.
 - Native DTOs belong in `WhatHaveIDone.API.Models` and stay browser-compatible. Toggl endpoints, DTOs/mappers and error responses belong in `WhatHaveIDone.API.Toggl`; keep its aliases, duration encoding and synthetic workspace out of the domain and frontend endpoint implementations. The single API host references the adapter for composition; the adapter references Logic, not the host or WASM.

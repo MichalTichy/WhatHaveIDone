@@ -39,8 +39,8 @@
 
 ## UI conventions
 
-- Reuse the selected Lumex/RSM UI foundation, including buttons, `AppComponentBase`, forms, shell, styling and feedback. Keep product-specific components in the Web project until another boundary is needed.
-- Keep the personal visual direction inspired by Timely/Timemator: warm light canvas and navigation, quiet purple accent, project colours and locally hosted DM Sans. Reuse the Lumex/RSM component foundation without restoring its former corporate navy/cyan shell.
+- Use Blazor Blueprint components with the RSM-derived AppComponentBase, shared action button, shell and feedback. Keep product-specific components in the Web project until another boundary is needed.
+- Keep the personal visual direction inspired by Timely/Timemator: warm light canvas and navigation, quiet purple accent, project colours and locally hosted DM Sans. Use the Blazor Blueprint component foundation without restoring the former corporate navy/cyan shell.
 - Pair `.razor` markup with `.razor.cs`; keep page-specific styles, scripts and components nearby. Keep markup declarative.
 - Adapt `AppComponentBase` to typed HTTP calls and API errors instead of server-side `ISender` and exception types. Keep cancellation, feedback and protection against updating disposed UI.
 - Show skeletons where they clarify loading. End loading states on success, error or cancellation; display empty states only after a successful load.
