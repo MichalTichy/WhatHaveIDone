@@ -2,7 +2,7 @@
 
 A minimal personal time tracker built with .NET 10, Blazor WebAssembly and PostgreSQL. Every user owns their data; there are no product workspaces.
 
-This branch is layer 10 of 13: **Add project management and interactive reports**. Review its diff against the preceding layer. Feature folders and the `WhatHaveIDone.API.Models` project use their accepted final names from their introduction.
+This branch is layer 11 of 13: **Add account settings and import onboarding UI**. Review its diff against the preceding layer. Feature folders and the `WhatHaveIDone.API.Models` project use their accepted final names from their introduction.
 
 ```powershell
 dotnet build WhatHaveIDone.slnx -warnaserror
@@ -25,7 +25,7 @@ The API serves the Blazor assets. Node.js 24/npm builds the CSS and calendar dur
 8. Add the Blazor shell, shared controls and authentication UI (included)
 9. Add time tracking, autosave editing and the editable calendar (included)
 10. Add project management and interactive reports (included)
-11. Add account settings and import onboarding UI (later layer)
+11. Add account settings and import onboarding UI (included)
 12. Add Docker deployment, development tooling and full CI (later layer)
 13. Add MCP tools and AI connection setup (later layer)
 

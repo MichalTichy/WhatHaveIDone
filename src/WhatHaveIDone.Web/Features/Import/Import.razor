@@ -1,0 +1,56 @@
+@page "/import"
+@inherits AppComponentBase
+<PageTitle>@Strings.Import · @Strings.AppName</PageTitle>
+<div class="page-header"><h1>@Strings.Import</h1>@if(User.Settings.OnboardingCompleted){<a class="button secondary" href="/settings">@Strings.Settings</a>}</div>
+@if(Error is not null){<div class="alert error" role="alert">@Error <button @onclick="LoadAsync">@Strings.Retry</button></div>}
+@if(!loaded && Busy){<Loading />}
+else if(loaded)
+{
+    @if(Active is { } run)
+    {
+        <section class="surface stack"><h2>@Status(run.Status)</h2><p>@Strings.Stage: @Stage(run.Stage)</p>
+            @if(!string.IsNullOrWhiteSpace(run.MessageCode)){<p class="alert">@(Strings.ResourceManager.GetString(run.MessageCode)??Strings.ImportSource)</p>}
+            @if(run.NextAttemptAt.HasValue){<p>@Strings.NextAttempt: @UserTime.Local(run.NextAttemptAt.Value,User.Settings.TimeZone).ToString("g")</p>}
+            @if(run.Status=="AwaitingConfirmation")
+            {
+                @if(run.Kind=="Api")
+                {
+                    <p>@run.SourceEmail · @Strings.History</p><fieldset class="stack"><legend>@Strings.Workspaces</legend>@foreach(var workspace in run.Workspaces){<label class="check-row"><input type="checkbox" checked="@selectedWorkspaces.Contains(workspace.Id)" @onchange="a=>ToggleWorkspace(workspace.Id,a)" />@workspace.Name</label>}</fieldset>
+                }
+                else
+                {
+                    <p>@Strings.FileRows: @run.TotalRows · @Strings.Errors: @run.PreviewErrors</p>
+                    <label>@Strings.Email<select @bind="sourceEmail"><option value=""></option>@foreach(var email in run.AvailableEmails){<option value="@email">@email</option>}</select></label>
+                    <p class="muted">@run.SourceTimeZone</p>
+                    @if(!run.HasOriginalIds){<p class="alert">@Strings.FileIdWarning</p>}
+                    <div class="table-scroll"><table class="data-table"><thead><tr><th>@Strings.Description</th><th>@Strings.Project</th><th>@Strings.Start</th><th>@Strings.End</th></tr></thead><tbody>@foreach(var row in run.Preview.Where(p=>string.IsNullOrEmpty(sourceEmail)||string.Equals(p.Email,sourceEmail,StringComparison.OrdinalIgnoreCase))){<tr><td>@row.Description</td><td>@row.Project</td><td>@UserTime.Local(row.Start,run.SourceTimeZone).ToString("g")</td><td>@(row.End.HasValue?UserTime.Local(row.End.Value,run.SourceTimeZone).ToString("g"):Strings.Running)</td></tr>}</tbody></table></div>
+                }
+                <div><AppActionButton Disabled="@(Busy || (run.Kind=="Api" ? selectedWorkspaces.Count==0 : string.IsNullOrEmpty(sourceEmail)))" OnClick="()=>ConfirmAsync(run)">@(run.Kind=="Api"?Strings.StartImport:Strings.ConfirmFile)</AppActionButton></div>
+            }
+            else { <div class="actions"><strong>@Strings.Imported: @run.Imported</strong><span>@Strings.Skipped: @run.Skipped</span><span>@Strings.Errors: @run.Errors</span></div> }
+            @if(run.Status=="NeedsAttention")
+            {<form class="stack" @onsubmit="()=>ResumeAsync(run)" @onsubmit:preventDefault>@if(run.Kind=="Api"){<label>@Strings.TogglToken<input type="password" @bind="token" autocomplete="off" maxlength="256" /></label>}<div><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.ResumeImport</AppActionButton></div></form>}
+            <div class="actions">@if(!User.Settings.OnboardingCompleted){<button type="button" class="secondary" disabled="@Busy" @onclick="SkipAsync">@Strings.SkipImport</button>}else{<a class="button secondary" href="/time">@Strings.GoToTime</a>}<button class="danger" disabled="@Busy" @onclick="()=>CancelAsync(run)">@Strings.CancelImport</button></div>
+        </section>
+    }
+    else
+    {
+        <div class="toolbar"><div class="tabs"><button class="@(!fileMode?"active":"")" @onclick="()=>fileMode=false">@Strings.ViaApi</button><button class="@(fileMode?"active":"")" @onclick="ShowFileHelp">@Strings.FromFile</button></div></div>
+        @if(!fileMode)
+        {<form class="surface stack" @onsubmit="PrepareAsync" @onsubmit:preventDefault><label>@Strings.TogglToken<input type="password" @bind="token" autocomplete="off" required maxlength="256" /></label><p class="muted">@Strings.TokenNotice</p><div class="actions"><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.ConnectToggl</AppActionButton>@if(!User.Settings.OnboardingCompleted){<button type="button" class="secondary" disabled="@Busy" @onclick="SkipAsync">@Strings.SkipImport</button>}</div></form>}
+        else
+        {<form class="surface stack" @onsubmit="PrepareFileAsync" @onsubmit:preventDefault><label>@Strings.ImportFile<InputFile OnChange="SelectFile" accept=".csv,text/csv" /></label><label>@Strings.FileTimeZone<input @bind="fileZone" required /></label><p class="muted">@Strings.FileFormat</p><button type="button" class="text-action" @onclick="ShowFileHelp">@Strings.WhereGetFile</button><div class="actions"><AppActionButton Type="ButtonType.Submit" Disabled="@(Busy||file is null)">@Strings.PreviewFile</AppActionButton>@if(!User.Settings.OnboardingCompleted){<button type="button" class="secondary" disabled="@Busy" @onclick="SkipAsync">@Strings.SkipImport</button>}</div></form>}
+        @foreach(var previous in imports.Where(r=>r.Status is "Completed" or "CompletedWithWarnings" or "Cancelled"))
+        {<section class="surface" style="margin-top:20px"><h2>@Status(previous.Status)</h2><div class="actions"><strong>@Strings.Imported: @previous.Imported</strong><span>@Strings.Skipped: @previous.Skipped</span><span>@Strings.Errors: @previous.Errors</span></div>@if(previous.MessageCode is not null){<p class="muted">@(Strings.ResourceManager.GetString(previous.MessageCode)??Strings.ImportSource)</p>}</section>}
+    }
+}
+
+<dialog class="help-dialog" @ref="helpDialog" aria-labelledby="file-help-title">
+    <header class="drawer-header"><h2 id="file-help-title">@Strings.WhereGetFile</h2><button type="button" class="secondary" aria-label="@Strings.Close" @onclick="RequestCloseAsync">×</button></header>
+    <div class="drawer-body">
+        <ol class="help-steps"><li>@Strings.FileHelpReports</li><li>@Strings.FileHelpRange</li><li>@Strings.FileHelpExport</li><li>@Strings.FileHelpUpload</li></ol>
+        <p class="muted">@Strings.FileHelpPlan</p>
+        <a href="https://support.toggl.com/en-us/article/detailed-report-k9bzy2/" target="_blank" rel="noopener noreferrer">@Strings.TogglExportGuide ↗</a>
+    </div>
+    <footer class="drawer-footer"><span class="spacer"></span><AppActionButton OnClick="RequestCloseAsync">@Strings.ChooseFile</AppActionButton></footer>
+</dialog>
