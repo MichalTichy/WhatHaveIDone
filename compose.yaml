@@ -14,5 +14,21 @@ services:
       interval: 3s
       timeout: 3s
       retries: 20
+  app:
+    profiles: [app]
+    build: .
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DB: Host=db;Database=what_have_i_done;Username=what_have_i_done;Password=${POSTGRES_PASSWORD}
+      DataProtection__Path: /data/keys
+      Import__Path: /data/imports
+    ports:
+      - "127.0.0.1:${APP_PORT:-5088}:8080"
+    volumes:
+      - app-data:/data
+    depends_on:
+      db:
+        condition: service_healthy
 volumes:
   database:
+  app-data:
