@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App" /></ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../WhatHaveIDone.Logic/WhatHaveIDone.Logic.csproj" />
+    <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Persistence.EF.Identity/Shared.Infrastructure.Persistence.EF.Identity.csproj" />
+    <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Authentication.Entra/Shared.Infrastructure.Authentication.Entra.csproj" />
+</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13" PrivateAssets="all" />
+</ItemGroup>
+</Project>
