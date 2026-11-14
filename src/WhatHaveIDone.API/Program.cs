@@ -12,6 +12,7 @@ using Shared.Infrastructure.CurrentUserProvider.HttpContext;
 using WhatHaveIDone.API;
 using WhatHaveIDone.API.Authentication;
 using WhatHaveIDone.API.Endpoints;
+using WhatHaveIDone.API.Toggl;
 using WhatHaveIDone.Infrastructure.Identity;
 using WhatHaveIDone.Infrastructure.Persistence;
 using WhatHaveIDone.Logic.Execution;
@@ -54,6 +55,7 @@ builder.Services.AddRateLimiter(o => { o.RejectionStatusCode=429; o.AddPolicy("a
 var app = builder.Build();
 if (knownProxies.Length > 0) app.UseForwardedHeaders();
 app.UseMiddleware<ApiExceptionMiddleware>();
+app.UseMiddleware<TogglApiExceptionMiddleware>();
 app.UseRequestLocalization();
 app.UseRouting();
 app.UseAuthentication();
@@ -72,6 +74,7 @@ app.Use(async (http, next) =>
 app.MapAccountEndpoints();
 app.MapTrackingEndpoints();
 app.MapReportEndpoints();
+app.MapTogglEndpoints();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 app.Map("/api/{**path}", () => Results.NotFound()).AllowAnonymous();
 await using (var scope = app.Services.CreateAsyncScope())
