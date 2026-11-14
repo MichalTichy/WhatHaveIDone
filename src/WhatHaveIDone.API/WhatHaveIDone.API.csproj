@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <ItemGroup>
+    <ProjectReference Include="../WhatHaveIDone.API.Toggl/WhatHaveIDone.API.Toggl.csproj" />
     <ProjectReference Include="../WhatHaveIDone.Logic/WhatHaveIDone.Logic.csproj" />
     <ProjectReference Include="../WhatHaveIDone.Infrastructure.Persistence/WhatHaveIDone.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="../WhatHaveIDone.Infrastructure.Identity/WhatHaveIDone.Infrastructure.Identity.csproj" />

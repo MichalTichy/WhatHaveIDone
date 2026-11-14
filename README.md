@@ -2,7 +2,7 @@
 
 A minimal personal time tracker built with .NET 10, Blazor WebAssembly and PostgreSQL. Every user owns their data; there are no product workspaces.
 
-This branch is layer 5 of 13: **Add the authenticated native HTTP API**. Review its diff against the preceding layer. Feature folders and the `WhatHaveIDone.API.Models` project use their accepted final names from their introduction.
+This branch is layer 6 of 13: **Add the Toggl v9 compatibility adapter**. Review its diff against the preceding layer. Feature folders and the `WhatHaveIDone.API.Models` project use their accepted final names from their introduction.
 
 ```powershell
 dotnet build WhatHaveIDone.slnx -warnaserror
@@ -18,7 +18,7 @@ The API requires `ConnectionStrings__DB`. For a local database, copy `.env.examp
 3. Add tracking use cases and read specifications (included)
 4. Add PostgreSQL persistence and ASP.NET Identity adapters (included)
 5. Add the authenticated native HTTP API (included)
-6. Add the Toggl v9 compatibility adapter (later layer)
+6. Add the Toggl v9 compatibility adapter (included)
 7. Add resumable Toggl API and CSV imports (later layer)
 8. Add the Blazor shell, shared controls and authentication UI (later layer)
 9. Add time tracking, autosave editing and the editable calendar (later layer)
