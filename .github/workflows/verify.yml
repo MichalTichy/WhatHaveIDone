@@ -25,6 +25,12 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/WhatHaveIDone.Web/package-lock.json
       - run: dotnet restore WhatHaveIDone.slnx
       - run: dotnet build WhatHaveIDone.slnx --no-restore -warnaserror
       - run: dotnet test WhatHaveIDone.slnx --no-build
+      - run: dotnet publish src/WhatHaveIDone.API -c Release --no-restore -o artifacts/publish -warnaserror
