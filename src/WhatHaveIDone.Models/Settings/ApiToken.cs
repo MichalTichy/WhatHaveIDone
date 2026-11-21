@@ -1,11 +1,8 @@
+using JasperFx.Metadata;
+using Shared.Infrastructure.Authentication.ApiKey;
+using Shared.Infrastructure.Persistence;
+
 namespace WhatHaveIDone.Models;
 
-public sealed class ApiToken : Document
-{
-    public required string UserId { get; init; }
-    public required string Name { get; init; }
-    public required string Hash { get; init; }
-    public required string Suffix { get; init; }
-    public DateTimeOffset CreatedAt { get; init; }
-    public DateTimeOffset? RevokedAt { get; set; }
-}
+// Keep the persisted document type and alias stable while the module owns its data and behavior.
+public sealed class ApiToken : ApiKeyRecord, IItemWithId, IVersioned;

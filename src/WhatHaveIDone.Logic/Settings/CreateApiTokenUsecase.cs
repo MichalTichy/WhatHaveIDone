@@ -1,22 +1,20 @@
-using System.Security.Cryptography;
-using System.Text;
 using MediatR;
-using Shared.Infrastructure.CurrentUserProvider;
-using Shared.Infrastructure.Persistence.Repositories;
+using Shared.Infrastructure.Authentication.ApiKey;
 using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Logic.Execution;
-using WhatHaveIDone.Models;
 
 namespace WhatHaveIDone.Logic.Settings;
 
 public sealed record CreateApiTokenUsecase(string Name) : IRequest<CreatedApiToken>;
-public sealed class CreateApiTokenUsecaseHandler(ICurrentUserIdProvider actor, IRepository<ApiToken> tokens, TimeProvider clock) : UsecaseHandlerBase<CreateApiTokenUsecase, CreatedApiToken>
+public sealed class CreateApiTokenUsecaseHandler(ApiKeyManager keys) : UsecaseHandlerBase<CreateApiTokenUsecase, CreatedApiToken>
 {
     protected override async Task<CreatedApiToken> ExecuteAsync(CreateApiTokenUsecase request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Name) || request.Name.Length > 100) throw new AppException("InvalidName");
-        var secret = "whid_" + Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant();
-        var token = new ApiToken { Id = Guid.NewGuid().ToString("N"), UserId = await actor.GetCurrentUserIdRequiredAsync(), Name = request.Name.Trim(), Hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(secret))), Suffix = secret[^6..], CreatedAt = clock.GetUtcNow() };
-        await tokens.AddAsync(token, cancellationToken); return new CreatedApiToken(token.Id, secret);
+        try
+        {
+            var created = await keys.CreateAsync(request.Name, cancellationToken);
+            return new CreatedApiToken(created.Id, created.Key);
+        }
+        catch (ArgumentException exception) when (exception.ParamName == "name") { throw new AppException("InvalidName"); }
     }
 }
