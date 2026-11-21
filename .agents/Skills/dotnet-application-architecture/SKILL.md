@@ -27,7 +27,7 @@ When infrastructure is involved, apply [shared-infra](../shared-infra/SKILL.md).
 - Inject read-only repositories for reads and writable repositories inside write handlers. Keep Marten/configuration details out of endpoint and page code.
 - Make the transaction boundary clear. Related Marten changes, including timer switching, complete atomically. Identity EF operations have their own boundaries; do not silently assume a shared transaction with Marten.
 - Preserve concurrency only where required: one running timer per user, stale edit detection, tag deduplication and repeatable imports. A read-then-write check alone does not guarantee these under concurrency.
-- Embed the active/current import in UserProfile and keep compact history, rather than storing each run separately. Reload the profile on each batch, validate the embedded run version and commit it with related writes. Settings and import versions are independent so progress cannot invalidate an unrelated settings edit.
+- Store each import as a tenant-scoped document. Claim a pending source call before fetching it; reload the run in the tenant and verify ownership of the claim before committing related writes and the continuation. Keep import progress separate from settings.
 - Add a notification only for a real current consumer. Publish completed facts after confirmed commit; do not introduce event sourcing, a bus or an outbox for unused extension points.
 
 ## Specifications and read models
