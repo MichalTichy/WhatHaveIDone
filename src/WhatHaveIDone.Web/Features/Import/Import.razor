@@ -1,0 +1,42 @@
+@page "/import"
+@inherits AppComponentBase
+<PageTitle>@Strings.Import · @Strings.AppName</PageTitle>
+<div class="page-header"><h1>@Strings.Import</h1>@if(User.Settings.OnboardingCompleted){<a class="button secondary" href="/settings">@Strings.Settings</a>}</div>
+@if(Error is not null){<div class="alert error" role="alert">@Error <button @onclick="LoadAsync">@Strings.Retry</button></div>}
+@if(!loaded && Busy){<Loading />}
+else if(loaded)
+{
+    @if(Active is { } run)
+    {
+        <section class="surface stack"><h2>@Status(run.Status)</h2>
+            @if(run.RequestedFrom is { } requestedFrom && run.RequestedThrough is { } requestedThrough)
+            {<p>@Strings.ImportRequestedRange: @requestedFrom.ToString("d") – @requestedThrough.ToString("d")</p>}
+            @if(run.RangeStart.HasValue && run.RangeEnd.HasValue)
+            {<p>@Strings.ImportedDates: @ImportedRange(run)</p>}
+            @if(!string.IsNullOrWhiteSpace(run.MessageCode)){<p class="alert">@(Strings.ResourceManager.GetString(run.MessageCode)??Strings.ImportSource)</p>}
+            @if(run.NextAttemptAt.HasValue){<p>@Strings.NextAttempt: @UserTime.Local(run.NextAttemptAt.Value,User.Settings.TimeZone).ToString("g")</p>}
+            @if(run.Status==ImportStatus.AwaitingConfirmation)
+            {
+                <p>@run.SourceEmail</p>
+                <fieldset class="stack">
+                    <legend>@Strings.Workspaces</legend>
+                    @foreach(var workspace in run.Workspaces)
+                    {
+                        <label class="check-row"><input type="checkbox" checked="@selectedWorkspaces.Contains(workspace.Id)" @onchange="args => ToggleWorkspace(workspace.Id, args)" />@workspace.Name</label>
+                    }
+                </fieldset>
+                <div><AppActionButton Disabled="@(Busy || selectedWorkspaces.Count == 0)" OnClick="() => ConfirmAsync(run)">@Strings.StartImport</AppActionButton></div>
+            }
+            else { <div class="actions"><strong>@Strings.Imported: @run.Imported</strong><span>@Strings.Skipped: @run.Skipped</span><span>@Strings.Errors: @run.Errors</span></div> }
+            @if(run.Status==ImportStatus.NeedsAttention)
+            {<form class="stack" @onsubmit="()=>ResumeAsync(run)" @onsubmit:preventDefault><label>@Strings.TogglToken<input type="password" @bind="token" autocomplete="off" maxlength="256" /></label><div><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.ResumeImport</AppActionButton></div></form>}
+            <div class="actions">@if(!User.Settings.OnboardingCompleted){<button type="button" class="secondary" disabled="@Busy" @onclick="SkipAsync">@Strings.SkipImport</button>}else{<a class="button secondary" href="/time">@Strings.GoToTime</a>}<button class="danger" disabled="@Busy" @onclick="()=>CancelAsync(run)">@Strings.CancelImport</button></div>
+        </section>
+    }
+    else
+    {
+        <form class="surface stack" @onsubmit="PrepareAsync" @onsubmit:preventDefault><label>@Strings.TogglToken<input type="password" @bind="token" autocomplete="off" required maxlength="256" /></label><label>@Strings.ImportFromDate<input type="date" @bind="from" /></label><label>@Strings.ImportThroughDate<input type="date" @bind="through" /></label><p class="muted">@Strings.TokenNotice</p><div class="actions"><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.ConnectToggl</AppActionButton>@if(!User.Settings.OnboardingCompleted){<button type="button" class="secondary" disabled="@Busy" @onclick="SkipAsync">@Strings.SkipImport</button>}</div></form>
+        @foreach(var previous in imports.Where(r=>!r.Status.IsActive()))
+        {<section class="surface" style="margin-top:20px"><h2>@Status(previous.Status)</h2>@if(previous.RangeStart.HasValue && previous.RangeEnd.HasValue){<p>@Strings.ImportedDates: @ImportedRange(previous)</p>}<div class="actions"><strong>@Strings.Imported: @previous.Imported</strong><span>@Strings.Skipped: @previous.Skipped</span><span>@Strings.Errors: @previous.Errors</span></div>@if(previous.MessageCode is not null){<p class="muted">@(Strings.ResourceManager.GetString(previous.MessageCode)??Strings.ImportSource)</p>}</section>}
+    }
+}
