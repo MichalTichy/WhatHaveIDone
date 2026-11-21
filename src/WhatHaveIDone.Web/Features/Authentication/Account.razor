@@ -1,0 +1,15 @@
+@page "/login"
+@page "/register"
+@inherits AppComponentBase
+@layout AuthLayout
+<PageTitle>@(register ? Strings.Register : Strings.SignIn) · @Strings.AppName</PageTitle>
+<h1>@(register ? Strings.Register : Strings.SignIn)</h1>
+@if (Error is not null) { <p class="alert error" role="alert">@Error</p> }
+<form @onsubmit="SubmitAsync" @onsubmit:preventDefault>
+    <label>@Strings.Email<input type="email" autocomplete="username" @bind="input.Email" required maxlength="254" /></label>
+    <label>@Strings.Password<input type="password" autocomplete="@(register ? "new-password" : "current-password")" @bind="input.Password" required minlength="@(register ? 10 : 1)" maxlength="128" /></label>
+    @if (register) { <label>@Strings.ConfirmPassword<input type="password" autocomplete="new-password" @bind="confirmation" required maxlength="128" /></label> }
+    <AppActionButton Type="ButtonType.Submit" Disabled="Busy">@(register ? Strings.Register : Strings.SignIn)</AppActionButton>
+</form>
+@if (User.Session.SsoEnabled) { <a class="button secondary sso" href="/auth/sso">@Strings.MicrosoftSignIn</a> }
+<a class="auth-link" href="@(register ? "/login" : "/register")">@(register ? Strings.HaveAccount : Strings.NoAccount)</a>
