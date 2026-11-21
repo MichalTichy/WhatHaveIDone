@@ -60,3 +60,7 @@ See [repository conventions](AGENTS.md), [the .NET architecture skill](.agents/S
 The UI uses Blazor Blueprint and FullCalendar, with locally served DM Sans. The font comes from [google/fonts](https://github.com/google/fonts/tree/e7db6ca603fd4862010383ff17ffd6cc4ffac1c0/ofl/dmsans) and includes its SIL Open Font License. The UI and server-side authentication flow draw on RSM commit `7eb0637e06fdafc53469c66b3650db0e16af2b06`. Timely and Timemator informed the visual design.
 
 End-to-end verification with a real Toggl account, a configured Entra tenant, and the updated Riganti IS integration remains pending. A public open-source release also requires confirmation of distribution rights for copied internal code and selection of a project license. Timesheet drafts are the first planned feature after the MVP.
+
+## Connect an AI client over MCP
+
+Open **Settings → API keys → Connect AI / MCP** for setup instructions for VS Code, Cursor, and Claude Code. Configure the client with the `/mcp` URL and set `WHID_API_KEY` privately in its environment. The MCP endpoint uses Bearer authentication and runs tracking operations under the API key owner's account.
