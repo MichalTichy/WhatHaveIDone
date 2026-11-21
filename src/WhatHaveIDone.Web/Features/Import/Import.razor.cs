@@ -40,6 +40,9 @@ public partial class Import : IAsyncDisposable
     }
     private string ImportedRange(ImportModel run)
         => $"{UserTime.Local(run.RangeStart!.Value, User.Settings.TimeZone):d} – {UserTime.Local(run.RangeEnd!.Value, User.Settings.TimeZone):d}";
-    private static string Status(ImportStatus status)=>Strings.ResourceManager.GetString(status.ToString())??Strings.Running;
+    private static string Status(ImportModel run)
+        => run is { Status: ImportStatus.Completed, Errors: > 0 }
+            ? Strings.CompletedWithWarnings
+            : Strings.ResourceManager.GetString(run.Status.ToString()) ?? Strings.Running;
     public async ValueTask DisposeAsync(){Dispose();poll.Dispose();if(polling is not null)await polling;}
 }

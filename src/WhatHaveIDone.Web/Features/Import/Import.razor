@@ -8,7 +8,7 @@ else if(loaded)
 {
     @if(Active is { } run)
     {
-        <section class="surface stack"><h2>@Status(run.Status)</h2>
+        <section class="surface stack"><h2>@Status(run)</h2>
             @if(run.RequestedFrom is { } requestedFrom && run.RequestedThrough is { } requestedThrough)
             {<p>@Strings.ImportRequestedRange: @requestedFrom.ToString("d") – @requestedThrough.ToString("d")</p>}
             @if(run.RangeStart.HasValue && run.RangeEnd.HasValue)
@@ -37,6 +37,6 @@ else if(loaded)
     {
         <form class="surface stack" @onsubmit="PrepareAsync" @onsubmit:preventDefault><label>@Strings.TogglToken<input type="password" @bind="token" autocomplete="off" required maxlength="256" /></label><label>@Strings.ImportFromDate<input type="date" @bind="from" /></label><label>@Strings.ImportThroughDate<input type="date" @bind="through" /></label><p class="muted">@Strings.TokenNotice</p><div class="actions"><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.ConnectToggl</AppActionButton>@if(!User.Settings.OnboardingCompleted){<button type="button" class="secondary" disabled="@Busy" @onclick="SkipAsync">@Strings.SkipImport</button>}</div></form>
         @foreach(var previous in imports.Where(r=>!r.Status.IsActive()))
-        {<section class="surface" style="margin-top:20px"><h2>@Status(previous.Status)</h2>@if(previous.RangeStart.HasValue && previous.RangeEnd.HasValue){<p>@Strings.ImportedDates: @ImportedRange(previous)</p>}<div class="actions"><strong>@Strings.Imported: @previous.Imported</strong><span>@Strings.Skipped: @previous.Skipped</span><span>@Strings.Errors: @previous.Errors</span></div>@if(previous.MessageCode is not null){<p class="muted">@(Strings.ResourceManager.GetString(previous.MessageCode)??Strings.ImportSource)</p>}</section>}
+        {<section class="surface" style="margin-top:20px"><h2>@Status(previous)</h2>@if(previous.RangeStart.HasValue && previous.RangeEnd.HasValue){<p>@Strings.ImportedDates: @ImportedRange(previous)</p>}<div class="actions"><strong>@Strings.Imported: @previous.Imported</strong><span>@Strings.Skipped: @previous.Skipped</span><span>@Strings.Errors: @previous.Errors</span></div>@if(previous.MessageCode is not null){<p class="muted">@(Strings.ResourceManager.GetString(previous.MessageCode)??Strings.ImportSource)</p>}</section>}
     }
 }
