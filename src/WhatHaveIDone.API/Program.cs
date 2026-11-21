@@ -13,6 +13,7 @@ using Shared.Infrastructure.CurrentUserProvider;
 using Shared.Infrastructure.CurrentUserProvider.HttpContext;
 using WhatHaveIDone.API;
 using WhatHaveIDone.API.Endpoints;
+using WhatHaveIDone.API.Toggl;
 using WhatHaveIDone.Infrastructure.Identity;
 using WhatHaveIDone.Infrastructure.Persistence;
 using WhatHaveIDone.Logic.Execution;
@@ -33,7 +34,7 @@ new IdentityInstaller().Install(builder.Services, builder.Configuration, builder
 builder.Services.AddMartenApiKeyStorage<WhatHaveIDone.Models.ApiToken>();
 builder.Services.AddAuthentication(o => { o.DefaultScheme = "Combined"; o.DefaultAuthenticateScheme = "Combined"; o.DefaultChallengeScheme = "Combined"; o.DefaultForbidScheme = "Combined"; })
     .AddPolicyScheme("Combined", null, o => o.ForwardDefaultSelector = http => http.Request.Headers.Authorization.Count > 0 ? ApiKeyAuthenticationDefaults.AuthenticationScheme : IdentityConstants.ApplicationScheme)
-    .AddApiKeys<AppUser>(options => { options.KeyPrefix = "whid_"; });
+    .AddApiKeys<AppUser>(options => { options.KeyPrefix = "whid_"; options.UseTogglCompatibility(); });
 builder.Services.AddAuthorization();
 builder.Services.AddAntiforgery(o => { o.HeaderName = "X-CSRF-TOKEN"; o.Cookie.Name = "whid.csrf"; o.Cookie.HttpOnly = true; });
 var keyPath = builder.Configuration["DataProtection:Path"] ?? Path.Combine(builder.Environment.ContentRootPath, "data", "keys");
@@ -53,6 +54,7 @@ builder.Services.AddRateLimiter(o => { o.RejectionStatusCode=429; o.AddPolicy("a
 var app = builder.Build();
 if (knownProxies.Length > 0) app.UseForwardedHeaders();
 app.UseMiddleware<ApiExceptionMiddleware>();
+app.UseMiddleware<TogglApiExceptionMiddleware>();
 app.UseRequestLocalization();
 app.UseRouting();
 app.UseAuthentication();
@@ -71,6 +73,7 @@ app.Use(async (http, next) =>
 app.MapAccountEndpoints();
 app.MapTrackingEndpoints();
 app.MapReportEndpoints();
+app.MapTogglEndpoints();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 app.Map("/api/{**path}", () => Results.NotFound()).AllowAnonymous();
 await using (var scope = app.Services.CreateAsyncScope())
