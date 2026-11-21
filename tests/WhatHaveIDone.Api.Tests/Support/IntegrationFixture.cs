@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using WhatHaveIDone.API.Import;
 using WhatHaveIDone.API.Models;
 
 namespace WhatHaveIDone.Api.Tests;
@@ -16,6 +17,7 @@ public sealed class IntegrationFixture : IAsyncLifetime
     private readonly Dictionary<string,string?> previous=[];
     public WebApplicationFactory<Program> App { get; private set; }=null!;
     public MutableTimeProvider Clock { get; }=new();
+    public FakeTogglHandler Toggl { get; }=new();
     public async Task InitializeAsync()
     {
         var root=FindRoot();var env=File.Exists(Path.Combine(root,".env"))?File.ReadAllLines(Path.Combine(root,".env")).Where(l=>l.Contains('=')).Select(l=>l.Split('=',2)).ToDictionary(p=>p[0],p=>p[1]):[];
@@ -28,6 +30,8 @@ public sealed class IntegrationFixture : IAsyncLifetime
         App=new WebApplicationFactory<Program>().WithWebHostBuilder(web=>web.UseEnvironment("Testing").ConfigureTestServices(services=>
         {
             services.AddSingleton<TimeProvider>(Clock);
+            services.AddHttpClient<TogglImportClient>().ConfigurePrimaryHttpMessageHandler(()=>Toggl).SetHandlerLifetime(Timeout.InfiniteTimeSpan);
+            services.AddSingleton<ImportWorker>();
         }));
         using var client=App.CreateClient();(await client.GetAsync("/health")).EnsureSuccessStatusCode();
     }
@@ -37,6 +41,7 @@ public sealed class IntegrationFixture : IAsyncLifetime
         var id=await owner.PostAsync<string>("account/register",new AccountInput{Email=Guid.NewGuid().ToString("N")+"@example.test",Password="aA1!"+Convert.ToHexString(RandomNumberGenerator.GetBytes(20))});
         var result=new OwnerClient(http,id);await result.RefreshCsrfAsync();return result;
     }
+    public Task StepImportAsync()=>App.Services.GetRequiredService<ImportWorker>().ProcessNextAsync(CancellationToken.None);
     private void Set(string key,string value){previous[key]=Environment.GetEnvironmentVariable(key);Environment.SetEnvironmentVariable(key,value);}
     private static string FindRoot(){var path=new DirectoryInfo(AppContext.BaseDirectory);while(path is not null&&!File.Exists(Path.Combine(path.FullName,"WhatHaveIDone.slnx")))path=path.Parent;return path?.FullName??throw new InvalidOperationException("Repository root not found.");}
     public async Task DisposeAsync()
