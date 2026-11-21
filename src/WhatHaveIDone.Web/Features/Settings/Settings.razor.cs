@@ -18,17 +18,17 @@ public partial class Settings
     private Task LoadAsync() => RunAsync(async ct =>
     {
         await User.ReloadAsync(ct); settings = User.Settings with { };
-        tokens = await Api.GetAsync<List<ApiTokenModel>>("tokens", ct);
-        var imports = await Api.GetAsync<List<ImportModel>>("imports", ct);
+        tokens = await Api.GetTokensAsync(ct);
+        var imports = await Api.GetImportsAsync(ct);
         importActive = imports.Any(i => i.Status.IsActive() && i.Status != ImportStatus.AwaitingConfirmation); loaded = true;
     });
-    private Task SaveSettingsAsync() => RunAsync(async ct => { await Api.SendAsync<bool>(HttpMethod.Put,"settings",settings,ct); await User.ReloadAsync(ct); settings = User.Settings with { }; Feedback.Show(Strings.Saved); });
-    private Task ChangePasswordAsync() => RunAsync(async ct => { await Api.SendAsync<bool>(HttpMethod.Post,"account/password",new ChangePasswordInput(currentPassword,newPassword),ct); currentPassword = newPassword = ""; Feedback.Show(Strings.Saved); });
-    private Task CreateTokenAsync() => RunAsync(async ct => { newToken = (await Api.SendAsync<CreatedApiToken>(HttpMethod.Post,"tokens",new CreateApiKeyRequest(tokenName),ct)).Token; tokens = await Api.GetAsync<List<ApiTokenModel>>("tokens",ct); });
+    private Task SaveSettingsAsync() => RunAsync(async ct => { await Api.SaveSettingsAsync(settings, ct); await User.ReloadAsync(ct); settings = User.Settings with { }; Feedback.Show(Strings.Saved); });
+    private Task ChangePasswordAsync() => RunAsync(async ct => { await Api.ChangePasswordAsync(new ChangePasswordInput(currentPassword,newPassword),ct); currentPassword = newPassword = ""; Feedback.Show(Strings.Saved); });
+    private Task CreateTokenAsync() => RunAsync(async ct => { newToken = (await Api.CreateTokenAsync(new CreateApiKeyRequest(tokenName),ct)).Token; tokens = await Api.GetTokensAsync(ct); });
     private Task CopyAsync() => RunAsync(async ct => { await Js.InvokeVoidAsync("whid.copy",ct,newToken); Feedback.Show(Strings.Copied); });
     private async Task RevokeAsync(ApiTokenModel token)
     {
         if(!await Js.InvokeAsync<bool>("confirm",Cancellation,Strings.RevokeConfirm))return;
-        await RunAsync(async ct => { await Api.SendAsync<bool>(HttpMethod.Delete,"tokens/"+Uri.EscapeDataString(token.Id),null,ct); tokens = await Api.GetAsync<List<ApiTokenModel>>("tokens",ct); });
+        await RunAsync(async ct => { await Api.RevokeTokenAsync(token.Id, ct); tokens = await Api.GetTokensAsync(ct); });
     }
 }

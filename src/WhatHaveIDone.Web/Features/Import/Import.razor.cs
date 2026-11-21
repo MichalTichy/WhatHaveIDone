@@ -20,7 +20,7 @@ public partial class Import : IAsyncDisposable
     protected override async Task OnInitializedAsync(){await LoadAsync();polling=PollAsync();}
     private Task LoadAsync()=>RunAsync(async ct=>
     {
-        var result=await Api.GetAsync<List<ImportModel>>("imports",ct);if(IsDisposed)return;imports=result;loaded=true;
+        var result=await Api.GetImportsAsync(ct);if(IsDisposed)return;imports=result;loaded=true;
         if(Active is {Status:ImportStatus.AwaitingConfirmation} ready&&previewId!=ready.Id){previewId=ready.Id;selectedWorkspaces.Clear();foreach(var workspace in ready.Workspaces)selectedWorkspaces.Add(workspace.Id);}
     });
     private async Task PollAsync()
@@ -29,14 +29,14 @@ public partial class Import : IAsyncDisposable
         catch(OperationCanceledException)when(Cancellation.IsCancellationRequested){}
     }
     private void ToggleWorkspace(long id,ChangeEventArgs args){if(args.Value is true)selectedWorkspaces.Add(id);else selectedWorkspaces.Remove(id);}
-    private Task PrepareAsync()=>RunAsync(async ct=>{await Api.SendAsync<string>(HttpMethod.Post,"imports/prepare",new PrepareApiImport(token, from, through),ct);token="";await LoadAsync();});
-    private Task ConfirmAsync(ImportModel run)=>RunAsync(async ct=>{await Api.SendAsync<bool>(HttpMethod.Post,"imports/"+run.Id+"/confirm",new ConfirmImportInput(selectedWorkspaces.ToList()),ct);await User.ReloadAsync(ct);await LoadAsync();});
-    private Task SkipAsync()=>RunAsync(async ct=>{await Api.SendAsync<bool>(HttpMethod.Post,"onboarding/complete",null,ct);await User.ReloadAsync(ct);Navigation.NavigateTo("/time");});
-    private Task ResumeAsync(ImportModel run)=>RunAsync(async ct=>{await Api.SendAsync<bool>(HttpMethod.Post,"imports/"+run.Id+"/resume",new PrepareApiImport(token),ct);token="";await LoadAsync();});
+    private Task PrepareAsync()=>RunAsync(async ct=>{await Api.PrepareImportAsync(new PrepareApiImport(token, from, through),ct);token="";await LoadAsync();});
+    private Task ConfirmAsync(ImportModel run)=>RunAsync(async ct=>{await Api.ConfirmImportAsync(run.Id,new ConfirmImportInput(selectedWorkspaces.ToList()),ct);await User.ReloadAsync(ct);await LoadAsync();});
+    private Task SkipAsync()=>RunAsync(async ct=>{await Api.CompleteOnboardingAsync(ct);await User.ReloadAsync(ct);Navigation.NavigateTo("/time");});
+    private Task ResumeAsync(ImportModel run)=>RunAsync(async ct=>{await Api.ResumeImportAsync(run.Id,new PrepareApiImport(token),ct);token="";await LoadAsync();});
     private async Task CancelAsync(ImportModel run)
     {
         if(!await Js.InvokeAsync<bool>("confirm",Cancellation,Strings.CancelImportConfirm))return;
-        await RunAsync(async ct=>{await Api.SendAsync<bool>(HttpMethod.Post,"imports/"+run.Id+"/cancel",null,ct);await LoadAsync();});
+        await RunAsync(async ct=>{await Api.CancelImportAsync(run.Id, ct);await LoadAsync();});
     }
     private string ImportedRange(ImportModel run)
         => $"{UserTime.Local(run.RangeStart!.Value, User.Settings.TimeZone):d} – {UserTime.Local(run.RangeEnd!.Value, User.Settings.TimeZone):d}";
