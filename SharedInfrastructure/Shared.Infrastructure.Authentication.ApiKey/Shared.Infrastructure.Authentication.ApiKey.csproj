@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><Description>Opt-in ASP.NET Core API-key authentication and management with Identity integration and an injected IApiKeyStorageService.</Description></PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../Shared.Infrastructure.CurrentUserProvider.HttpContext/Shared.Infrastructure.CurrentUserProvider.HttpContext.csproj" />
+    <ProjectReference Include="../Shared.Infrastructure.Persistence/Shared.Infrastructure.Persistence.csproj" />
+  </ItemGroup>
+</Project>
