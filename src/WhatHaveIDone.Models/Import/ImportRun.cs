@@ -7,14 +7,12 @@ public sealed class ImportRun : Document
 {
     [TenantIdMetadata]
     public string TenantId { get; set; } = "";
-    public Guid? Lease { get; set; }
-    public DateTimeOffset? LeaseUntil { get; set; }
-    public List<ImportCall> Calls { get; set; } = [];
+    public List<ImportCall> PendingCalls { get; set; } = [];
+    public HashSet<string> ConsumedCursors { get; set; } = [];
     public Dictionary<long, ImportedProject> SourceProjects { get; set; } = [];
     public DateOnly? RequestedFrom { get; init; }
     public DateOnly? RequestedThrough { get; init; }
     public ImportStatus Status { get; set; } = ImportStatus.Queued;
-    public bool Confirmed { get; set; }
     public string SourceEmail { get; set; } = "";
     public List<ImportWorkspace> Workspaces { get; set; } = [];
     public Dictionary<long, string> TagNames { get; set; } = [];

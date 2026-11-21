@@ -21,8 +21,6 @@ public sealed class ResumeImportUsecaseHandler(IRepository<ImportRun> imports, T
             run.ProtectedToken = request.ProtectedToken;
         }
 
-        var index = run.Calls.FindIndex(call => call.Status == ImportCallStatus.Error);
-        if (index >= 0) run.Calls[index] = run.Calls[index] with { Status = ImportCallStatus.Todo };
         run.Status = ImportStatus.Queued;
         run.MessageCode = null;
         run.NextAttemptAt = null;

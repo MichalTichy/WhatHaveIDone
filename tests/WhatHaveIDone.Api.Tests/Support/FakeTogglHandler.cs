@@ -48,7 +48,7 @@ public sealed class FakeTogglHandler : HttpMessageHandler
             }
             if(token.StartsWith("premium",StringComparison.Ordinal))return Json(new{error="Workspace needs to have this feature enabled"},HttpStatusCode.PaymentRequired);
             using var json=JsonDocument.Parse(body);var next=json.RootElement.TryGetProperty("first_row_number",out var row)&&row.ValueKind==JsonValueKind.Number?row.GetInt32():0;
-            if(next==0)
+            if(next==0 || token.StartsWith("loop-", StringComparison.Ordinal))
             {
                 var response=Json(new[]{Group(1002,42,"2026-10-26T09:00:00Z"),Group(9999,99,"2026-10-26T10:00:00Z")});
                 response.Headers.Add("X-Next-Row-Number","2");response.Headers.Add("X-Next-ID","1001");return response;

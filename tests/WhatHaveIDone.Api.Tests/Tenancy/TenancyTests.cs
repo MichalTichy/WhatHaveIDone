@@ -111,14 +111,12 @@ public sealed class TenancyTests(IntegrationFixture fixture)
         await using var scope = fixture.App.Services.CreateAsyncScope();
         scope.ServiceProvider.GetRequiredService<CurrentTenancyProvider>().SetBackgroundUser(owner.Owner);
         var sender = scope.ServiceProvider.GetRequiredService<ISender>();
-        var claim = Assert.IsType<ImportRun>(await sender.Send(new ClaimImportUsecase(id)));
-        Assert.Null(await sender.Send(new ClaimImportUsecase(id)));
 
         using var other = await fixture.CreateOwnerAsync();
         Assert.Empty(await other.GetAsync<List<ImportModel>>("imports"));
         Assert.Equal(HttpStatusCode.NotFound, (await other.Http.PostAsJsonAsync("/api/v1/imports/" + id + "/cancel", new { })).StatusCode);
         await owner.PostAsync<bool>("imports/" + id + "/cancel", new { });
-        var conflict = await Assert.ThrowsAsync<AppException>(() => sender.Send(new ApplyImportBatchUsecase(id, claim.Lease!.Value, [])));
+        var conflict = await Assert.ThrowsAsync<AppException>(() => sender.Send(new ApplyImportBatchUsecase(id, [])));
         Assert.Equal("Conflict", conflict.Code);
 
         await using var verify = store.QuerySession(owner.Owner);

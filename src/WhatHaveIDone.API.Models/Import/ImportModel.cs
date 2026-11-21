@@ -4,7 +4,6 @@ public sealed record ImportModel
 {
     public string Id { get; init; } = "";
     public ImportStatus Status { get; init; }
-    public bool Confirmed { get; init; }
     public string SourceEmail { get; init; } = "";
     public string SourceTimeZone { get; init; } = "Europe/Prague";
     public List<ImportWorkspaceModel> Workspaces { get; init; } = [];

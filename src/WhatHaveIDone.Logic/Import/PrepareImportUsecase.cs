@@ -21,7 +21,7 @@ public sealed class PrepareImportUsecaseHandler(IRepository<UserProfile> profile
         var profile = await profiles.RequireAsync(new UserProfileSpecification(), cancellationToken);
         var now = clock.GetUtcNow();
         var existing = await imports.ListAsync(new RetainedImportsSpecification(), cancellationToken);
-        if (existing.Any(run => run.IsActive || run.LeaseUntil > now)) throw new AppException("ImportAlreadyActive", 409);
+        if (existing.Any(run => run.IsActive)) throw new AppException("ImportAlreadyActive", 409);
 
         var zone = source.TimeZone;
         var from = request.From ?? new DateOnly(1970, 1, 1);

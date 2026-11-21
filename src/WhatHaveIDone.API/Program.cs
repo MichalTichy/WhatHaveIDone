@@ -84,6 +84,7 @@ await using (var scope = app.Services.CreateAsyncScope())
 {
     await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database.MigrateAsync();
     await scope.ServiceProvider.GetRequiredService<IDocumentStore>().Storage.ApplyAllConfiguredChangesToDatabaseAsync();
+    await ImportQueueMigration.ApplyAsync(scope.ServiceProvider.GetRequiredService<Npgsql.NpgsqlDataSource>());
 }
 await app.RunAsync();
 

@@ -11,6 +11,5 @@ public enum ImportStatus
     NeedsAttention,
     AwaitingConfirmation,
     Completed,
-    CompletedWithWarnings,
-    Cancelled
+    Cancelled = 7
 }

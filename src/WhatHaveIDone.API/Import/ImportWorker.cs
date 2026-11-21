@@ -4,6 +4,8 @@ using JasperFx;
 using MediatR;
 using Npgsql;
 using Shared.Infrastructure.Persistence.Marten.Repository.Document;
+using Shared.Infrastructure.Persistence.Repositories;
+using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Logic.Execution;
 using WhatHaveIDone.Logic.Import;
 using WhatHaveIDone.Logic.Tenancy;
@@ -41,16 +43,16 @@ public sealed class ImportWorker(IServiceScopeFactory scopes, TimeProvider clock
         var sender = services.GetRequiredService<ISender>();
         try
         {
-            var run = await sender.Send(new ClaimImportUsecase(candidate.Id), cancellationToken);
-            if (run?.Lease is not { } lease) return;
+            var run = await services.GetRequiredService<IReadOnlyRepository<ImportRun>>()
+                .GetByIdAsync(candidate.Id, cancellationToken);
+            if (run is null || !run.Status.CanAdvance() || run.NextAttemptAt > clock.GetUtcNow()) return;
 
             try
             {
-                // Bound the read below the lease lifetime so a second instance cannot fetch the same page while this one reads it.
                 using var readTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 readTimeout.CancelAfter(TimeSpan.FromSeconds(60));
                 var batch = await services.GetRequiredService<TogglImportClient>().FetchAsync(run, readTimeout.Token);
-                var apply = new ApplyImportBatchUsecase(run.Id, lease, batch.Entries,
+                var apply = new ApplyImportBatchUsecase(run.Id, batch.Entries,
                     batch.Continuation);
 
                 for (var attempt = 0; ; attempt++)
@@ -68,25 +70,20 @@ public sealed class ImportWorker(IServiceScopeFactory scopes, TimeProvider clock
             }
             catch (TogglImportException exception)
             {
-                await sender.Send(new MarkImportFailureUsecase(run.Id, lease, exception.Code, exception.NextAttempt), cancellationToken);
+                await sender.Send(new MarkImportFailureUsecase(run.Id, exception.Code, exception.NextAttempt), cancellationToken);
             }
             catch (AppException exception) when (exception.Code != "Conflict")
             {
-                await sender.Send(new MarkImportFailureUsecase(run.Id, lease, exception.Code, null), cancellationToken);
+                await sender.Send(new MarkImportFailureUsecase(run.Id, exception.Code, null), cancellationToken);
             }
             catch (PostgresException exception) when (exception.SqlState == PostgresErrorCodes.UniqueViolation)
             {
-                await sender.Send(new MarkImportFailureUsecase(run.Id, lease, "ImportIdCollision", null), cancellationToken);
+                await sender.Send(new MarkImportFailureUsecase(run.Id, "ImportIdCollision", null), cancellationToken);
             }
             catch (Exception exception) when (!cancellationToken.IsCancellationRequested &&
                 exception is HttpRequestException or JsonException or IOException or OperationCanceledException or FormatException or OverflowException or CryptographicException)
             {
-                await sender.Send(new MarkImportFailureUsecase(run.Id, lease, "ImportSource", null), cancellationToken);
-            }
-            finally
-            {
-                if (!cancellationToken.IsCancellationRequested)
-                    await sender.Send(new ReleaseCancelledImportUsecase(run.Id, lease), cancellationToken);
+                await sender.Send(new MarkImportFailureUsecase(run.Id, "ImportSource", null), cancellationToken);
             }
         }
         catch (AppException exception) when (exception.Code is "Conflict" or "NotFound") { }

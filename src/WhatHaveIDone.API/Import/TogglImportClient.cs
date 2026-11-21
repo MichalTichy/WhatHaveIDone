@@ -39,7 +39,7 @@ public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider p
 
     public async Task<ImportBatch> FetchAsync(ImportRun run, CancellationToken cancellationToken)
     {
-        var call = run.Calls.FirstOrDefault(call => call.Status == ImportCallStatus.Todo)
+        var call = run.PendingCalls.FirstOrDefault()
             ?? throw new TogglImportException("ImportSource");
         var protector = protection.CreateProtector(ProtectionPurpose);
         var token = protector.Unprotect(run.ProtectedToken ?? throw new TogglImportException("ImportToken"));
@@ -94,10 +94,9 @@ public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider p
         ImportCall? continuation = null;
         if (nextId.HasValue || nextRow.HasValue)
         {
-            if (run.Calls.Any(previous => previous.WorkspaceId == call.WorkspaceId && previous.From == call.From
-                && previous.Through == call.Through && previous.FirstId == nextId && previous.FirstRow == nextRow))
-                throw new TogglImportException("ImportSource");
             continuation = call with { FirstId = nextId, FirstRow = nextRow };
+            if (continuation == call || run.ConsumedCursors.Contains(continuation.CursorKey()))
+                throw new TogglImportException("ImportSource");
         }
         return new ImportBatch(entries, continuation);
     }

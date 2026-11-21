@@ -15,16 +15,15 @@ public sealed class ConfirmImportUsecaseHandler(IRepository<ImportRun> imports, 
     protected override async Task<bool> ExecuteAsync(ConfirmImportUsecase request, CancellationToken cancellationToken)
     {
         var run = await imports.RequireAsync(request.Id, cancellationToken);
-        if (run.Confirmed) return true;
-        if (run.Status != ImportStatus.AwaitingConfirmation) throw new AppException("InvalidImport");
+        if (run.Status == ImportStatus.Cancelled) throw new AppException("InvalidImport");
+        if (run.Status != ImportStatus.AwaitingConfirmation) return true;
 
         var ids = request.Input.WorkspaceIds;
         if (ids is null || ids.Count == 0 || ids.Any(id => !run.Workspaces.Any(workspace => workspace.Id == id)))
             throw new AppException("InvalidImport");
-        run.Calls = ids.Distinct().Select(id => new ImportCall(id, run.RequestedFrom!.Value, run.RequestedThrough!.Value)).ToList();
+        run.PendingCalls = ids.Distinct().Select(id => new ImportCall(id, run.RequestedFrom!.Value, run.RequestedThrough!.Value)).ToList();
 
         var now = clock.GetUtcNow();
-        run.Confirmed = true;
         run.Status = ImportStatus.Queued;
         run.UpdatedAt = now;
         await imports.UpdateAsync(run, cancellationToken);

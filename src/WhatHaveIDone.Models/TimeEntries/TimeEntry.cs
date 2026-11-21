@@ -8,7 +8,6 @@ public sealed class TimeEntry : Document
     public List<string> Tags { get; set; } = [];
     public DateTimeOffset Start { get; set; }
     public DateTimeOffset? End { get; set; }
-    public string? SourceKey { get; init; }
 
     public void Change(string? description, string? projectId, IEnumerable<string> tags, DateTimeOffset start, DateTimeOffset? end)
     {
