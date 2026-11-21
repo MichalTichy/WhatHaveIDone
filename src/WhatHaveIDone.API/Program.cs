@@ -1,5 +1,8 @@
 using Shared.Infrastructure.Authentication.ApiKey.Marten;
 using Shared.Infrastructure.Authentication.ApiKey;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using System.Threading.RateLimiting;
 using System.Net;
 using MediatR;
@@ -24,6 +27,14 @@ using WhatHaveIDone.Logic.Reporting;
 using Marten;
 
 var builder = WebApplication.CreateBuilder(args);
+if (!string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]))
+{
+    builder.Logging.AddOpenTelemetry(options => { options.IncludeFormattedMessage = true; options.IncludeScopes = true; });
+    builder.Services.AddOpenTelemetry()
+        .WithMetrics(metrics => metrics.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation())
+        .WithTracing(tracing => tracing.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation())
+        .UseOtlpExporter();
+}
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<ICurrentUserIdProvider, HttpContextCurrentUserIdProvider>();
 builder.Services.AddSingleton(TimeProvider.System);
