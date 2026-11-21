@@ -11,8 +11,15 @@ public partial class Reports
     private bool detail;
     private ReportModel? report;
     private string CsvUrl { get; set; } = "";
+
     protected override Task OnInitializedAsync()
-    { var today = UserTime.Local(DateTimeOffset.UtcNow, User.Settings.TimeZone).Date; startDate = new DateTime(today.Year,today.Month,1); endDate = startDate.AddMonths(1).AddDays(-1); return LoadAsync(); }
+    {
+        var today = UserTime.Local(DateTimeOffset.UtcNow, User.Settings.TimeZone).Date;
+        startDate = new DateTime(today.Year, today.Month, 1);
+        endDate = startDate.AddMonths(1).AddDays(-1);
+        return LoadAsync();
+    }
+
     private Task LoadAsync()
     {
         var from = UserTime.Instant(startDate.Date, User.Settings.TimeZone);
@@ -26,10 +33,36 @@ public partial class Reports
             appliedTo = to;
         });
     }
-    private Task FilterProjectAsync(string? value) { project = value ?? "none"; return LoadAsync(); }
-    private Task FilterDayAsync(string value) { startDate = endDate = DateTime.Parse(value, System.Globalization.CultureInfo.InvariantCulture); return LoadAsync(); }
-    private Task FilterDescriptionAsync(string value) { text = value; return LoadAsync(); }
-    private Task FilterTagAsync(string value) { tag = value; return LoadAsync(); }
-    private Task ResetAsync() { project = tag = text = ""; return LoadAsync(); }
+
+    private Task FilterProjectAsync(string? value)
+    {
+        project = value ?? "none";
+        return LoadAsync();
+    }
+
+    private Task FilterDayAsync(string value)
+    {
+        startDate = endDate = DateTime.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
+        return LoadAsync();
+    }
+
+    private Task FilterDescriptionAsync(string value)
+    {
+        text = value;
+        return LoadAsync();
+    }
+
+    private Task FilterTagAsync(string value)
+    {
+        tag = value;
+        return LoadAsync();
+    }
+
+    private Task ResetAsync()
+    {
+        project = tag = text = "";
+        return LoadAsync();
+    }
+
     private bool Overlaps(TimeEntryModel entry) => report!.Entries.Any(e => e.Id != entry.Id && e.Start < (entry.End ?? report.CalculatedAt) && (e.End ?? report.CalculatedAt) > entry.Start);
 }

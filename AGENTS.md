@@ -42,6 +42,7 @@
 - Use Blazor Blueprint components with the RSM-derived AppComponentBase, shared action button, shell and feedback. Keep product-specific components in the Web project until another boundary is needed.
 - Keep the personal visual direction inspired by Timely/Timemator: warm light canvas and navigation, quiet purple accent, project colours and locally hosted DM Sans. Use the Blazor Blueprint component foundation without restoring the former corporate navy/cyan shell.
 - Pair `.razor` markup with `.razor.cs`; keep page-specific styles, scripts and components nearby. Keep markup declarative.
+- In code-behind, use multiline blocks for control flow and multi-step methods or callbacks. Use expression bodies for simple expressions.
 - Use `Web/Components` for cross-feature controls and `Web/Services/Api` for the native HTTP client.
 - Give the client named operations that accept typed arguments and return native API models. It owns URL construction, parameter encoding, JSON, and request headers. Pages pass filters and IDs and keep presentation state in code-behind.
 - Use `AppComponentBase` for HTTP feedback and component-lifetime cancellation. Use `ExecuteLoadAsync` for replaceable reads so obsolete responses cannot update the UI.
