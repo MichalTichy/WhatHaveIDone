@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <ItemGroup>
+    <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Initializer/Shared.Infrastructure.Initializer.csproj" />
     <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Authentication.ApiKey.Marten/Shared.Infrastructure.Authentication.ApiKey.Marten.csproj" />
     <ProjectReference Include="../WhatHaveIDone.API.Toggl/WhatHaveIDone.API.Toggl.csproj" />
     <ProjectReference Include="../WhatHaveIDone.Logic/WhatHaveIDone.Logic.csproj" />

@@ -45,6 +45,9 @@ builder.Services.AddHttpClient<TogglImportClient>(http=>{http.BaseAddress=new Ur
 if(builder.Configuration.GetValue<bool?>("Import:WorkerEnabled")!=false)builder.Services.AddHostedService<ImportWorker>();
 new PersistenceInstaller().Install(builder.Services, builder.Configuration, builder.Environment.IsProduction());
 new IdentityInstaller().Install(builder.Services, builder.Configuration, builder.Environment.IsProduction());
+#if DEBUG
+builder.Services.AddScoped<WhatHaveIDone.API.Development.DevelopmentDataInitializer>();
+#endif
 builder.Services.AddMartenApiKeyStorage<WhatHaveIDone.Models.ApiToken>();
 builder.Services.AddAuthentication(o => { o.DefaultScheme = "Combined"; o.DefaultAuthenticateScheme = "Combined"; o.DefaultChallengeScheme = "Combined"; o.DefaultForbidScheme = "Combined"; })
     .AddPolicyScheme("Combined", null, o => o.ForwardDefaultSelector = http => http.Request.Headers.Authorization.Count > 0 ? ApiKeyAuthenticationDefaults.AuthenticationScheme : IdentityConstants.ApplicationScheme)
@@ -99,6 +102,10 @@ await using (var scope = app.Services.CreateAsyncScope())
     await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database.MigrateAsync();
     await scope.ServiceProvider.GetRequiredService<IDocumentStore>().Storage.ApplyAllConfiguredChangesToDatabaseAsync();
     await ImportQueueMigration.ApplyAsync(scope.ServiceProvider.GetRequiredService<Npgsql.NpgsqlDataSource>());
+#if DEBUG
+    await scope.ServiceProvider.GetRequiredService<WhatHaveIDone.API.Development.DevelopmentDataInitializer>()
+        .InitializeAsync(app.Configuration);
+#endif
 }
 await app.RunAsync();
 

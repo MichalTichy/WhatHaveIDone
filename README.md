@@ -1,83 +1,62 @@
 # What Have I Done?!
 
-Minimalistická osobní evidence času: .NET 10, Blazor WebAssembly/PWA, Blazor Blueprint UI, PostgreSQL a Marten. Jeden API host obsluhuje také web. Každý uživatel má vlastní data, bez organizací a workspaces.
+A personal time tracker built with .NET 10, Blazor WebAssembly, Blazor Blueprint, PostgreSQL, and Marten. One ASP.NET Core host serves the API and the installable web app. Data is isolated by user.
 
-Implementováno je přihlášení/registrace, serverové Entra SSO pro jeden tenant, časovač, seznam s automatickým ukládáním, editovatelný kalendář, projekty, dynamické tagy, přehledy/CSV, API klíče a import na pozadí přes Toggl API nebo podporované CSV. Vybraný profil Toggl v9 slouží pro navazující úpravu Riganti IS; nejde o úplnou kopii Togglu. Emailing, reset hesla a offline editace nejsou součástí první verze.
+The app includes account registration, single-tenant Microsoft Entra SSO, a timer, autosaving time entries, an editable calendar, projects and tags, reporting with CSV export, API keys, and background import from Toggl. The supported Toggl v9 endpoints provide compatibility for the planned Riganti IS integration.
 
-## Lokální start
+## Run locally with Aspire
 
-Potřebujete SDK z [global.json](global.json), Node.js 24/npm a Docker s Compose. V PowerShellu z kořene:
+Install the .NET SDK pinned in [global.json](global.json), Node.js 24 with npm, Docker, and the Aspire 17 CLI. Run these commands from the repository root:
 
-```powershell
-./eng/start.ps1
+```sh
+dotnet tool install --global Aspire.Cli --version 17.0.0
+aspire run --apphost src/WhatHaveIDone.AppHost/WhatHaveIDone.AppHost.csproj
 ```
 
-Skript vytvoří ignorovaný `.env` s náhodným heslem, spustí PostgreSQL a aplikaci na **http://localhost:5088**. Restore a sestavení CSS/kalendáře jsou součástí .NET buildu. Ve druhém terminálu lze založit syntetická data:
+If Aspire is already installed as a global .NET tool, use `dotnet tool update --global Aspire.Cli --version 17.0.0`. Open [the application](http://localhost:5088) after the API is healthy. The CLI prints a sign-in link for the Aspire dashboard, which shows resource health, logs, HTTP traces, and metrics. Keep the dashboard sign-in link private.
 
-```powershell
-./eng/seed.ps1
-```
+Aspire starts PostgreSQL 17.6 and waits for the database before launching the API. It passes the connection string as `ConnectionStrings__DB` and keeps database data in the `whid-aspire-postgres` Docker volume. Aspire manages the PostgreSQL password through local AppHost user secrets. Press Ctrl+C to stop the AppHost. The volume persists across restarts.
 
-Účet je `demo@example.test`; jeho vygenerované heslo najdete pouze v lokálním `.env` jako `DEMO_PASSWORD`. Seed lze opakovat, existující změny nepřepisuje. Nový vlastní účet můžete založit přímo v aplikaci. Při prvním přihlášení se otevře Import, který lze přeskočit.
+The API exports OpenTelemetry data when `OTEL_EXPORTER_OTLP_ENDPOINT` is configured. Aspire sets it during local orchestration. An external OTLP collector can supply the endpoint for deployments that use Docker Compose.
 
-Celá aplikace v kontejnerech, bez lokálního SDK/Node:
+### Development sample data
 
-```powershell
-# Poprvé: Copy-Item .env.example .env a nastavte vlastní heslo.
+A Debug build running in the Development environment seeds a demo account, projects, tags, and time entries on its first startup against the database. Sign in as `demo@example.test` using the generated password in the ignored file `src/WhatHaveIDone.API/data/demo-password.txt`. Subsequent startups preserve edits to the demo account and its data. You can also register a separate account to try the onboarding and import flow.
+
+## Run with Docker Compose
+
+Copy [the example environment file](.env.example) to `.env` and set a long, random `POSTGRES_PASSWORD`. Start the full application:
+
+```sh
 docker compose --profile app up -d --build --wait
 ```
 
-Na portu 5088 smí běžet jen jedna z variant. Data i ochranné klíče mají persistentní volumes.
+The default URL is [http://localhost:5088](http://localhost:5088). Aspire and Compose use separate database volumes. Stop the Aspire application before starting the Compose application on the same port. Compose persists both database data and ASP.NET Core Data Protection keys. The Compose image uses a Release build. Register an account through the UI to get started.
 
-## Aspire pro lokální vývoj
+## Build and test
 
-Alternativně můžete spustit PostgreSQL a stejný API/WASM host přes Aspire 17. Potřebujete stejné SDK/Node/Docker a Aspire CLI:
+With `.env` configured for Compose, run:
 
-```powershell
-dotnet tool install --global Aspire.Cli --version 17.0.0
-./eng/start.ps1 -Aspire
-```
-
-Přímo lze použít `aspire run --apphost src/WhatHaveIDone.AppHost/WhatHaveIDone.AppHost.csproj`. Aplikace běží na **http://localhost:5088**. Dashboard otevřete pomocí přihlašovacího odkazu vypsaného Aspire; token nesdílejte. Nabízí stav prostředků, konzolové/strukturované logy, HTTP traces a metriky. API exportuje OTLP jen při nastaveném `OTEL_EXPORTER_OTLP_ENDPOINT`; mimo Aspire lze použít vlastní OTLP collector.
-
-AppHost čeká na zdravou databázi a předává `ConnectionStrings__DB`. PostgreSQL 17.6 má vlastní persistentní volume `whid-aspire-postgres`, oddělený od Compose. Heslo spravuje Aspire v lokálních user secrets AppHostu. Ctrl+C zastaví host i jeho prostředky; databázová data zůstanou pro další spuštění. Aspire a Compose používají oddělené databáze; aplikaci na portu 5088 spouštějte jen jedním způsobem. Pro integrační testy dál slouží `./eng/start.ps1 -DatabaseOnly` nebo explicitní `WHID_TEST_CONNECTION`.
-
-Pro syntetická data lze po startu přes `eng/start.ps1 -Aspire` použít stávající `./eng/seed.ps1`. Aspire je vývojový orchestrátor; produkční Docker/Compose postup zůstává dostupný. AppHost je jediný nový projekt, ne další webový server.
-
-## Ověření a struktura
-
-```powershell
-./eng/start.ps1 -DatabaseOnly
+```sh
+docker compose up -d --wait db
 dotnet test WhatHaveIDone.slnx -warnaserror
+node --test tests/calendar-behavior.test.mjs
 dotnet publish src/WhatHaveIDone.API -c Release -o artifacts/publish -warnaserror
 ```
 
-Integrační testy vytvářejí a odstraňují vlastní databázi `whid_tests_<guid>`. Čtou lokální `.env`, případně `WHID_TEST_CONNECTION`; připojení potřebuje oprávnění vytvořit databázi. Nepoužívejte produkční účet. Build zahrnuje npm/CSS a nepoužívá interní NuGet feed ani zdrojové checkouty RSM/Edifio.
+The integration suite uses the database credentials in `.env` or an explicit `WHID_TEST_CONNECTION`. Its login needs permission to create a temporary database. The suite drops its own `whid_tests_<guid>` database when it finishes. The .NET build restores the npm packages and builds the CSS and calendar assets.
 
-`src/` obsahuje Web, API, API.Toggl, API.Models, Models, Logic a dva konkrétní persistence/Identity adaptéry. API hostuje nativní rozhraní pro frontend; samostatná knihovna API.Toggl vlastní kompatibilní v9 endpointy, DTO a formát chyb. Nativní API a Toggl adaptér používají stejnou Logic a běží v jednom serveru. Čtrnáct potřebných projektů v `SharedInfrastructure/` jsou lokální kopie. Navíc zde vznikly `Shared.Infrastructure.Authentication.ApiKey` (generování/hash, správa a Identity autentizace, vyžaduje `IApiKeyStorageService`) a oddělený `.Marten` adaptér s úložištěm a konfigurací. Zapojení je `AddMartenApiKeyStorage<ApiToken>()` a `AddAuthentication(...).AddApiKeys<AppUser>(...)`; vlastní typ dokumentu zachovává uložená data a jiné aplikace mohou použít výchozí typ adaptéru. Core nemá závislost na Martenu. UI/nativní kontrakty a Basic kompatibilita v API.Toggl zůstávají aplikaci. Zápisy jdou přes use cases, čtení přes specifikace; WASM zná jen vlastní HTTP kontrakty.
+## Architecture
 
-Autentizace přímo používá ASP.NET Identity UserManager/SignInManager v account endpointech a standardním OIDC eventu v Infrastructure.Identity. Společná privátní sign-in metoda doplní chybějící profil a výchozího klienta v jedné Marten transakci a až potom vydá cookie. Autentizace nemá MediatR wrappery ani account/provisioning service; tracking operace dál používají use cases.
+- `WhatHaveIDone.Web` groups pages and their components under `Features`. Shared controls live in `Components`, the shell lives in `Layout`, and a typed client in `Services/Api` owns the native HTTP calls.
+- `WhatHaveIDone.API` serves the frontend and native API. `WhatHaveIDone.API.Toggl` owns compatible Toggl v9 endpoints, wire DTOs, and errors. `WhatHaveIDone.API.Models` contains contracts shared with the frontend.
+- `WhatHaveIDone.Logic` exposes use cases for writes and specifications for reads. `WhatHaveIDone.Models` contains domain documents. The persistence and Identity projects provide the PostgreSQL and ASP.NET Identity integrations.
+- Marten scopes tracking documents to the signed-in user. API keys are looked up globally during authentication and then resolve to their owner. The worker discovers pending imports across users and processes each run inside its owner's tenant.
+- A Toggl import reads the source account and its available workspaces, then imports selected workspaces from newest to oldest. The worker saves each page and its checkpoint together and resumes after quota limits. Completed and cancelled imports discard source credentials. The UI shows up to 20 runs.
+- `SharedInfrastructure/` contains locally copied infrastructure and the API key module with its separate Marten adapter. See the [provenance manifest](SharedInfrastructure/PROVENANCE.md) for source and licensing details.
 
-Marten používá společné tabulky s tenantem pro každého uživatele. Scoped `CurrentTenancyProvider` získává ID z existujícího claimu `NameIdentifier` přes sdílený `HttpContextCurrentUserIdProvider`; klient nemůže tenant zvolit hlavičkou, parametrem ani workspace ID. Běžné dokumenty mají `Id` a `Version`, bez duplicitního `OwnerId`. Globální API klíče si ponechávají `UserId` pro autentizaci a kontrolu vlastníka. Worker hledá čekající importy explicitním dotazem napříč tenanty a zápisy provádí ve scope jejich uživatele.
+See [repository conventions](AGENTS.md), [the .NET architecture skill](.agents/Skills/dotnet-application-architecture/SKILL.md), and [the shared infrastructure skill](.agents/Skills/shared-infra/SKILL.md). Planning and verification notes in `docs/` are local.
 
-Import má vlastní dokument v tenantu uživatele. Připojení jedním voláním načte účet a číselníky Togglu. Po potvrzení se nejnovější stránky ve vybraných workspaces načítají jako první. Každá stránka se zapíše s checkpointem, při limitu zůstane čekat do dalšího pokusu. Dokončení a zrušení odstraní token, souborovou cestu, náhled i pomocná metadata. API vrací nejvýše 20 běhů. Před prvním vydáním nepodporujeme převod starých vývojových schémat.
+The UI uses Blazor Blueprint and FullCalendar, with locally served DM Sans. The font comes from [google/fonts](https://github.com/google/fonts/tree/e7db6ca603fd4862010383ff17ffd6cc4ffac1c0/ofl/dmsans) and includes its SIL Open Font License. The UI and server-side authentication flow draw on RSM commit `7eb0637e06fdafc53469c66b3650db0e16af2b06`. Timely and Timemator informed the visual design.
 
-Soubory uvnitř projektů jsou seskupené podle funkcí, například `TimeEntries`, `Projects`, `Import` a `Settings`. API DTO jsou v odpovídajících složkách `API.Models`, doménové dokumenty v `Models` a use cases se specifikacemi v `Logic`. Společné modelové namespaces zůstávají stabilní, včetně identit uložených dokumentů.
-
-Ve Webu jsou stránky i jejich související komponenty ve `Features/Authentication`, `Time`, `Projects`, `Reporting`, `Import` a `Settings`. Například `Features/Time` obsahuje stránku Čas, editor záznamu i zdrojové skripty kalendáře; `Features/Settings` obsahuje také MCP dialog. Znovupoužitelné UI zůstává v `Components`, shell v `Layout`. API testy mají stejné funkční členění a společnou testovací infrastrukturu ve složce `Support`.
-
-
-- [Plánovací návrh stránky Čas a jeho omezení](prototype/doc/components.md)
-- [Pravidla repozitáře](AGENTS.md)
-- [Architektonický skill](.agents/Skills/dotnet-application-architecture/SKILL.md)
-- [Práce s lokální Shared.Infrastructure](.agents/Skills/shared-infra/SKILL.md)
-
-Plánovací a ověřovací poznámky ve složce `docs/` zůstávají lokální a nejsou součástí repozitáře.
-
-Lokálně kopírované infrastrukturní projekty mají vlastní [manifest původu](SharedInfrastructure/PROVENANCE.md). UI komponenty a serverový auth tok vycházejí z RSM commitu `7eb0637e06fdafc53469c66b3650db0e16af2b06` a jsou přizpůsobené WASM a osobním účtům. DM Sans v `src/WhatHaveIDone.Web/wwwroot/fonts/` pochází z google/fonts commitu `e7db6ca603fd4862010383ff17ffd6cc4ffac1c0`; původní SIL OFL 1.1 je přiložená u fontu. Timely a Timemator jsou vizuální inspirací, jejich kód ani značkové podklady se nekopírují.
-
-První navazující funkcí je **draft výkazu**, oddělený od potvrzených záznamů a reportů. MVP kvůli němu neobsahuje prázdné projekty, sběrače ani menu.
-
-Přenos se skutečným Toggl účtem, přihlášení přes skutečného Entra poskytovatele a synchronizace s upraveným Riganti IS vyžadují ověření v nakonfigurovaném prostředí. Lokálně jsou pokryté protokolové odpovědi, kvóty, obnovování importu a provisioning účtů. Před veřejným open-source vydáním zbývá vyřešit distribuční práva převzatého interního kódu a licenci výsledné aplikace; zdrojový checkout licenci neposkytoval.
-
-UI controls use BlazorBlueprint.Components 4.2.0 with the application Tailwind build and a warm light theme. Component CSS is served locally from the package; ES modules load on demand. FullCalendar remains the editable calendar.
+End-to-end verification with a real Toggl account, a configured Entra tenant, and the updated Riganti IS integration remains pending. A public open-source release also requires confirmation of distribution rights for copied internal code and selection of a project license. Timesheet drafts are the first planned feature after the MVP.
