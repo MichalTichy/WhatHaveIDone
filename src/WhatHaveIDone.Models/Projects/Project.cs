@@ -7,5 +7,4 @@ public sealed class Project : Document
     public string Color { get; set; } = "#009cde";
     public string? ClientId { get; set; }
     public bool Archived { get; set; }
-    public string? SourceKey { get; init; }
 }

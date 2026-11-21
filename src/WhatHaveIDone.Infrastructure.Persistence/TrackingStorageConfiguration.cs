@@ -11,6 +11,7 @@ public sealed class TrackingStorageConfiguration : IStorageConfiguration
     public void Configure(StoreOptions options)
     {
         options.DatabaseSchemaName = "tracking";
+        options.Schema.For<ImportRun>().MultiTenanted().UseOptimisticConcurrency(true);
         options.Schema.For<UserProfile>().MultiTenanted().UseOptimisticConcurrency(true);
         options.Schema.For<Client>().MultiTenanted().UseOptimisticConcurrency(true)
             .UniqueIndex(UniqueIndexType.Computed, "client_compatibility", TenancyScope.PerTenant, x => x.CompatibilityId);
