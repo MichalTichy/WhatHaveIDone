@@ -1,0 +1,13 @@
+<fieldset class="color-picker">
+    <legend>@Strings.Color</legend>
+    <div class="color-grid">
+        @foreach (var color in Palette)
+        {
+            <button type="button" class="color-option" style="--project-color:@color" aria-label="@string.Format(Strings.SelectColor, color)"
+                    aria-pressed="@string.Equals(Value, color, StringComparison.OrdinalIgnoreCase)" @onclick="() => ValueChanged.InvokeAsync(color)">
+                @if (string.Equals(Value, color, StringComparison.OrdinalIgnoreCase)) { <span aria-hidden="true">✓</span> }
+            </button>
+        }
+    </div>
+    <label>@Strings.HexColor<input value="@Value" @onchange="ChangeAsync" pattern="#[0-9a-fA-F]{6}" maxlength="7" placeholder="#009cde" /></label>
+</fieldset>

@@ -1,0 +1,18 @@
+@inherits AppComponentBase
+<div class="client-picker">
+    <label for="@selectId">@Strings.Client</label>
+    <div class="project-select">
+        <select id="@selectId" value="@(Value ?? User.DefaultClientId)" @onchange="SelectAsync">
+            @foreach (var client in User.Clients) { <option value="@client.Id">@client.Name</option> }
+        </select>
+        <button type="button" class="secondary" aria-label="@Strings.AddClient" aria-expanded="@adding" @onclick="Toggle">＋</button>
+    </div>
+    @if (adding)
+    {
+        <div class="inline-client stack">
+            <label>@Strings.ClientName<input @bind="name" @bind:event="oninput" maxlength="200" autocomplete="off" /></label>
+            @if (Error is not null) { <p class="alert error" role="alert">@Error</p> }
+            <div class="actions"><AppActionButton Disabled="@(Busy || string.IsNullOrWhiteSpace(name))" OnClick="CreateAsync">@Strings.AddClient</AppActionButton><button type="button" class="secondary" disabled="@Busy" @onclick="Toggle">@Strings.Cancel</button></div>
+        </div>
+    }
+</div>
