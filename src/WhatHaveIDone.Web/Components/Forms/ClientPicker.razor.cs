@@ -14,7 +14,7 @@ public partial class ClientPicker
     private Task SelectAsync(ChangeEventArgs args) => ValueChanged.InvokeAsync(args.Value?.ToString());
     private Task CreateAsync() => RunAsync(async ct =>
     {
-        var id = await Api.SendAsync<string>(HttpMethod.Post, "clients", new ClientModel { Name = name }, ct);
+        var id = await Api.SaveClientAsync(new ClientModel { Name = name }, ct);
         await User.ReloadAsync(ct);
         if (IsDisposed) return;
         adding = false; name = "";

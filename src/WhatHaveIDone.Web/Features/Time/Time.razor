@@ -20,7 +20,7 @@
 </section>
 <div class="toolbar"><div class="tabs"><button class="@(!calendarView ? "active" : "")" aria-pressed="@(!calendarView)" @onclick="ShowList">@Strings.List</button><button class="@(calendarView ? "active" : "")" aria-pressed="@calendarView" @onclick="ShowCalendar">@Strings.Calendar</button></div><AppActionButton OnClick="AddAsync">＋ @Strings.AddEntry</AppActionButton></div>
 <div class="period"><div class="actions"><button class="secondary" aria-label="@Strings.Previous" @onclick="PreviousAsync">‹</button><button class="secondary" @onclick="TodayAsync">@Strings.Today</button><button class="secondary" aria-label="@Strings.Next" @onclick="NextAsync">›</button><input aria-label="@Strings.Period" class="date-input" type="date" @bind="selectedDay" @bind:format="yyyy-MM-dd" @bind:after="LoadAsync" /></div><strong class="period-total"><span>@Strings.Total</span> @UserTime.Duration(TotalSeconds())</strong></div>
-@if (loading && !loaded) { <Loading /> }
+@if (IsLoading && !loaded) { <Loading /> }
 else if (loaded)
 {
     @if (calendarView) { <section class="surface"><div @ref="calendarElement"></div></section> }
@@ -41,7 +41,7 @@ else if (loaded)
                     }
                     else
                     {
-                        <button class="entry-gap" @key="(day,row.Start,row.End)" disabled="@loading"
+                        <button class="entry-gap" @key="(day,row.Start,row.End)" disabled="@IsLoading"
                                 aria-label="@string.Format(Strings.FillGap, GapTime(row.Start), GapTime(row.End), UserTime.Duration((row.End-row.Start).TotalSeconds))"
                                 @onclick="() => FillGap(row.Start, row.End)">
                             <span class="gap-icon" aria-hidden="true">＋</span>

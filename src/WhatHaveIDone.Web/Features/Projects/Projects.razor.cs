@@ -24,7 +24,7 @@ public partial class Projects : IAsyncDisposable
     private Task SaveClientAsync() => RunAsync(async ct =>
     {
         if (editingClient is null) return;
-        await Api.SendAsync<string>(addingClient ? HttpMethod.Post : HttpMethod.Put, addingClient ? "clients" : "clients/" + Uri.EscapeDataString(editingClient.Id), editingClient, ct);
+        await Api.SaveClientAsync(editingClient, ct);
         await User.ReloadAsync(ct); editingClient = null;
     });
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -35,10 +35,10 @@ public partial class Projects : IAsyncDisposable
     private Task SaveAsync() => RunAsync(async ct =>
     {
         if (editing is null) return;
-        await Api.SendAsync<string>(string.IsNullOrEmpty(editing.Id) ? HttpMethod.Post : HttpMethod.Put, "projects" + (string.IsNullOrEmpty(editing.Id) ? "" : "/" + Uri.EscapeDataString(editing.Id)), editing, ct);
+        await Api.SaveProjectAsync(editing, ct);
         await CloseAsync(); await User.ReloadAsync(ct);
     });
-    private Task ToggleArchiveAsync(ProjectModel project) => RunAsync(async ct => { await Api.SendAsync<string>(HttpMethod.Put, "projects/" + Uri.EscapeDataString(project.Id), project with { Archived = !project.Archived }, ct); await User.ReloadAsync(ct); });
+    private Task ToggleArchiveAsync(ProjectModel project) => RunAsync(async ct => { await Api.SaveProjectAsync(project with { Archived = !project.Archived }, ct); await User.ReloadAsync(ct); });
     [JSInvokable] public Task RequestCloseAsync() => CloseAsync();
     private async Task CloseAsync() { if (editing is null) return; await Js.InvokeVoidAsync("whid.closeDialog", Cancellation, dialog); editing = null; }
     public ValueTask DisposeAsync() { Dispose(); self?.Dispose(); return ValueTask.CompletedTask; }

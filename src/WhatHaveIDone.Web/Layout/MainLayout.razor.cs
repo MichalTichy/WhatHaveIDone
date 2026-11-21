@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using WhatHaveIDone.Web.Services;
+using WhatHaveIDone.Web.Services.Api;
 using WhatHaveIDone.Web.Resources;
 
 namespace WhatHaveIDone.Web.Layout;
@@ -31,7 +32,7 @@ public partial class MainLayout : IAsyncDisposable
     {
         try
         {
-            await Api.SendAsync<bool>(HttpMethod.Post, "account/logout", null, CancellationToken.None);
+            await Api.LogoutAsync(CancellationToken.None);
             Navigation.NavigateTo("/login", forceLoad: true);
         }
         catch (ApiCallException exception) when (exception.Status == 401) { Navigation.NavigateTo("/login", forceLoad: true); }

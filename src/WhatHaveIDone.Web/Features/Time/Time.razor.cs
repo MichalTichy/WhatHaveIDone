@@ -17,10 +17,8 @@ public partial class Time : IAsyncDisposable
     private List<string> selectedTags = [];
     private DateTime selectedDay;
     private DateTimeOffset now = DateTimeOffset.UtcNow, from, to, editorStart, editorEnd;
-    private bool calendarView, narrow, loading, loaded, editorOpen, calendarDirty, createEditorEntry;
-    private int loadGeneration;
+    private bool calendarView, narrow, loaded, editorOpen, calendarDirty, createEditorEntry;
     private Guid editorKey;
-    private CancellationTokenSource? loadCancellation;
     private readonly PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
     private Task? timerTask;
     private ElementReference calendarElement;
@@ -38,21 +36,22 @@ public partial class Time : IAsyncDisposable
         var start = narrow ? selectedDay.Date : selectedDay.Date.AddDays(-((7 + (int)selectedDay.DayOfWeek - User.Settings.FirstDayOfWeek) % 7));
         from = UserTime.Instant(start, User.Settings.TimeZone); to = UserTime.Instant(start.AddDays(narrow ? 1 : 7), User.Settings.TimeZone);
     }
-    private async Task LoadAsync()
+    private Task LoadAsync()
     {
-        loadCancellation?.Cancel(); loadCancellation?.Dispose(); loadCancellation = CancellationTokenSource.CreateLinkedTokenSource(Cancellation);
-        var ct = loadCancellation.Token; var generation = ++loadGeneration; loading = true; SetRange();
-        try
+        SetRange();
+        var range = (From: from, To: to);
+        return ExecuteLoadAsync(async ct =>
         {
-            var selected = await Api.GetAsync<List<TimeEntryModel>>($"time-entries?from={Uri.EscapeDataString(from.ToString("O"))}&to={Uri.EscapeDataString(to.ToString("O"))}", ct);
-            var running = await Api.GetAsync<TimeEntryModel?>("timer", ct);
-            if (IsDisposed || generation != loadGeneration) return;
-            entries = selected; runningEntry = running; loaded = true; Error = null; calendarDirty = true;
-        }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested) { }
-        catch (ApiCallException exception) { if (!IsDisposed && generation == loadGeneration) { Error = exception.Message; if (exception.Status == 401) Navigation.NavigateTo("/login", forceLoad: true); } }
-        catch (HttpRequestException) { if (!IsDisposed && generation == loadGeneration) Error = Strings.Offline; }
-        finally { if (!IsDisposed && generation == loadGeneration) { loading = false; StateHasChanged(); } }
+            var selected = await Api.GetTimeEntriesAsync(range.From, range.To, ct);
+            var running = await Api.GetTimerAsync(ct);
+            return (selected, running);
+        }, result =>
+        {
+            entries = result.selected;
+            runningEntry = result.running;
+            loaded = true;
+            calendarDirty = true;
+        });
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -85,14 +84,14 @@ public partial class Time : IAsyncDisposable
     private Task TodayAsync() { selectedDay = UserTime.Local(now, User.Settings.TimeZone).Date; return LoadAsync(); }
     private async Task ShowList() { await DisposeCalendarAsync(); calendarView = false; }
     private void ShowCalendar() { calendarView = true; calendarDirty = true; }
-    private Task StartAsync() => RunAsync(async ct => { await Api.SendAsync<TimeEntryModel>(HttpMethod.Post, "timer/start", new EditTimeEntry { Description = description, ProjectId = projectId, Tags = selectedTags }, ct); await User.ReloadAsync(ct); await LoadAsync(); });
-    private Task StopAsync() => RunAsync(async ct => { if (runningEntry is not null) await Api.SendAsync<bool>(HttpMethod.Post, "timer/" + Uri.EscapeDataString(runningEntry.Id) + "/stop", null, ct); await LoadAsync(); });
-    private Task ContinueAsync(TimeEntryModel entry) => RunAsync(async ct => { var project = User.Projects.FirstOrDefault(p => p.Id == entry.ProjectId && !p.Archived); await Api.SendAsync<TimeEntryModel>(HttpMethod.Post, "timer/start", new EditTimeEntry { Description = entry.Description, ProjectId = project?.Id, Tags = entry.Tags }, ct); await LoadAsync(); });
+    private Task StartAsync() => RunAsync(async ct => { await Api.StartTimerAsync(new EditTimeEntry { Description = description, ProjectId = projectId, Tags = selectedTags }, ct); await User.ReloadAsync(ct); await LoadAsync(); });
+    private Task StopAsync() => RunAsync(async ct => { if (runningEntry is not null) await Api.StopTimerAsync(runningEntry.Id, ct); await LoadAsync(); });
+    private Task ContinueAsync(TimeEntryModel entry) => RunAsync(async ct => { var project = User.Projects.FirstOrDefault(p => p.Id == entry.ProjectId && !p.Archived); await Api.StartTimerAsync(new EditTimeEntry { Description = entry.Description, ProjectId = project?.Id, Tags = entry.Tags }, ct); await LoadAsync(); });
     private Task AddAsync() { editingEntry = null; editorStart = UserTime.Instant(selectedDay.Date.AddHours(9), User.Settings.TimeZone); editorEnd = editorStart.AddHours(1); ShowEditor(); return Task.CompletedTask; }
     private void ShowEditor(bool createEntry = false) { createEditorEntry = createEntry; editorKey = Guid.NewGuid(); editorOpen = true; }
     private void FillGap(DateTimeOffset start, DateTimeOffset end)
     {
-        if (editorOpen || loading) return;
+        if (editorOpen || IsLoading) return;
         editingEntry = null; editorStart = start; editorEnd = end;
         ShowEditor(createEntry: true);
     }
@@ -102,7 +101,7 @@ public partial class Time : IAsyncDisposable
     {
         var entry = entries.FirstOrDefault(e => e.Id == id); if (entry is null || entry.End is null) return false;
         var success = false;
-        await RunAsync(async ct => { await Api.SendAsync<TimeEntryModel>(HttpMethod.Put, "time-entries/" + Uri.EscapeDataString(id), new EditTimeEntry { Version = entry.Version, Description = entry.Description, ProjectId = entry.ProjectId, Tags = entry.Tags, Start = DateTimeOffset.Parse(start, CultureInfo.InvariantCulture), End = DateTimeOffset.Parse(end, CultureInfo.InvariantCulture) }, ct); success = true; await LoadAsync(); });
+        await RunAsync(async ct => { await Api.SaveTimeEntryAsync(id, new EditTimeEntry { Version = entry.Version, Description = entry.Description, ProjectId = entry.ProjectId, Tags = entry.Tags, Start = DateTimeOffset.Parse(start, CultureInfo.InvariantCulture), End = DateTimeOffset.Parse(end, CultureInfo.InvariantCulture) }, ct); success = true; await LoadAsync(); });
         return success;
     }
     [JSInvokable] public Task RefreshAsync() => RunAsync(async ct => { await User.ReloadAsync(ct); await LoadAsync(); });
@@ -139,7 +138,7 @@ public partial class Time : IAsyncDisposable
     private async Task DisposeCalendarAsync() { if (calendarCreated && calendarModule is not null) { await calendarModule.InvokeVoidAsync("dispose", calendarElement); calendarCreated = false; } }
     public async ValueTask DisposeAsync()
     {
-        Dispose(); timer.Dispose(); loadCancellation?.Cancel(); loadCancellation?.Dispose();
+        Dispose(); timer.Dispose();
         if (timerTask is not null) await timerTask;
         try { if (watcher is not null) await Js.InvokeVoidAsync("whid.unwatchPage", watcher); await DisposeCalendarAsync(); if (calendarModule is not null) await calendarModule.DisposeAsync(); } catch (JSDisconnectedException) { }
         self?.Dispose();
