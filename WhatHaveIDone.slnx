@@ -18,6 +18,7 @@
     <Project Path="SharedInfrastructure/Shared.Infrastructure.UnitOfWork/Shared.Infrastructure.UnitOfWork.csproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/WhatHaveIDone.AppHost/WhatHaveIDone.AppHost.csproj" />
     <Project Path="src/WhatHaveIDone.API/WhatHaveIDone.API.csproj" />
     <Project Path="src/WhatHaveIDone.API.Toggl/WhatHaveIDone.API.Toggl.csproj" />
     <Project Path="src/WhatHaveIDone.API.Models/WhatHaveIDone.API.Models.csproj" />
