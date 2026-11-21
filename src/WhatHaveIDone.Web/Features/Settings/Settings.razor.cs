@@ -13,7 +13,9 @@ public partial class Settings
     private string currentPassword = "", newPassword = "", tokenName = "Riganti IS";
     private string? newToken;
     private bool loaded, importActive;
+    private bool mcpSetupOpen;
     private string ApiUrl => Navigation.BaseUri;
+    private string McpUrl => new Uri(new Uri(Navigation.BaseUri), "mcp").AbsoluteUri;
     protected override Task OnInitializedAsync() => LoadAsync();
     private Task LoadAsync() => RunAsync(async ct =>
     {
