@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using WhatHaveIDone.Web.Services;
+using WhatHaveIDone.Web.Services.Api;
 
 namespace WhatHaveIDone.Web;
 

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using WhatHaveIDone.API.Models;
 
-namespace WhatHaveIDone.Web.Components.Forms;
+namespace WhatHaveIDone.Web.Features.Time;
 
 public partial class ProjectPicker
 {
@@ -17,7 +17,7 @@ public partial class ProjectPicker
     private Task ChooseAsync(string? id) => Value == id ? Task.CompletedTask : ValueChanged.InvokeAsync(id);
     private Task CreateAsync() => RunAsync(async ct =>
     {
-        var id = await Api.SendAsync<string>(HttpMethod.Post, "projects", new ProjectModel { Name = name, Color = color, ClientId = clientId }, ct);
+        var id = await Api.SaveProjectAsync(new ProjectModel { Name = name, Color = color, ClientId = clientId }, ct);
         await User.ReloadAsync(ct);
         if (IsDisposed) return;
         adding = false; name = "";

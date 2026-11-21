@@ -5,6 +5,7 @@ using Microsoft.JSInterop;
 using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Web.Resources;
 using WhatHaveIDone.Web.Services;
+using WhatHaveIDone.Web.Services.Api;
 
 namespace WhatHaveIDone.Web.Features.Time;
 
@@ -100,7 +101,7 @@ public partial class TimeEntryEditor : IAsyncDisposable
                 saving = true; status = Strings.Saving; Error = null; StateHasChanged();
                 try
                 {
-                    var saved = await Api.SendAsync<TimeEntryModel>(id is null ? HttpMethod.Post : HttpMethod.Put, id is null ? "time-entries" : "time-entries/" + Uri.EscapeDataString(id), snapshot with { Version = version }, Cancellation);
+                    var saved = await Api.SaveTimeEntryAsync(id, snapshot with { Version = version }, Cancellation);
                     if (IsDisposed) return;
                     id = saved.Id; version = saved.Version; originalProject = saved.ProjectId; savedRevision = requestRevision; pendingCreate = null;
                     failed = authenticationExpired = false; status = revision == savedRevision ? Strings.Saved : Strings.Unsaved;
@@ -122,7 +123,7 @@ public partial class TimeEntryEditor : IAsyncDisposable
             var snapshot = Snapshot(); var to = snapshot.End ?? DateTimeOffset.UtcNow;
             if (to <= snapshot.Start) return;
             var atRevision = revision;
-            var entries = await Api.GetAsync<List<TimeEntryModel>>($"time-entries?from={Uri.EscapeDataString(snapshot.Start.ToString("O"))}&to={Uri.EscapeDataString(to.ToString("O"))}", Cancellation);
+            var entries = await Api.GetTimeEntriesAsync(snapshot.Start, to, Cancellation);
             if (!IsDisposed && atRevision == revision) { overlap = entries.Any(e => e.Id != id); StateHasChanged(); }
         }
         catch (FormatException) { }
@@ -151,14 +152,14 @@ public partial class TimeEntryEditor : IAsyncDisposable
     private async Task ReloadAsync()
     {
         if (id is null || !await Js.InvokeAsync<bool>("confirm", Cancellation, Strings.DiscardConfirm)) return;
-        await RunAsync(async ct => { var latest = await Api.GetAsync<TimeEntryModel>("time-entries/" + Uri.EscapeDataString(id), ct); Fill(latest); await CheckOverlapAsync(); });
+        await RunAsync(async ct => { var latest = await Api.GetTimeEntryAsync(id, ct); Fill(latest); await CheckOverlapAsync(); });
     }
     private void SignInAgain() => Navigation.NavigateTo("/login", forceLoad: true);
     private async Task DeleteAsync()
     {
         debounce?.Cancel();
         if (id is null || !await Js.InvokeAsync<bool>("confirm", Cancellation, Strings.DeleteConfirm)) return;
-        await RunAsync(async ct => { await Api.SendAsync<string>(HttpMethod.Delete, $"time-entries/{Uri.EscapeDataString(id)}?version={version}", null, ct); await Js.InvokeVoidAsync("whid.closeDialog", ct, dialog); await Closed.InvokeAsync(); });
+        await RunAsync(async ct => { await Api.DeleteTimeEntryAsync(id, version, ct); await Js.InvokeVoidAsync("whid.closeDialog", ct, dialog); await Closed.InvokeAsync(); });
     }
     private bool Ambiguous(string value) => DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var local) && TimeZoneInfo.FindSystemTimeZoneById(User.Settings.TimeZone).IsAmbiguousTime(DateTime.SpecifyKind(local, DateTimeKind.Unspecified));
     private IEnumerable<string> Offsets(string value) => TimeZoneInfo.FindSystemTimeZoneById(User.Settings.TimeZone).GetAmbiguousTimeOffsets(DateTime.Parse(value, CultureInfo.InvariantCulture)).Select(t => t.ToString());

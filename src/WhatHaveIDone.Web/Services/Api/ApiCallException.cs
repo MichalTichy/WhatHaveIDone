@@ -1,4 +1,4 @@
-namespace WhatHaveIDone.Web.Services;
+namespace WhatHaveIDone.Web.Services.Api;
 
 public sealed class ApiCallException(string code, string message, int status) : Exception(message)
 {

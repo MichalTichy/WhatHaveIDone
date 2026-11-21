@@ -13,7 +13,7 @@
 - When a small requirement introduces substantial complexity, explain the concrete cost and propose a simpler approach. Do not silently drop accepted functionality; the first release includes an editable calendar.
 - Add a project, abstraction, helper, service or component split only for a concrete dependency boundary, current consumer or meaningful duplication. Do not add layers that only forward equivalent calls.
 - Keep each operation and its UI state together. Extract shared behavior when there is an actual shared responsibility.
-- Group files by existing feature inside each project. Keep a web page, its code-behind, feature components and scripts together under `Web/Features`; reserve `Web/Components` for reused UI. Keep shared model namespaces stable when moving files, especially persisted document types.
+- Group files by feature, then by responsibility where useful. Keep a web page, its code-behind, feature components and scripts together under `Web/Features`. Keep shared model namespaces stable when moving files, especially persisted document types.
 - Add notifications, hooks, retries, queues, caching and concurrency mechanisms only for actual requirements. One running timer per user, repeatable imports and protection against stale edits are actual requirements; a general event platform is not.
 - Do not add infrastructure or views for future work-evidence collection to the initial release. Preserve the plan's extension boundaries without empty projects or placeholder navigation.
 - The first feature after MVP is timesheet drafts. Keep draft records separate from confirmed TimeEntry documents and reports; reuse the actual time-entry rules and editor where appropriate. Do not add draft flags, workflow frameworks or empty draft projects to MVP.
@@ -42,7 +42,9 @@
 - Use Blazor Blueprint components with the RSM-derived AppComponentBase, shared action button, shell and feedback. Keep product-specific components in the Web project until another boundary is needed.
 - Keep the personal visual direction inspired by Timely/Timemator: warm light canvas and navigation, quiet purple accent, project colours and locally hosted DM Sans. Use the Blazor Blueprint component foundation without restoring the former corporate navy/cyan shell.
 - Pair `.razor` markup with `.razor.cs`; keep page-specific styles, scripts and components nearby. Keep markup declarative.
-- Adapt `AppComponentBase` to typed HTTP calls and API errors instead of server-side `ISender` and exception types. Keep cancellation, feedback and protection against updating disposed UI.
+- Use `Web/Components` for cross-feature controls and `Web/Services/Api` for the native HTTP client.
+- Give the client named operations that accept typed arguments and return native API models. It owns URL construction, parameter encoding, JSON, and request headers. Pages pass filters and IDs and keep presentation state in code-behind.
+- Use `AppComponentBase` for HTTP feedback and component-lifetime cancellation. Use `ExecuteLoadAsync` for replaceable reads so obsolete responses cannot update the UI.
 - Show skeletons where they clarify loading. End loading states on success, error or cancellation; display empty states only after a successful load.
 - Use strongly typed generated `.resx` classes for user-visible text. Keep resources with their owning feature/project, with neutral English and Czech resources.
 - Authentication and SSO complete on the server. Client authentication state is presentation state, never authority to access data. Do not copy Blazor Server circuit mechanisms into WASM.

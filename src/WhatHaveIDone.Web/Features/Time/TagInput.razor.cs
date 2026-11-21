@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using WhatHaveIDone.Web.Resources;
 using WhatHaveIDone.Web.Services;
+using WhatHaveIDone.Web.Services.Api;
 
-namespace WhatHaveIDone.Web.Components.Forms;
+namespace WhatHaveIDone.Web.Features.Time;
 
 public partial class TagInput
 {
@@ -38,7 +39,7 @@ public partial class TagInput
         loadingSuggestions = true;
         try
         {
-            var tags = await Api.GetAsync<List<string>>("projects/" + Uri.EscapeDataString(ProjectId) + "/recent-tags", ct);
+            var tags = await Api.GetRecentTagsAsync(ProjectId, ct);
             if (!IsDisposed && generation == suggestionGeneration) recentTags = tags;
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { }

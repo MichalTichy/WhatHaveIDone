@@ -17,7 +17,8 @@ public partial class Account
     private Task SubmitAsync() => RunAsync(async ct =>
     {
         if (register && confirmation != input.Password) { Error = Strings.PasswordsDiffer; return; }
-        await Api.SendAsync<string>(HttpMethod.Post, register ? "account/register" : "account/login", input, ct);
+        if (register) await Api.RegisterAsync(input, ct);
+        else await Api.LoginAsync(input, ct);
         Navigation.NavigateTo("/time", forceLoad: true);
     });
 }
