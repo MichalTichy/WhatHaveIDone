@@ -19,6 +19,7 @@ public partial class MainLayout : IAsyncDisposable
     protected override void OnParametersSet()
     {
         if (!User.Session.Authenticated) Navigation.NavigateTo("/login", replace: true);
+        else if (!User.Settings.OnboardingCompleted && !Navigation.ToBaseRelativePath(Navigation.Uri).StartsWith("import", StringComparison.Ordinal)) Navigation.NavigateTo("/import", replace: true);
     }
     private void OnFeedback() => _ = InvokeAsync(StateHasChanged);
     protected override async Task OnAfterRenderAsync(bool firstRender)
