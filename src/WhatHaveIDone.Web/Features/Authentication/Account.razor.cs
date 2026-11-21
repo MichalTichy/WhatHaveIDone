@@ -11,14 +11,24 @@ public partial class Account
     protected override void OnParametersSet()
     {
         register = Navigation.ToBaseRelativePath(Navigation.Uri).StartsWith("register", StringComparison.Ordinal);
-        if (User.Session.Authenticated) Navigation.NavigateTo("/time");
-        if (Navigation.Uri.Contains("error=", StringComparison.Ordinal)) Error = Strings.SsoDenied;
+        if (User.Session.Authenticated)
+            Navigation.NavigateTo("/time");
+        if (Navigation.Uri.Contains("error=", StringComparison.Ordinal))
+            Error = Strings.SsoDenied;
     }
+
     private Task SubmitAsync() => RunAsync(async ct =>
     {
-        if (register && confirmation != input.Password) { Error = Strings.PasswordsDiffer; return; }
-        if (register) await Api.RegisterAsync(input, ct);
-        else await Api.LoginAsync(input, ct);
+        if (register && confirmation != input.Password)
+        {
+            Error = Strings.PasswordsDiffer;
+            return;
+        }
+
+        if (register)
+            await Api.RegisterAsync(input, ct);
+        else
+            await Api.LoginAsync(input, ct);
         Navigation.NavigateTo("/time", forceLoad: true);
     });
 }
