@@ -1,0 +1,32 @@
+@inherits AppComponentBase
+<div class="project-picker">
+    <label for="@selectId">@Strings.Project</label>
+    <div class="project-select">
+        <select id="@selectId" value="@(Value ?? "")" @onchange="SelectAsync">
+            <option value="">@Strings.NoProject</option>
+            @foreach (var project in User.Projects.Where(p => !p.Archived || p.Id == OriginalProject))
+            { <option value="@project.Id">@project.Name · @User.ClientName(project.ClientId)</option> }
+        </select>
+        <button type="button" class="secondary" aria-label="@Strings.AddProject" aria-expanded="@adding" @onclick="Toggle">＋</button>
+    </div>
+    <div class="suggestion-badges project-suggestions" role="group" aria-label="@Strings.ProjectSuggestions">
+        <button type="button" class="suggestion-badge" aria-pressed="@(string.IsNullOrEmpty(Value) ? "true" : "false")" @onclick="() => ChooseAsync(null)">@Strings.NoProject</button>
+        @foreach (var project in User.Projects.Where(p => !p.Archived).Take(8))
+        {
+            <button type="button" class="suggestion-badge" aria-pressed="@(Value == project.Id ? "true" : "false")" title="@User.ClientName(project.ClientId)"
+                    aria-label="@string.Format(Strings.ChooseProject, project.Name + " · " + User.ClientName(project.ClientId))" @onclick="() => ChooseAsync(project.Id)">
+                <span class="swatch" style="--project-color:@project.Color" aria-hidden="true"></span>@project.Name
+            </button>
+        }
+    </div>
+    @if (adding)
+    {
+        <div class="inline-project stack">
+            <label>@Strings.Name<input @bind="name" @bind:event="oninput" maxlength="200" autocomplete="off" /></label>
+            <ClientPicker @bind-Value="clientId" />
+            <ProjectColorPicker @bind-Value="color" />
+            @if (Error is not null) { <p class="alert error" role="alert">@Error</p> }
+            <div class="actions"><AppActionButton Disabled="@(Busy || string.IsNullOrWhiteSpace(name))" OnClick="CreateAsync">@Strings.AddProject</AppActionButton><button type="button" class="secondary" disabled="@Busy" @onclick="Toggle">@Strings.Cancel</button></div>
+        </div>
+    }
+</div>
