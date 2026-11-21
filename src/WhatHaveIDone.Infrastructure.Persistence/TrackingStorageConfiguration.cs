@@ -21,6 +21,5 @@ public sealed class TrackingStorageConfiguration : IStorageConfiguration
         options.Schema.For<Tag>().MultiTenanted().UseOptimisticConcurrency(true)
             .UniqueIndex(UniqueIndexType.Computed, "tag_name", TenancyScope.PerTenant, x => x.NormalizedName)
             .UniqueIndex(UniqueIndexType.Computed, "tag_compatibility", TenancyScope.PerTenant, x => x.CompatibilityId);
-        options.Schema.For<ApiToken>().SingleTenanted().UseOptimisticConcurrency(true).Index(x => x.UserId).UniqueIndex(x => x.Hash);
     }
 }

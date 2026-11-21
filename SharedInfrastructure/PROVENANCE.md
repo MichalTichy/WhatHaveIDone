@@ -32,3 +32,12 @@ Updated the locally copied Persistence.EF.Identity package references from EF Co
 No root LICENSE/NOTICE/COPYING file was present in either source directory at the inspected commit. This manifest does not grant a license. Confirm distribution rights for the internally sourced components before public release; keep any subsequently supplied notices. No private feeds or credentials are copied.
 
 The application import worker no longer injects a single-instance leader-election abstraction or registers it explicitly. LeaderElection remains in the copied transitive dependency closure through Initializer; no distributed worker-coordination feature is activated.
+
+
+## Locally authored API-key authentication
+
+Shared.Infrastructure.Authentication.ApiKey and Shared.Infrastructure.Authentication.ApiKey.Marten were authored in this repository on 2026-11-18; neither is copied from RSM or upstream Shared.Infrastructure. There are 14 copied projects plus these two local projects. The core owns generation, hashing, management and Identity-backed authentication, with an injected IApiKeyStorageService and no Marten dependency. The separate adapter supplies an internal storage service and SingleTenanted storage configuration. WhatHaveIDone keeps its existing persisted ApiToken type and native API contracts; Toggl Basic parsing stays in API.Toggl. The modules are also proposed upstream in [Shared.Infrastructure PR 20715](https://dev.azure.com/rigantitfs/Infrastructure/_git/Shared.Infrastructure/pullrequest/20715), commit `70d11db`. This copy uses the application's existing Marten 9.37.0 and build settings; the upstream contribution uses its central packages. The upstream PR is separate from the application stack and does not change the RSM submodule pointer.
+
+The creation result is TemporaryApiKey; API keys remain valid until revoked. The Marten adapter uses the shared no-tenancy repositories and internal specifications, joining ambient transactions for application use cases. ApiKeyRecord implements the provider-neutral IItemWithId contract from Persistence.
+
+The shared handler supports a configurable HeaderName (Authorization/Bearer by default, raw keys for custom headers) and rejects mismatched KeyPrefix values before invoking validation/storage.

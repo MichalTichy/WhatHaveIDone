@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><Description>Internal Marten storage service and single-tenanted storage configuration for the API-key authentication module.</Description></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Shared.Infrastructure.Authentication.ApiKey/Shared.Infrastructure.Authentication.ApiKey.csproj" />
+    <ProjectReference Include="../Shared.Infrastructure.Persistence.Marten/Shared.Infrastructure.Persistence.Marten.csproj" />
+  </ItemGroup>
+</Project>

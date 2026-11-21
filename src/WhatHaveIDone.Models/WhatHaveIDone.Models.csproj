@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Authentication.ApiKey/Shared.Infrastructure.Authentication.ApiKey.csproj" />
     <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Persistence/Shared.Infrastructure.Persistence.csproj" />
 </ItemGroup>
   <ItemGroup>

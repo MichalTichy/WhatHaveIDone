@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Authentication.ApiKey/Shared.Infrastructure.Authentication.ApiKey.csproj" />
     <ProjectReference Include="../WhatHaveIDone.Models/WhatHaveIDone.Models.csproj" />
     <ProjectReference Include="../WhatHaveIDone.API.Models/WhatHaveIDone.API.Models.csproj" />
     <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.CurrentUserProvider/Shared.Infrastructure.CurrentUserProvider.csproj" />

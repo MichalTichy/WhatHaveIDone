@@ -17,7 +17,7 @@ The user explicitly chose physical project copies in `SharedInfrastructure/`. Th
 4. Keep references relative and self-contained. A clean build must not need an absolute path, source checkout, upstream submodule or an unavailable internal feed.
 5. Record the actual source repository/commit, copied project names and local adaptations in `SharedInfrastructure/PROVENANCE.md` at copy time. Namespaces and assembly names can remain unchanged.
 
-The implemented selection has 14 projects including transitives, recorded in PROVENANCE.md. Unused UserManagement, DataAnnotations, Localization and IoC.Mediatr/DDD.Core roots were removed after verifying actual consumers. Do not copy Emailing projects: email delivery, password recovery and email verification are outside MVP. Recompute the graph when needs change; this is not a quota. A technical dependency on tenancy or leader election does not authorize corresponding product features.
+The copied selection has 14 projects including transitives, recorded in PROVENANCE.md. Shared.Infrastructure.Authentication.ApiKey and its separate .Marten adapter are two locally authored projects, not copies from RSM. The core owns authentication/key management and requires IApiKeyStorageService; the adapter provides Marten storage/configuration. Unused UserManagement, DataAnnotations, Localization and IoC.Mediatr/DDD.Core roots were removed after verifying actual consumers. Do not copy Emailing projects: email delivery, password recovery and email verification are outside MVP. Recompute the graph when needs change; this is not a quota. A technical dependency on tenancy or leader election does not authorize corresponding product features.
 
 ## Adapt source guidance to this repository
 
