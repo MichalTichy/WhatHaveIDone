@@ -9,4 +9,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13" PrivateAssets="all" />
 </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FastEndpoints" Version="9.0.0" />
+  </ItemGroup>
 </Project>

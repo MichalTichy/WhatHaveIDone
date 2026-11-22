@@ -43,9 +43,11 @@ public sealed class McpApiTests(IntegrationFixture fixture)
         Assert.Equal("WhatHaveIDone", initialized.GetProperty("result").GetProperty("serverInfo").GetProperty("name").GetString());
         var listed = await RpcAsync(client, "tools/list", new { });
         var tools = listed.GetProperty("result").GetProperty("tools").EnumerateArray().ToList();
-        Assert.Contains(tools, t => t.GetProperty("name").GetString() == "create_time_entry");
+        Assert.Equal(
+            ["create_time_entry", "delete_time_entry", "get_report", "get_settings", "get_time_entry",
+                "get_timer", "list_projects", "list_tags", "list_time_entries", "start_timer", "stop_timer", "update_time_entry"],
+            tools.Select(t => t.GetProperty("name").GetString()!).Order(StringComparer.Ordinal).ToArray());
         Assert.Contains(tools, t => t.GetProperty("name").GetString() == "get_report" && t.GetProperty("annotations").GetProperty("readOnlyHint").GetBoolean());
-        Assert.DoesNotContain(tools, t => t.GetProperty("name").GetString()!.Contains("token", StringComparison.Ordinal));
         Assert.DoesNotContain(key.Token, listed.GetRawText());
         Assert.DoesNotContain("actor", listed.GetRawText());
         using var originRequest = Request("tools/list", new { });

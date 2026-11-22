@@ -29,6 +29,23 @@ public sealed class TrackingApiTests(IntegrationFixture fixture)
     }
     private EditTimeEntry Input(string description="",string? project=null)=>new(){CreateRequestId=Guid.NewGuid(),Description=description,ProjectId=project,Start=fixture.Clock.GetUtcNow().AddHours(-2),End=fixture.Clock.GetUtcNow().AddHours(-1)};
     private static string Range=>"from=2019-01-01T00%3A00%3A00Z&to=2030-01-01T00%3A00%3A00Z";
+
+    [Fact]
+    public async Task HttpBindingRequiresDateBoundsAndUsesTheRouteIdForUpdatesAsync()
+    {
+        using var owner = await fixture.CreateOwnerAsync();
+        using var missingDate = await owner.Http.GetAsync("/api/v1/time-entries?to=2030-01-01T00%3A00%3A00Z");
+        Assert.Equal(HttpStatusCode.BadRequest, missingDate.StatusCode);
+        Assert.Equal("InvalidRequest", (await missingDate.Content.ReadFromJsonAsync<ApiError>())!.Code);
+
+        var input = Input("Original");
+        var entry = await owner.PostAsync<TimeEntryModel>("time-entries", input);
+        var updated = await owner.PutAsync<TimeEntryModel>("time-entries/" + Uri.EscapeDataString(entry.Id),
+            new { id = "body-id-is-ignored", version = entry.Version, input.Start, input.End, description = "Updated" });
+        Assert.Equal(entry.Id, updated.Id);
+        Assert.Equal("Updated", updated.Description);
+    }
+
     [Fact] public async Task AnonymousMutationsRequireAntiforgeryAndProtectedReadsDoNotRedirectAsync()
     {
         using var client=fixture.App.CreateClient();

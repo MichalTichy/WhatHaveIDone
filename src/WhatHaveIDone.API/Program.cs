@@ -5,6 +5,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using System.Threading.RateLimiting;
 using System.Net;
+using FastEndpoints;
 using MediatR;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
@@ -15,7 +16,6 @@ using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.CurrentUserProvider;
 using Shared.Infrastructure.CurrentUserProvider.HttpContext;
 using WhatHaveIDone.API;
-using WhatHaveIDone.API.Endpoints;
 using WhatHaveIDone.API.Toggl;
 using WhatHaveIDone.API.Import;
 using WhatHaveIDone.API.Mcp;
@@ -54,6 +54,11 @@ builder.Services.AddAuthentication(o => { o.DefaultScheme = "Combined"; o.Defaul
     .AddPolicyScheme("Combined", null, o => o.ForwardDefaultSelector = http => http.Request.Headers.Authorization.Count > 0 ? ApiKeyAuthenticationDefaults.AuthenticationScheme : IdentityConstants.ApplicationScheme)
     .AddApiKeys<AppUser>(options => { options.KeyPrefix = "whid_"; options.UseTogglCompatibility(); });
 builder.Services.AddAuthorization();
+builder.Services.AddFastEndpoints(options =>
+{
+    options.Assemblies = [typeof(Program).Assembly, typeof(TogglApiExceptionMiddleware).Assembly, typeof(AccountEndpoints).Assembly];
+    options.DisableAutoDiscovery = true;
+});
 builder.Services.AddTrackingMcp();
 builder.Services.AddAntiforgery(o => { o.HeaderName = "X-CSRF-TOKEN"; o.Cookie.Name = "whid.csrf"; o.Cookie.HttpOnly = true; });
 var keyPath = builder.Configuration["DataProtection:Path"] ?? Path.Combine(builder.Environment.ContentRootPath, "data", "keys");
@@ -102,13 +107,14 @@ app.Use(async (http, next) =>
     }
     await next(http);
 });
-app.MapAccountEndpoints();
-app.MapTrackingEndpoints();
-app.MapReportEndpoints();
-app.MapTogglEndpoints();
-app.MapImportEndpoints();
+app.UseFastEndpoints(options =>
+{
+    options.Endpoints.Configurator = endpoint => endpoint.PostProcessors(Order.After, new McpEndpointErrors());
+    options.Errors.ResponseBuilder = (_, http, _) => http.Request.Path.StartsWithSegments("/api/v9")
+        ? WhatHaveIDone.Logic.Resources.Strings.InvalidRequest
+        : new WhatHaveIDone.API.Models.ApiError("InvalidRequest", WhatHaveIDone.Logic.Resources.Strings.InvalidRequest);
+});
 app.MapTrackingMcp();
-app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 app.Map("/api/{**path}", () => Results.NotFound()).AllowAnonymous();
 app.MapFallbackToFile("index.html");
 await using (var scope = app.Services.CreateAsyncScope())

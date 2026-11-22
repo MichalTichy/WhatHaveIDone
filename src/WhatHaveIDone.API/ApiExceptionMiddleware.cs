@@ -1,7 +1,4 @@
-using JasperFx;
-using Npgsql;
 using WhatHaveIDone.API.Models;
-using WhatHaveIDone.Logic.Execution;
 using WhatHaveIDone.Logic.Resources;
 
 namespace WhatHaveIDone.API;
@@ -24,10 +21,7 @@ public sealed class ApiExceptionMiddleware(RequestDelegate next, ILogger<ApiExce
         catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested) { context.Abort(); }
         catch (Exception exception) when (!context.Response.HasStarted)
         {
-            var error = exception as AppException;
-            if (exception is ConcurrencyException || exception is PostgresException { SqlState: "23505" or "40001" }) error = new AppException("Conflict", 409);
-            if (exception is BadHttpRequestException) error = new AppException("InvalidRequest");
-            if (exception is FormatException) error = new AppException("InvalidInterval");
+            var error = ApiFailure.From(exception);
             if (error is null) logger.LogError(exception, "Request failed: {Path}", context.Request.Path);
             context.Response.StatusCode = error?.Status ?? 500;
             context.Response.Headers.CacheControl = "no-store";

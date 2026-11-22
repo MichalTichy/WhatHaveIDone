@@ -1,16 +1,12 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Infrastructure.Persistence.Marten.UnitOfWorks;
 using Shared.Infrastructure.Persistence.Repositories;
-using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Logic.Execution;
 using WhatHaveIDone.Models;
 
@@ -18,58 +14,6 @@ namespace WhatHaveIDone.Infrastructure.Identity;
 
 public static class AccountEndpoints
 {
-    public static void MapAccountEndpoints(this IEndpointRouteBuilder app)
-    {
-        app.MapGet("/api/v1/session", async (HttpContext http, IAntiforgery csrf, UserManager<AppUser> users, IConfiguration config) =>
-        {
-            http.Response.Headers.CacheControl = "no-cache, no-store"; http.Response.Headers.Pragma = "no-cache";
-            var user = http.User.Identity?.IsAuthenticated == true ? await users.GetUserAsync(http.User) : null;
-            return new SessionModel(user is not null, user?.Email, user is not null && await users.HasPasswordAsync(user), config.GetValue<bool>("Sso:Enabled"), csrf.GetAndStoreTokens(http).RequestToken);
-        }).AllowAnonymous();
-        app.MapPost("/api/v1/account/register", RegisterAsync).AllowAnonymous().RequireRateLimiting("accounts");
-        app.MapPost("/api/v1/account/login", SignInAsync).AllowAnonymous().RequireRateLimiting("accounts");
-        app.MapPost("/api/v1/account/logout", async (SignInManager<AppUser> signIn, CancellationToken ct) =>
-        {
-            ct.ThrowIfCancellationRequested();
-            await signIn.SignOutAsync();
-            return Results.Ok(true);
-        }).RequireAuthorization();
-        app.MapPost("/api/v1/account/password", ChangePasswordAsync).RequireAuthorization();
-        app.MapGet("/auth/sso", (IConfiguration config) => config.GetValue<bool>("Sso:Enabled")
-            ? Results.Challenge(new AuthenticationProperties { RedirectUri = "/time" }, ["Entra"]) : Results.NotFound()).AllowAnonymous();
-    }
-
-    private static async Task<IResult> RegisterAsync(AccountInput input, HttpContext http, UserManager<AppUser> users, CancellationToken ct)
-    {
-        if (!Validator.TryValidateObject(input, new ValidationContext(input), [], true)) throw new AppException("InvalidAccount");
-        var user = new AppUser { Email = input.Email.Trim(), UserName = input.Email.Trim(), Name = input.Email.Trim(), EmailConfirmed = false };
-        if (!(await users.CreateAsync(user, input.Password)).Succeeded) throw new AppException("InvalidAccount");
-        await CompleteSignInAsync(http, user, ct);
-        return Results.Ok(user.Id);
-    }
-
-    private static async Task<IResult> SignInAsync(AccountInput input, HttpContext http, UserManager<AppUser> users, SignInManager<AppUser> signIn, CancellationToken ct)
-    {
-        if (string.IsNullOrWhiteSpace(input.Email) || string.IsNullOrEmpty(input.Password) || input.Email.Length > 254 || input.Password.Length > 128)
-            throw new AppException("InvalidLogin", 401);
-        var user = await users.FindByEmailAsync(input.Email.Trim());
-        if (user is null || !(await signIn.CheckPasswordSignInAsync(user, input.Password, lockoutOnFailure: true)).Succeeded)
-            throw new AppException("InvalidLogin", 401);
-        await CompleteSignInAsync(http, user, ct);
-        return Results.Ok(user.Id);
-    }
-
-    private static async Task<IResult> ChangePasswordAsync(ChangePasswordInput input, HttpContext http, UserManager<AppUser> users, SignInManager<AppUser> signIn, CancellationToken ct)
-    {
-        ct.ThrowIfCancellationRequested();
-        var user = await users.GetUserAsync(http.User) ?? throw new AppException("Unauthenticated", 401);
-        if (string.IsNullOrEmpty(input.CurrentPassword) || string.IsNullOrEmpty(input.NewPassword) || input.NewPassword.Length > 128
-            || !(await users.ChangePasswordAsync(user, input.CurrentPassword, input.NewPassword)).Succeeded)
-            throw new AppException("InvalidPassword");
-        await signIn.RefreshSignInAsync(user);
-        return Results.Ok(true);
-    }
-
     public static async Task HandleSsoTicketAsync(TicketReceivedContext context)
     {
         context.HandleResponse();
@@ -109,7 +53,7 @@ public static class AccountEndpoints
         }
     }
 
-    private static async Task CompleteSignInAsync(HttpContext http, AppUser user, CancellationToken ct)
+    internal static async Task CompleteSignInAsync(HttpContext http, AppUser user, CancellationToken ct)
     {
         var services = http.RequestServices;
         var database = services.GetRequiredService<IdentityDbContext>();
