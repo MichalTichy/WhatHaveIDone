@@ -17,5 +17,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.21.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.21.0" />
     <PackageReference Include="CsvHelper" Version="33.1.0" />
+    <PackageReference Include="FastEndpoints" Version="9.0.0" />
+    <PackageReference Include="FastEndpoints.Mcp" Version="1.0.0-beta.10" />
 </ItemGroup>
 </Project>

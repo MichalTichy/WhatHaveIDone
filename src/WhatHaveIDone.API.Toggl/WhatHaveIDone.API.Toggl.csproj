@@ -4,4 +4,7 @@
     <ProjectReference Include="../WhatHaveIDone.Logic/WhatHaveIDone.Logic.csproj" />
     <ProjectReference Include="../../SharedInfrastructure/Shared.Infrastructure.Authentication.ApiKey/Shared.Infrastructure.Authentication.ApiKey.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FastEndpoints" Version="9.0.0" />
+  </ItemGroup>
 </Project>

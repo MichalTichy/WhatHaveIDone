@@ -1,6 +1,6 @@
 namespace WhatHaveIDone.API.Models;
 
-public sealed record EditTimeEntry
+public record EditTimeEntry
 {
     public Guid CreateRequestId { get; set; }
     public Guid Version { get; set; }

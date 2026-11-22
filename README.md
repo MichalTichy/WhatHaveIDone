@@ -49,7 +49,7 @@ The integration suite uses the database credentials in `.env` or an explicit `WH
 ## Architecture
 
 - `WhatHaveIDone.Web` groups pages and their components under `Features`. Shared controls live in `Components`, the shell lives in `Layout`, and a typed client in `Services/Api` owns the native HTTP calls.
-- `WhatHaveIDone.API` serves the frontend and native API. `WhatHaveIDone.API.Toggl` owns compatible Toggl v9 endpoints, wire DTOs, and errors. `WhatHaveIDone.API.Models` contains contracts shared with the frontend.
+- `WhatHaveIDone.API` serves the frontend and native API. FastEndpoints groups HTTP operations into individual endpoint classes. `WhatHaveIDone.API.Toggl` owns compatible Toggl v9 endpoints, wire DTOs, and errors. `WhatHaveIDone.API.Models` contains contracts shared with the frontend.
 - `WhatHaveIDone.Logic` exposes use cases for writes and specifications for reads. `WhatHaveIDone.Models` contains domain documents. The persistence and Identity projects provide the PostgreSQL and ASP.NET Identity integrations.
 - Marten scopes tracking documents to the signed-in user. API keys are looked up globally during authentication and then resolve to their owner. The worker discovers pending imports across users and processes each run inside its owner's tenant.
 - A Toggl import reads the source account and its available workspaces, then imports selected workspaces from newest to oldest. The worker saves each page and its checkpoint together and resumes after quota limits. Completed and cancelled imports discard source credentials. The UI shows up to 20 runs.
@@ -60,3 +60,9 @@ See [repository conventions](AGENTS.md), [the .NET architecture skill](.agents/S
 The UI uses Blazor Blueprint and FullCalendar, with locally served DM Sans. The font comes from [google/fonts](https://github.com/google/fonts/tree/e7db6ca603fd4862010383ff17ffd6cc4ffac1c0/ofl/dmsans) and includes its SIL Open Font License. The UI and server-side authentication flow draw on RSM commit `7eb0637e06fdafc53469c66b3650db0e16af2b06`. Timely and Timemator informed the visual design.
 
 End-to-end verification with a real Toggl account, a configured Entra tenant, and the updated Riganti IS integration remains pending. A public open-source release also requires confirmation of distribution rights for copied internal code and selection of a project license. Timesheet drafts are the first planned feature after the MVP.
+
+## Connect an AI client over MCP
+
+Open **Settings → API keys → Connect AI / MCP** for setup instructions for VS Code, Cursor, and Claude Code. Configure the client with the `/mcp` URL and set `WHID_API_KEY` privately in its environment. The MCP endpoint uses Bearer authentication and runs tracking operations under the API key owner's account.
+
+`FastEndpoints.Mcp` exposes the tracking endpoints that explicitly opt in through `McpTool`. REST and MCP use the same endpoint handlers. The MCP integration package is currently pinned to a beta version.
