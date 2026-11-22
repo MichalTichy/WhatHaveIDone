@@ -1,7 +1,7 @@
 @inherits LayoutComponentBase
 <div class="app-shell">
     <aside class="sidebar @(menuOpen ? "expanded" : "")">
-        <a class="brand" href="/time"><span class="brand-mark" aria-hidden="true">W</span><span class="brand-name">@Strings.AppName</span></a>
+        <a class="brand" href="/time"><img class="brand-mark" src="icon.svg" alt=""><span class="brand-name">@Strings.AppName</span></a>
         <p class="brand-caption">@Strings.PersonalTimeTracking</p>
         <nav aria-label="@Strings.Menu">
             <NavLink href="/time" @onclick="CloseMenu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg>@Strings.Time</NavLink>

@@ -55,7 +55,7 @@ label small, .muted { font-weight: 400; color: var(--app-muted); font-size: 12px
     padding: 32px 18px 20px; border-right: 1px solid #e7e4e1;
 }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 650; font-size: 15px; line-height: 1.25; }
-.brand-mark { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 11px; background: #e3dcf1; color: #6b509e; font-size: 23px; font-weight: 650; letter-spacing: -2px; padding-right: 2px; }
+.brand-mark { display: block; width: 34px; height: 34px; flex: 0 0 34px; }
 .brand-name { max-width: 126px; }
 .brand-caption { font-size: 11px; color: var(--app-muted); margin: 12px 0 0; }
 .sidebar nav { display: grid; gap: 5px; margin-top: 36px; }
