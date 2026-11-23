@@ -34,7 +34,13 @@ public partial class Settings
 
     private Task SaveSettingsAsync() => RunAsync(async ct =>
     {
+        var languageChanged = settings.Language != User.Settings.Language;
         await Api.SaveSettingsAsync(settings, ct);
+        if (languageChanged)
+        {
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+            return;
+        }
         await User.ReloadAsync(ct);
         settings = User.Settings with
         {

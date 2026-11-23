@@ -6,7 +6,7 @@ using WhatHaveIDone.Logic.TimeEntries;
 
 namespace WhatHaveIDone.API.Endpoints;
 
-internal sealed class DeleteTimeEntryEndpoint(ISender sender) : Endpoint<DeleteTimeEntryRequest, string>
+internal sealed class DeleteTimeEntryEndpoint(ISender sender) : Endpoint<DeleteVersionedDocumentRequest, string>
 {
     public override void Configure()
     {
@@ -18,7 +18,7 @@ internal sealed class DeleteTimeEntryEndpoint(ISender sender) : Endpoint<DeleteT
         });
     }
 
-    public override async Task HandleAsync(DeleteTimeEntryRequest request, CancellationToken ct)
+    public override async Task HandleAsync(DeleteVersionedDocumentRequest request, CancellationToken ct)
     {
         await Send.OkAsync(await sender.Send(new DeleteTimeEntryUsecase(request.Id, request.Version), ct), ct);
     }

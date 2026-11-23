@@ -1,5 +1,6 @@
 using WhatHaveIDone.Logic.Execution;
 using FastEndpoints;
+using Microsoft.AspNetCore.Localization;
 using FastEndpoints.Mcp;
 using Shared.Infrastructure.Persistence.Repositories;
 using WhatHaveIDone.API.Models;
@@ -23,6 +24,12 @@ internal sealed class GetSettingsEndpoint(IReadOnlyRepository<UserProfile> profi
     public override async Task HandleAsync(CancellationToken ct)
     {
         var profile = await profiles.RequireAsync(new UserProfileSpecification(), ct);
+        if (!HttpContext.Request.Headers.ContainsKey("Authorization"))
+        {
+            HttpContext.Response.Cookies.Append(CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(profile.Language)),
+                new CookieOptions { HttpOnly = true, IsEssential = true, Secure = HttpContext.Request.IsHttps, MaxAge = TimeSpan.FromDays(365) });
+        }
         await Send.OkAsync(new SettingsModel
         {
             Version = profile.SettingsVersion,

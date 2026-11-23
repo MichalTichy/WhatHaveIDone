@@ -7,6 +7,7 @@ namespace WhatHaveIDone.Web.Services;
 public sealed class UserContext(ApiClient api)
 {
     private int reloadGeneration;
+    private Dictionary<string, double> recentProjectUsage = [];
     public SessionModel Session { get; private set; } = new(false, null, false, false, null);
     public SettingsModel Settings { get; set; } = new();
     public List<ClientModel> Clients { get; private set; } = [];
@@ -14,6 +15,7 @@ public sealed class UserContext(ApiClient api)
     public List<string> Tags { get; private set; } = [];
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
+        api.SetLanguage(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
         Session = await api.GetSessionAsync(cancellationToken);
         if (Session.Authenticated) await ReloadAsync(cancellationToken);
         else { Clients = []; Projects = []; Tags = []; Settings = new(); }
@@ -25,13 +27,22 @@ public sealed class UserContext(ApiClient api)
         var clients = await api.GetClientsAsync(cancellationToken);
         var projects = await api.GetProjectsAsync(cancellationToken);
         var tags = await api.GetTagsAsync(cancellationToken);
+        var usage = await api.GetRecentProjectUsageAsync(cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         if (generation != reloadGeneration) return;
+        recentProjectUsage = usage;
         Settings = settings; Clients = clients; Projects = projects; Tags = tags;
         var culture = CultureInfo.GetCultureInfo(Settings.Language);
         CultureInfo.DefaultThreadCurrentCulture = culture; CultureInfo.DefaultThreadCurrentUICulture = culture;
         api.SetLanguage(Settings.Language);
     }
+    public IEnumerable<ProjectModel> ProjectsByUsage => Projects
+        .OrderByDescending(p => RecentProjectSeconds(p.Id))
+        .ThenBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase)
+        .ThenBy(p => ClientName(p.ClientId), StringComparer.CurrentCultureIgnoreCase);
+
+    public double RecentProjectSeconds(string id) => recentProjectUsage.GetValueOrDefault(id);
+
     public string? DefaultClientId => Clients.FirstOrDefault(c => c.IsDefault)?.Id;
     public string ClientName(string? id) => Clients.FirstOrDefault(c => c.Id == id)?.Name ?? "";
     public string ProjectName(string? id) => Projects.FirstOrDefault(p => p.Id == id)?.Name ?? Resources.Strings.NoProject;

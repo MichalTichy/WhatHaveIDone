@@ -1,4 +1,22 @@
 window.whid={
+ async start(){
+  let culture=navigator.language.toLowerCase().startsWith('cs')?'cs':'en';
+  try{
+   const stored=localStorage.getItem('whid.language');
+   if(stored==='cs'||stored==='en')culture=stored;
+   const response=await fetch('api/v1/settings',{cache:'no-store'});
+   if(response.ok){
+    const {language}=await response.json();
+    if(language==='cs'||language==='en'){
+     culture=language;
+     localStorage.setItem('whid.language',culture);
+    }
+   }
+  }catch{}
+  document.documentElement.lang=culture;
+  await Blazor.start({applicationCulture:culture});
+  this.registerWorker();
+ },
  tagKeys(element){element.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===',')event.preventDefault();});},
  openDialog(element,dotnet){
   element._closeHandler=event=>{event.preventDefault();dotnet.invokeMethodAsync('RequestCloseAsync');};

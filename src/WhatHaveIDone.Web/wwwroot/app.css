@@ -187,9 +187,9 @@ p { margin: 0 0 16px; }
 .tag-pill>span:first-child { min-width: 0; }
 .tag-pill button { min-width: 30px; min-height: 30px; padding: 0; background: transparent; color: inherit; font-size: 18px; }
 .tag-input .tag-pill { flex-shrink: 0; max-width: 100%; }
-.project-select { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
-.project-select select { margin: 0; flex: 1; }
-.project-select button { flex-shrink: 0; padding: 8px 13px; }
+.project-select { display: flex; align-items: start; gap: 6px; margin-top: 6px; }
+.project-select select { margin: 0; }
+.project-select > button { flex-shrink: 0; padding: 8px 13px; margin-top: 25px; }
 .inline-project, .inline-client { padding: 16px; margin-top: 12px; background: #f8f6fb; border: 1px solid var(--line); border-radius: 10px; }
 .color-picker { padding: 0; border: 0; min-width: 0; margin: 0; }
 .color-picker legend { font-size: 13px; font-weight: 550; margin-bottom: 12px; }
@@ -283,3 +283,60 @@ p { margin: 0 0 16px; }
 @media (max-width: 500px) { .mcp-config { padding: 12px; font-size: 11px; } .mcp-tabs { width: 100%; } .mcp-tabs button { flex: 1 1 40%; } }
 
 @media (max-width: 500px) { .mcp-dialog .drawer-footer { flex-wrap: nowrap; } .mcp-dialog .drawer-footer .spacer { display: none; } .mcp-dialog .drawer-footer button { padding-inline: 10px; } .mcp-dialog .drawer-footer button:last-child { margin-left: auto; font-size: 12px; } }
+
+.project-select > :first-child { flex: 1; min-width: 0; }
+.timer-details-toggle { max-width: 100%; text-align: left; }
+.timer-description { overflow-wrap: anywhere; }
+.timer-description .entry-subline { display: flex; flex-wrap: wrap; gap: 6px; }
+.timer-main:last-child { border-bottom: 0; padding-bottom: 0; }
+.is-running .timer-composer { margin-top: 12px; }
+.fc .fc-timegrid-event { padding-block: 0; margin-bottom: 0; container-type: size; }
+.fc .fc-timegrid-event .fc-event-main { overflow: hidden; }
+@container (height < 11px) {
+    .fc-timegrid-event .fc-event-main-frame { visibility: hidden; }
+    .fc-timegrid-event .fc-event-main { border-bottom: 1px solid var(--fc-event-border-color); }
+}
+.report-mobile-label { display: none; }
+
+@media (max-width: 799px) {
+    .timer-card { padding: 12px 16px; }
+    .timer-main.timer-composer { flex-wrap: nowrap; gap: 10px; padding-bottom: 0; border: 0; }
+    .timer-composer .timer-description { flex-basis: auto; }
+    .timer-card .timer-fields { margin-top: 12px; }
+    .timer-card .timer-start { min-width: auto; }
+
+    .report-detail table, .report-detail tbody { display: block; }
+    .report-detail thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+    .report-detail tr {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "description duration" "project project" "tags tags" "start end";
+        align-items: baseline;
+        gap: 6px 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eeeaf2;
+    }
+    .report-detail tr:last-child { border-bottom: 0; }
+    .report-detail td { padding: 0; border: 0; min-width: 0; overflow-wrap: anywhere; }
+    .report-description { grid-area: description; }
+    .report-project { grid-area: project; }
+    .report-tag-cell { grid-area: tags; }
+    .report-tag-cell:has(.report-tags:empty) { display: none; }
+    .report-start { grid-area: start; }
+    .report-end { grid-area: end; }
+    .report-duration { grid-area: duration; white-space: nowrap; font-weight: 600; }
+    .report-mobile-label { display: block; font-size: .75rem; color: var(--app-muted); }
+    .report-tags .tag-pill { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+}
+
+.project-search { min-width: 0; }
+.project-search select { width: 100%; }
+.project-search summary { color: #624799; cursor: pointer; font-size: .85rem; }
+.project-search-results { display: grid; max-height: 180px; overflow: auto; }
+.report-description .warning-text { margin-inline-start: .35rem; }

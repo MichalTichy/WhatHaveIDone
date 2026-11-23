@@ -1,4 +1,6 @@
+using BlazorBlueprint.Primitives;
 using WhatHaveIDone.API.Models;
+using WhatHaveIDone.Web.Resources;
 using WhatHaveIDone.Web.Services;
 
 namespace WhatHaveIDone.Web.Features.Reporting;
@@ -11,6 +13,15 @@ public partial class Reports
     private bool detail;
     private ReportModel? report;
     private string CsvUrl { get; set; } = "";
+
+    private IReadOnlyList<SelectOption<string>> ProjectOptions =>
+    [
+        new("", Strings.AllProjects),
+        new("none", Strings.NoProject),
+        .. User.ProjectsByUsage.Select(p => new SelectOption<string>(p.Id, p.Name + " · " + User.ClientName(p.ClientId)))
+    ];
+
+    private void SelectProject(string? value) => project = value ?? "";
 
     protected override Task OnInitializedAsync()
     {

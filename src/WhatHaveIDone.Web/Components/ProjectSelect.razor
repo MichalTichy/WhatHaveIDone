@@ -1,0 +1,27 @@
+<div class="project-search">
+    <label for="@selectId">@Strings.Project</label>
+    <select id="@selectId" @bind:get="Value" @bind:set="SelectAsync">
+        @foreach (var option in Options)
+        {
+            <option value="@option.Value" @key="option.Value">@option.Text</option>
+        }
+    </select>
+    <details>
+        <summary>@Strings.Search</summary>
+        <BbInput Class="app-input" AriaLabel="@Strings.Search" Placeholder="@Strings.Search" UpdateTiming="UpdateTiming.Immediate"
+                 Value="@search" ValueChanged="UpdateSearch" />
+        @if (search.Trim().Length > 0 && Matches.Count == 0)
+        {
+            <p class="muted">@Strings.NoProjects</p>
+        }
+        else if (search.Trim().Length > 0)
+        {
+            <div class="project-search-results">
+                @foreach (var option in Matches)
+                {
+                    <button type="button" class="text-action" @key="option.Value" @onclick="() => SelectAsync(option.Value)">@option.Text</button>
+                }
+            </div>
+        }
+    </details>
+</div>

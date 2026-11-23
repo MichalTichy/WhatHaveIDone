@@ -19,7 +19,7 @@ public partial class Time : IAsyncDisposable
     private List<string> selectedTags = [];
     private DateTime selectedDay;
     private DateTimeOffset now = DateTimeOffset.UtcNow, from, to, editorStart, editorEnd;
-    private bool calendarView, narrow, loaded, editorOpen, calendarDirty, createEditorEntry;
+    private bool calendarView, narrow, loaded, editorOpen, calendarDirty, showNewTimer, showTimerFields;
     private Guid editorKey;
     private readonly PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
     private Task? timerTask;
@@ -157,6 +157,7 @@ public partial class Time : IAsyncDisposable
     private Task StartAsync() => RunAsync(async ct =>
     {
         await Api.StartTimerAsync(new EditTimeEntry { Description = description, ProjectId = projectId, Tags = selectedTags }, ct);
+        showNewTimer = false;
         await User.ReloadAsync(ct);
         await LoadAsync();
     });
@@ -165,6 +166,8 @@ public partial class Time : IAsyncDisposable
     {
         if (runningEntry is not null)
             await Api.StopTimerAsync(runningEntry.Id, ct);
+        showNewTimer = false;
+        await User.ReloadAsync(ct);
         await LoadAsync();
     });
 
@@ -172,6 +175,7 @@ public partial class Time : IAsyncDisposable
     {
         var project = User.Projects.FirstOrDefault(p => p.Id == entry.ProjectId && !p.Archived);
         await Api.StartTimerAsync(new EditTimeEntry { Description = entry.Description, ProjectId = project?.Id, Tags = entry.Tags }, ct);
+        showNewTimer = false;
         await LoadAsync();
     });
 
@@ -184,9 +188,8 @@ public partial class Time : IAsyncDisposable
         return Task.CompletedTask;
     }
 
-    private void ShowEditor(bool createEntry = false)
+    private void ShowEditor()
     {
-        createEditorEntry = createEntry;
         editorKey = Guid.NewGuid();
         editorOpen = true;
     }
@@ -198,7 +201,7 @@ public partial class Time : IAsyncDisposable
         editingEntry = null;
         editorStart = start;
         editorEnd = end;
-        ShowEditor(createEntry: true);
+        ShowEditor();
     }
 
     [JSInvokable]
@@ -212,14 +215,14 @@ public partial class Time : IAsyncDisposable
     }
 
     [JSInvokable]
-    public Task SelectAsync(string start, string end, bool fillGap = false)
+    public Task SelectAsync(string start, string end)
     {
         if (editorOpen)
             return Task.CompletedTask;
         editingEntry = null;
         editorStart = DateTimeOffset.Parse(start, CultureInfo.InvariantCulture);
         editorEnd = DateTimeOffset.Parse(end, CultureInfo.InvariantCulture);
-        ShowEditor(createEntry: fillGap);
+        ShowEditor();
         StateHasChanged();
         return Task.CompletedTask;
     }

@@ -20,7 +20,7 @@
             @if (Error is not null) { <div class="alert error" role="alert">@Error</div> }
             @if (conflict) { <button class="secondary" @onclick="ReloadAsync">@Strings.Reload</button> }
             else if (authenticationExpired) { <button class="secondary" @onclick="SignInAgain">@Strings.SignIn</button> }
-            else if (failed) { <button class="secondary" @onclick="SaveAsync">@Strings.Retry</button> }
+            else if (failed && id is not null) { <button class="secondary" @onclick="SaveAsync">@Strings.Retry</button> }
             @if (id is not null)
             {
                 <details class="entry-more"><summary>@Strings.MoreActions</summary><button class="danger" disabled="@saving" @onclick="DeleteAsync">@Strings.Delete</button></details>
@@ -28,7 +28,7 @@
         </div>
         <footer class="drawer-footer"><span class="muted" role="status">@status</span><span class="spacer"></span>
             @if (id is null) { <AppActionButton Disabled="saving" OnClick="CreateAsync">@Strings.CreateEntry</AppActionButton> }
-            <AppActionButton Disabled="closing" OnClick="RequestCloseAsync">@Strings.Close</AppActionButton>
+            <AppActionButton Disabled="@(closing || saving && id is null)" OnClick="RequestCloseAsync">@Strings.Close</AppActionButton>
         </footer>
     </div>
 </dialog>

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using WhatHaveIDone.API.Models;
+using WhatHaveIDone.Web.Resources;
 
 namespace WhatHaveIDone.Web.Features.Projects;
 
@@ -92,6 +93,31 @@ public partial class Projects : IAsyncDisposable
         await Api.SaveProjectAsync(project with { Archived = !project.Archived }, ct);
         await User.ReloadAsync(ct);
     });
+
+    private async Task DeleteProjectAsync()
+    {
+        if (editing is not { } project || !await Js.InvokeAsync<bool>("confirm", Cancellation, string.Format(Strings.DeleteProjectConfirm, project.Name)))
+            return;
+        await RunAsync(async ct =>
+        {
+            await Api.DeleteProjectAsync(project.Id, project.Version, ct);
+            await CloseAsync();
+            await User.ReloadAsync(ct);
+        });
+    }
+
+    private async Task DeleteClientAsync(ClientModel client)
+    {
+        if (!await Js.InvokeAsync<bool>("confirm", Cancellation, string.Format(Strings.DeleteClientConfirm, client.Name)))
+            return;
+        await RunAsync(async ct =>
+        {
+            await Api.DeleteClientAsync(client.Id, client.Version, ct);
+            if (editingClient?.Id == client.Id)
+                editingClient = null;
+            await User.ReloadAsync(ct);
+        });
+    }
 
     [JSInvokable]
     public Task RequestCloseAsync() => CloseAsync();

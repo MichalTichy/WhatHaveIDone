@@ -1,4 +1,6 @@
+using BlazorBlueprint.Primitives;
 using Microsoft.AspNetCore.Components;
+using WhatHaveIDone.Web.Resources;
 using WhatHaveIDone.API.Models;
 
 namespace WhatHaveIDone.Web.Features.Time;
@@ -14,7 +16,6 @@ public partial class ProjectPicker
     [Parameter]
     public EventCallback<string?> ValueChanged { get; set; }
 
-    private readonly string selectId = "project-" + Guid.NewGuid().ToString("N");
     private bool adding;
     private string? clientId;
     private string name = "", color = "#009cde";
@@ -25,7 +26,14 @@ public partial class ProjectPicker
         Error = null;
     }
 
-    private Task SelectAsync(ChangeEventArgs args) => ChooseAsync(string.IsNullOrEmpty(args.Value?.ToString()) ? null : args.Value.ToString());
+    private IReadOnlyList<SelectOption<string>> Options =>
+    [
+        new("", Strings.NoProject),
+        .. User.ProjectsByUsage.Where(p => !p.Archived || p.Id == OriginalProject || p.Id == Value)
+            .Select(p => new SelectOption<string>(p.Id, p.Name + " · " + User.ClientName(p.ClientId)))
+    ];
+
+    private Task SelectAsync(string? value) => ChooseAsync(string.IsNullOrEmpty(value) ? null : value);
     private Task ChooseAsync(string? id) => Value == id ? Task.CompletedTask : ValueChanged.InvokeAsync(id);
     private Task CreateAsync() => RunAsync(async ct =>
     {

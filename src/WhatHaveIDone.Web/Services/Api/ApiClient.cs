@@ -33,11 +33,20 @@ public sealed class ApiClient(HttpClient http)
     public Task<bool> CompleteOnboardingAsync(CancellationToken ct) => SendAsync<bool>(HttpMethod.Post, "onboarding/complete", ct);
 
     public Task<List<ClientModel>> GetClientsAsync(CancellationToken ct) => GetAsync<List<ClientModel>>("clients", ct);
+    public Task<bool> DeleteClientAsync(string id, Guid version, CancellationToken ct)
+        => SendAsync<bool>(HttpMethod.Delete, $"clients/{Escape(id)}?version={version:D}", ct);
+
     public Task<string> SaveClientAsync(ClientModel client, CancellationToken ct)
         => string.IsNullOrEmpty(client.Id) ? SendAsync<string>(HttpMethod.Post, "clients", ct, client)
             : SendAsync<string>(HttpMethod.Put, $"clients/{Escape(client.Id)}", ct, client);
 
+    public Task<Dictionary<string, double>> GetRecentProjectUsageAsync(CancellationToken ct)
+        => GetAsync<Dictionary<string, double>>("projects/recent-usage", ct);
+
     public Task<List<ProjectModel>> GetProjectsAsync(CancellationToken ct) => GetAsync<List<ProjectModel>>("projects", ct);
+    public Task<bool> DeleteProjectAsync(string id, Guid version, CancellationToken ct)
+        => SendAsync<bool>(HttpMethod.Delete, $"projects/{Escape(id)}?version={version:D}", ct);
+
     public Task<string> SaveProjectAsync(ProjectModel project, CancellationToken ct)
         => string.IsNullOrEmpty(project.Id) ? SendAsync<string>(HttpMethod.Post, "projects", ct, project)
             : SendAsync<string>(HttpMethod.Put, $"projects/{Escape(project.Id)}", ct, project);

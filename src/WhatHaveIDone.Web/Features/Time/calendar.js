@@ -21,7 +21,7 @@ export function create(element,dotnet,options){
  const calendar=new Calendar(element,{
   plugins:[timeGridPlugin,interactionPlugin,luxonPlugin],locales:[csLocale],locale:options.locale,timeZone:options.timeZone,firstDay:options.firstDay,
   initialView:window.innerWidth<800?'timeGridDay':'timeGridWeek',initialDate:options.date,
-  headerToolbar:false,height:650,allDaySlot:false,scrollTime:'08:00:00',nowIndicator:true,editable:true,selectable:true,
+  headerToolbar:false,height:650,eventMinHeight:1,slotEventOverlap:false,allDaySlot:false,scrollTime:'08:00:00',nowIndicator:true,editable:true,selectable:true,
   slotDuration:'00:30:00',snapDuration:'00:05:00',eventOverlap:true,selectOverlap:true,longPressDelay:500,
   select(info){
    const local=DateTime.fromJSDate(info.start,{zone:calendar.getOption('timeZone')});
@@ -31,7 +31,12 @@ export function create(element,dotnet,options){
    const slot=[...element.querySelectorAll('.fc-timegrid-slot-lane[data-time]')].find(cell=>{const r=cell.getBoundingClientRect();return y>=r.top&&y<r.bottom;});
    if(slot){const r=slot.getBoundingClientRect(),[hour,minute]=slot.dataset.time.split(':').map(Number);point+=(hour*60+minute+(y-r.top)/r.height*30-local.hour*60-local.minute-local.second/60)*60*1000;}
    const gap=+info.end-+info.start<=5*60*1000?shortGapAt(point,intervals(),+local.startOf('day'),+local.plus({days:1}).startOf('day')):null;
-   dotnet.invokeMethodAsync('SelectAsync',gap?new Date(gap.start).toISOString():info.startStr,gap?new Date(gap.end).toISOString():info.endStr,!!gap);calendar.unselect();
+   dotnet.invokeMethodAsync('SelectAsync',gap?new Date(gap.start).toISOString():info.startStr,gap?new Date(gap.end).toISOString():info.endStr);calendar.unselect();
+  },
+  eventDidMount(info){
+   const label=[info.timeText,info.event.title].filter(Boolean).join(" ");
+   info.el.title=label;
+   info.el.setAttribute("aria-label",label);
   },
   eventClick(info){if(!pending.has(info.event.id))dotnet.invokeMethodAsync('OpenAsync',info.event.id);},
   eventDrop:info=>change(info,'move'),eventResize:info=>change(info,+info.event.start!==+info.oldEvent.start?'resizeStart':'resizeEnd'),

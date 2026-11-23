@@ -26,11 +26,11 @@ public sealed class SaveProjectUsecaseHandler(IRepository<UserProfile> profiles,
         project.Name = request.Input.Name.Trim(); project.Color = request.Input.Color; project.Archived = request.Input.Archived;
         project.ClientId = clientId;
         if (isNew)
-        {
             await projects.AddAsync(project, cancellationToken);
-            await profiles.UpdateAsync(profile, cancellationToken);
-        }
-        else await projects.UpdateAsync(project, cancellationToken);
+        else
+            await projects.UpdateAsync(project, cancellationToken);
+        // Serialize project assignments with client deletion.
+        await profiles.UpdateAsync(profile, cancellationToken);
         return project.Id;
     }
 }

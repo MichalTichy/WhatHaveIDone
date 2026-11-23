@@ -4,7 +4,7 @@
 <div class="page-header"><h1>@Strings.Reports</h1>@if(report is not null){<a class="button secondary" href="@CsvUrl">@Strings.ExportCsv</a>}</div>
 @if(Error is not null){<p class="alert error" role="alert">@Error</p>}
 <form class="surface stack report-filters" @onsubmit="LoadAsync" @onsubmit:preventDefault>
-    <div class="form-grid"><label>@Strings.From<input type="date" @bind="startDate" @bind:format="yyyy-MM-dd" required /></label><label>@Strings.To<input type="date" @bind="endDate" @bind:format="yyyy-MM-dd" required /></label><label>@Strings.Project<select aria-label="@Strings.Project" @bind="project"><option value="">@Strings.AllProjects</option><option value="none">@Strings.NoProject</option>@foreach(var p in User.Projects){<option value="@p.Id">@p.Name</option>}</select></label><label>@Strings.Tags<select aria-label="@Strings.Tags" @bind="tag"><option value="">@Strings.AllTags</option>@foreach(var t in User.Tags){<option value="@t">@t</option>}</select></label></div>
+    <div class="form-grid"><label>@Strings.From<input type="date" @bind="startDate" @bind:format="yyyy-MM-dd" required /></label><label>@Strings.To<input type="date" @bind="endDate" @bind:format="yyyy-MM-dd" required /></label><ProjectSelect Options="ProjectOptions" Value="@project" ValueChanged="SelectProject" /><label>@Strings.Tags<select aria-label="@Strings.Tags" @bind="tag"><option value="">@Strings.AllTags</option>@foreach(var t in User.Tags){<option value="@t">@t</option>}</select></label></div>
     <label>@Strings.FilterDescription<input @bind="text" /></label><div class="actions"><AppActionButton Type="ButtonType.Submit" Disabled="IsLoading">@Strings.Apply</AppActionButton><button type="button" class="secondary" @onclick="ResetAsync">@Strings.ClearFilters</button><span class="muted">@User.Settings.TimeZone</span></div>
 </form>
 <div class="toolbar"><div class="tabs"><button class="@(!detail ? "active" : "")" @onclick="() => detail = false">@Strings.Summary</button><button class="@(detail ? "active" : "")" @onclick="() => detail = true">@Strings.Detail</button></div>@if(report is not null){<strong>@Strings.Total @UserTime.Duration(report.TotalSeconds)</strong>}</div>
@@ -18,6 +18,35 @@ else if(report is not null)
     }
     else
     {
-        <section class="surface table-scroll"><table class="data-table"><thead><tr><th>@Strings.Description</th><th>@Strings.Project</th><th>@Strings.Tags</th><th>@Strings.Start</th><th>@Strings.End</th><th class="numeric">@Strings.Duration</th></tr></thead><tbody>@foreach(var entry in report.Entries){<tr><td><button type="button" class="text-action" disabled="@(IsLoading || string.IsNullOrEmpty(entry.Description))" @onclick="() => FilterDescriptionAsync(entry.Description)">@(string.IsNullOrEmpty(entry.Description)?Strings.NoDescription:entry.Description)</button>@if(Overlaps(entry)){<small class="warning-text"> · @Strings.OverlapShort</small>}</td><td><button type="button" class="text-action" disabled="@IsLoading" @onclick="() => FilterProjectAsync(entry.ProjectId)">@User.ProjectName(entry.ProjectId)</button></td><td><div class="report-tags">@foreach(var name in entry.Tags){<button type="button" class="tag-pill" disabled="@IsLoading" @onclick="() => FilterTagAsync(name)">@name</button>}</div></td><td>@UserTime.Local(entry.Start,User.Settings.TimeZone).ToString("g")</td><td>@(entry.End.HasValue?UserTime.Local(entry.End.Value,User.Settings.TimeZone).ToString("g"):Strings.Running)</td><td class="numeric">@UserTime.Duration(UserTime.Seconds(entry.Start,entry.End,report.CalculatedAt,appliedFrom,appliedTo))</td></tr>}</tbody></table></section>
+        <section class="surface table-scroll report-detail">
+            <table class="data-table" role="table">
+                <thead role="rowgroup">
+                    <tr role="row"><th role="columnheader">@Strings.Description</th><th role="columnheader">@Strings.Project</th><th role="columnheader">@Strings.Tags</th><th role="columnheader">@Strings.Start</th><th role="columnheader">@Strings.End</th><th role="columnheader" class="numeric">@Strings.Duration</th></tr>
+                </thead>
+                <tbody role="rowgroup">
+                    @foreach (var entry in report.Entries)
+                    {
+                        <tr role="row" @key="entry.Id">
+                            <td role="cell" class="report-description">
+                                <button type="button" class="text-action" disabled="@(IsLoading || string.IsNullOrEmpty(entry.Description))" @onclick="() => FilterDescriptionAsync(entry.Description)">@(string.IsNullOrEmpty(entry.Description) ? Strings.NoDescription : entry.Description)</button>
+                                @if (Overlaps(entry)) { <small class="warning-text">@Strings.OverlapShort</small> }
+                            </td>
+                            <td role="cell" class="report-project"><button type="button" class="text-action" disabled="@IsLoading" @onclick="() => FilterProjectAsync(entry.ProjectId)">@User.ProjectName(entry.ProjectId)</button></td>
+                            <td role="cell" class="report-tag-cell">
+                                <div class="report-tags">
+                                    @foreach (var name in entry.Tags)
+                                    {
+                                        <button type="button" class="tag-pill" disabled="@IsLoading" @onclick="() => FilterTagAsync(name)">@name</button>
+                                    }
+                                </div>
+                            </td>
+                            <td role="cell" class="report-start"><span class="report-mobile-label">@Strings.Start</span>@UserTime.Local(entry.Start, User.Settings.TimeZone).ToString("g")</td>
+                            <td role="cell" class="report-end"><span class="report-mobile-label">@Strings.End</span>@(entry.End.HasValue ? UserTime.Local(entry.End.Value, User.Settings.TimeZone).ToString("g") : Strings.Running)</td>
+                            <td role="cell" class="report-duration numeric"><span class="report-mobile-label sr-only">@Strings.Duration</span>@UserTime.Duration(UserTime.Seconds(entry.Start, entry.End, report.CalculatedAt, appliedFrom, appliedTo))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
     }
 }

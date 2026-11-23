@@ -24,9 +24,6 @@ public partial class TimeEntryEditor : IAsyncDisposable
     public DateTimeOffset InitialEnd { get; set; }
 
     [Parameter]
-    public bool CreateOnOpen { get; set; }
-
-    [Parameter]
     public EventCallback<TimeEntryModel> Saved { get; set; }
 
     [Parameter]
@@ -82,10 +79,7 @@ public partial class TimeEntryEditor : IAsyncDisposable
             return;
         self = DotNetObjectReference.Create(this);
         await Js.InvokeVoidAsync("whid.openDialog", Cancellation, dialog, self);
-        if (CreateOnOpen && Entry is null)
-            await CreateAsync();
-        else
-            await CheckOverlapAsync();
+        await CheckOverlapAsync();
     }
 
     private Task DescriptionChangedAsync(ChangeEventArgs args)
@@ -131,7 +125,10 @@ public partial class TimeEntryEditor : IAsyncDisposable
         try
         {
             await Task.Delay(500, pending.Token);
-            await SaveAsync();
+            if (id is null)
+                await CheckOverlapAsync();
+            else
+                await SaveAsync();
         }
         catch (OperationCanceledException) when (pending.IsCancellationRequested || IsDisposed)
         {
@@ -147,9 +144,11 @@ public partial class TimeEntryEditor : IAsyncDisposable
     private Task FlushAsync() => SaveAsync();
     private async Task CreateAsync()
     {
-        if (id is null && revision == savedRevision)
+        if (id is not null || saving)
+            return;
+        if (revision == savedRevision)
             revision++;
-        await SaveAsync();
+        await SaveAsync(create: true);
     }
 
     private EditTimeEntry Snapshot() => new()
@@ -167,9 +166,11 @@ public partial class TimeEntryEditor : IAsyncDisposable
         => value == UserTime.Input(original, User.Settings.TimeZone) && offset == UserTime.Offset(original, User.Settings.TimeZone)
             ? original
             : UserTime.Parse(value, User.Settings.TimeZone, offset);
-    private async Task SaveAsync()
+    private Task SaveAsync() => SaveAsync(create: false);
+
+    private async Task SaveAsync(bool create)
     {
-        if (IsDisposed || conflict)
+        if (IsDisposed || conflict || id is null && !create)
             return;
         try
         {
@@ -230,6 +231,8 @@ public partial class TimeEntryEditor : IAsyncDisposable
                     if (IsDisposed)
                         return;
                     Error = exception.Message;
+                    if (exception.Status is 400 or 404)
+                        pendingCreate = null;
                     failed = true;
                     conflict = exception.Status == 409;
                     authenticationExpired = exception.Status == 401;
@@ -272,7 +275,11 @@ public partial class TimeEntryEditor : IAsyncDisposable
             var snapshot = Snapshot();
             var to = snapshot.End ?? DateTimeOffset.UtcNow;
             if (to <= snapshot.Start)
+            {
+                overlap = false;
+                StateHasChanged();
                 return;
+            }
             var atRevision = revision;
             var entries = await Api.GetTimeEntriesAsync(snapshot.Start, to, Cancellation);
             if (!IsDisposed && atRevision == revision)
@@ -298,7 +305,7 @@ public partial class TimeEntryEditor : IAsyncDisposable
     [JSInvokable]
     public async Task RequestCloseAsync()
     {
-        if (closing)
+        if (closing || saving && id is null)
             return;
         closing = true;
         try
@@ -319,6 +326,11 @@ public partial class TimeEntryEditor : IAsyncDisposable
 
     private async Task BeforeNavigationAsync(LocationChangingContext context)
     {
+        if (saving && id is null)
+        {
+            context.PreventNavigation();
+            return;
+        }
         debounce?.Cancel();
         await SaveAsync();
         if (savedRevision < revision && !await Js.InvokeAsync<bool>("confirm", Cancellation, Strings.DiscardConfirm))
