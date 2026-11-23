@@ -33,6 +33,7 @@ public sealed class FakeTogglHandler : HttpMessageHandler
         {
             if (BeforeReport is { } beforeReport) await beforeReport(token, cancellationToken);
             var body=await request.Content!.ReadAsStringAsync(cancellationToken);ReportBodies.Enqueue(body);
+            if (token.StartsWith("windows-", StringComparison.Ordinal)) return Json(Array.Empty<object>());
             var count = calls.AddOrUpdate(token, 1, (_, value) => value + 1);
             if (count == 1 && token.StartsWith("throttled", StringComparison.Ordinal))
             {

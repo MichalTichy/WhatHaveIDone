@@ -10,7 +10,7 @@ using WhatHaveIDone.Models;
 
 namespace WhatHaveIDone.API.Import;
 
-public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider protection, TimeProvider clock)
+public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider protection, TimeProvider clock, ILogger<TogglImportClient> logger)
 {
     public const string ProtectionPurpose = "WhatHaveIDone.TogglImport.v1";
 
@@ -41,6 +41,9 @@ public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider p
     {
         var call = run.PendingCalls.FirstOrDefault()
             ?? throw new TogglImportException("ImportSource");
+        // Runs queued before windowing may still have an unbounded first request.
+        if (call.FirstId is null && call.FirstRow is null)
+            call = ImportCall.CreateWindow(call.WorkspaceId, call.From, call.Through);
         var protector = protection.CreateProtector(ProtectionPurpose);
         var token = protector.Unprotect(run.ProtectedToken ?? throw new TogglImportException("ImportToken"));
         var body = new Dictionary<string, object?>
@@ -53,6 +56,7 @@ public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider p
             ["order_dir"] = "DESC",
             ["grouped"] = false,
             ["enrich_response"] = true,
+            // The live Reports API accepts 0 for unrounded entries and rejects booleans.
             ["rounding"] = 0
         };
         if (call.FirstId is { } firstId) body["first_id"] = firstId;
@@ -97,6 +101,10 @@ public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider p
             continuation = call with { FirstId = nextId, FirstRow = nextRow };
             if (continuation == call || run.ConsumedCursors.Contains(continuation.CursorKey()))
                 throw new TogglImportException("ImportSource");
+        }
+        else if (run.RequestedFrom is { } from && call.From > from)
+        {
+            continuation = ImportCall.CreateWindow(call.WorkspaceId, from, call.From.AddDays(-1));
         }
         return new ImportBatch(entries, continuation);
     }
@@ -160,6 +168,8 @@ public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider p
                 if (rateReset is { } reset && reset > now.ToUnixTimeSeconds() && reset <= now.AddDays(1).ToUnixTimeSeconds())
                     next = Later(next, DateTimeOffset.FromUnixTimeSeconds(reset));
                 next ??= now.AddSeconds(Math.Min(3600, 60 * Math.Pow(2, Math.Min(retryCount, 6))));
+                logger.LogWarning("Toggl {Operation} returned HTTP {StatusCode} (ImportQuota). Retry after {RetryAt}.",
+                    body is null ? "source lookup" : "detailed report", (int)response.StatusCode, next);
                 throw new TogglImportException("ImportQuota", next > now ? next : now.AddSeconds(1));
             }
 
@@ -169,6 +179,13 @@ public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider p
                 HttpStatusCode.PaymentRequired => "ImportPlan",
                 _ => "ImportSource"
             };
+            var mentionedFields = new[] { "rounding", "start_date", "end_date", "page_size", "order_by", "order_dir",
+                "user_ids", "first_id", "first_row_number", "enrich_response", "grouped", "workspace_id" }
+                .Where(field => payload.Contains(field, StringComparison.OrdinalIgnoreCase));
+            var reason = payload.Contains("Maximum allowed date range", StringComparison.OrdinalIgnoreCase)
+                ? "date range too wide" : "upstream request rejected";
+            logger.LogWarning("Toggl {Operation} returned HTTP {StatusCode} ({ErrorCode}): {Reason}. Report parameters mentioned: {Parameters}.",
+                body is null ? "source lookup" : "detailed report", (int)response.StatusCode, code, reason, string.Join(", ", mentionedFields));
             throw new TogglImportException(code);
         }
     }

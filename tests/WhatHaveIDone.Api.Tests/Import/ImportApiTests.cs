@@ -47,6 +47,30 @@ public sealed class ImportApiTests(IntegrationFixture fixture)
     {for(var i=0;i<15;i++){if((await ModelAsync(owner,id)).Status==status)return;await fixture.StepImportAsync();}Assert.Equal(status,(await ModelAsync(owner,id)).Status);}
 
     [Fact]
+    public async Task MultiYearHistoryUsesContiguousNewestFirstWindowsAsync()
+    {
+        using var owner = await fixture.CreateOwnerAsync();
+        var from = new DateOnly(2019, 1, 1);
+        var through = new DateOnly(2022, 1, 1);
+        var before = fixture.Toggl.ReportBodies.Count;
+        var id = await owner.PostAsync<string>("imports/prepare", new PrepareApiImport("windows-" + Guid.NewGuid(), from, through));
+        await owner.PostAsync<bool>($"imports/{id}/confirm", new ConfirmImportInput([7]));
+        await UntilAsync(owner, id, ImportStatus.Completed);
+
+        var expectedThrough = through;
+        foreach (var body in fixture.Toggl.ReportBodies.Skip(before))
+        {
+            using var json = System.Text.Json.JsonDocument.Parse(body);
+            var start = DateOnly.ParseExact(json.RootElement.GetProperty("start_date").GetString()!, "yyyy-MM-dd");
+            var end = DateOnly.ParseExact(json.RootElement.GetProperty("end_date").GetString()!, "yyyy-MM-dd");
+            Assert.Equal(expectedThrough, end);
+            Assert.InRange(end.DayNumber - start.DayNumber, 0, 364);
+            expectedThrough = start.AddDays(-1);
+        }
+        Assert.Equal(from.AddDays(-1), expectedThrough);
+    }
+
+    [Fact]
     public async Task LegacyQueueUpgradeKeepsThePendingPageAndDetectsCursorLoopsAsync()
     {
         using var owner = await fixture.CreateOwnerAsync();
@@ -83,7 +107,7 @@ public sealed class ImportApiTests(IntegrationFixture fixture)
     }
     [Fact] public async Task QuotaWaitAndDurablePageCheckpointSurviveAWorkerReplacementAsync()
     {
-        using var owner=await fixture.CreateOwnerAsync();var secret="quota"+Guid.NewGuid().ToString("N");var reportStart = fixture.Toggl.ReportBodies.Count;var id=await owner.PostAsync<string>("imports/prepare",new PrepareApiImport(secret));
+        using var owner=await fixture.CreateOwnerAsync();var secret="quota"+Guid.NewGuid().ToString("N");var reportStart = fixture.Toggl.ReportBodies.Count;var id=await owner.PostAsync<string>("imports/prepare",new PrepareApiImport(secret, new DateOnly(2026, 1, 1)));
         await owner.PostAsync<bool>("imports/"+id+"/confirm",new ConfirmImportInput([7]));
         await fixture.StepImportAsync();var waiting=await ModelAsync(owner,id);Assert.Equal(ImportStatus.Waiting,waiting.Status);Assert.Equal("ImportQuota",waiting.MessageCode);Assert.True(waiting.NextAttemptAt>fixture.Clock.GetUtcNow());
         var key=await owner.PostAsync<CreatedApiToken>("tokens",new CreateApiKeyRequest("During import"));using var api=fixture.App.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions{HandleCookies=false});
@@ -111,7 +135,7 @@ public sealed class ImportApiTests(IntegrationFixture fixture)
         var defaultClient=Assert.Single(await owner.GetAsync<List<ClientModel>>("clients"));
         Assert.All(await owner.GetAsync<List<ProjectModel>>("projects"),p=>Assert.Equal(defaultClient.Id,p.ClientId));
         var entries=await owner.GetAsync<List<TimeEntryModel>>("time-entries?"+Range);Assert.Equal(new long[]{1001,1002},entries.Select(e=>e.CompatibilityId).Order().ToArray());Assert.All(entries,e=>Assert.Single(e.Tags));
-        Assert.All(fixture.Toggl.ReportBodies.Skip(reportStart),body=>{using var json=System.Text.Json.JsonDocument.Parse(body);Assert.Equal(42,json.RootElement.GetProperty("user_ids")[0].GetInt32());Assert.Equal(0,json.RootElement.GetProperty("rounding").GetInt32());Assert.Equal("1970-01-01",json.RootElement.GetProperty("start_date").GetString());Assert.Equal("DESC",json.RootElement.GetProperty("order_dir").GetString());});
+        Assert.All(fixture.Toggl.ReportBodies.Skip(reportStart),body=>{using var json=System.Text.Json.JsonDocument.Parse(body);Assert.Equal(42,json.RootElement.GetProperty("user_ids")[0].GetInt32());Assert.Equal(0,json.RootElement.GetProperty("rounding").GetInt32());Assert.Equal("2026-01-01",json.RootElement.GetProperty("start_date").GetString());Assert.Equal("DESC",json.RootElement.GetProperty("order_dir").GetString());});
     }
     [Fact]
     public async Task WorkerProcessesDifferentUsersInParallelAndDiscardsCancelledPagesAsync()

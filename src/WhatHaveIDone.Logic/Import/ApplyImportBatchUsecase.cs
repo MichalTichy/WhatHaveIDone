@@ -26,7 +26,16 @@ public sealed class ApplyImportBatchUsecaseHandler(IRepository<ImportRun> import
         if (next.PendingCalls.Count == 0) throw new AppException("Conflict", 409);
         var call = next.PendingCalls[0];
         next.PendingCalls.RemoveAt(0);
-        if (call.FirstId.HasValue || call.FirstRow.HasValue) next.ConsumedCursors.Add(call.CursorKey());
+        if (request.Continuation is { } pending && pending.Through == call.Through)
+        {
+            if (call.FirstId.HasValue || call.FirstRow.HasValue) next.ConsumedCursors.Add(call.CursorKey());
+        }
+        else
+        {
+            // Row numbers can repeat in the next date window for the same workspace.
+            var workspacePrefix = FormattableString.Invariant($"{call.WorkspaceId}:");
+            next.ConsumedCursors.RemoveWhere(cursor => cursor.StartsWith(workspacePrefix, StringComparison.Ordinal));
+        }
         // Give each workspace its newest page before proceeding to older pages.
         if (request.Continuation is { } continuation) next.PendingCalls.Add(continuation);
         var complete = next.PendingCalls.Count == 0;
