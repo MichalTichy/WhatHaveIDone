@@ -33,6 +33,7 @@ public sealed class FakeTogglHandler : HttpMessageHandler
         {
             if (BeforeReport is { } beforeReport) await beforeReport(token, cancellationToken);
             var body=await request.Content!.ReadAsStringAsync(cancellationToken);ReportBodies.Enqueue(body);
+            if (token.StartsWith("windows-", StringComparison.Ordinal)) return Json(Array.Empty<object>());
             var count = calls.AddOrUpdate(token, 1, (_, value) => value + 1);
             if (count == 1 && token.StartsWith("throttled", StringComparison.Ordinal))
             {
@@ -48,6 +49,7 @@ public sealed class FakeTogglHandler : HttpMessageHandler
             }
             if(token.StartsWith("premium",StringComparison.Ordinal))return Json(new{error="Workspace needs to have this feature enabled"},HttpStatusCode.PaymentRequired);
             using var json=JsonDocument.Parse(body);var next=json.RootElement.TryGetProperty("first_row_number",out var row)&&row.ValueKind==JsonValueKind.Number?row.GetInt32():0;
+            if (next > 0 && json.RootElement.TryGetProperty("first_id", out _)) return Json(Array.Empty<object>());
             if(next==0 || token.StartsWith("loop-", StringComparison.Ordinal))
             {
                 var response=Json(new[]{Group(1002,42,"2026-10-26T09:00:00Z"),Group(9999,99,"2026-10-26T10:00:00Z")});

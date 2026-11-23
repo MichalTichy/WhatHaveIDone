@@ -21,7 +21,9 @@ public sealed class ConfirmImportUsecaseHandler(IRepository<ImportRun> imports, 
         var ids = request.Input.WorkspaceIds;
         if (ids is null || ids.Count == 0 || ids.Any(id => !run.Workspaces.Any(workspace => workspace.Id == id)))
             throw new AppException("InvalidImport");
-        run.PendingCalls = ids.Distinct().Select(id => new ImportCall(id, run.RequestedFrom!.Value, run.RequestedThrough!.Value)).ToList();
+        run.PendingCalls = ids.Distinct()
+            .Select(id => ImportCall.CreateWindow(id, run.RequestedFrom!.Value, run.RequestedThrough!.Value))
+            .ToList();
 
         var now = clock.GetUtcNow();
         run.Status = ImportStatus.Queued;
