@@ -70,19 +70,24 @@ public sealed class ImportWorker(IServiceScopeFactory scopes, TimeProvider clock
             }
             catch (TogglImportException exception)
             {
+                if (exception.NextAttempt is null)
+                    logger.LogWarning("Import run {ImportId} paused with source error {ErrorCode}.", run.Id, exception.Code);
                 await sender.Send(new MarkImportFailureUsecase(run.Id, exception.Code, exception.NextAttempt), cancellationToken);
             }
             catch (AppException exception) when (exception.Code != "Conflict")
             {
+                logger.LogWarning("Import run {ImportId} paused with error {ErrorCode}.", run.Id, exception.Code);
                 await sender.Send(new MarkImportFailureUsecase(run.Id, exception.Code, null), cancellationToken);
             }
             catch (PostgresException exception) when (exception.SqlState == PostgresErrorCodes.UniqueViolation)
             {
+                logger.LogWarning("Import run {ImportId} paused because an imported ID already exists.", run.Id);
                 await sender.Send(new MarkImportFailureUsecase(run.Id, "ImportIdCollision", null), cancellationToken);
             }
             catch (Exception exception) when (!cancellationToken.IsCancellationRequested &&
                 exception is HttpRequestException or JsonException or IOException or OperationCanceledException or FormatException or OverflowException or CryptographicException)
             {
+                logger.LogWarning("Import run {ImportId} paused after {FailureType} while reading Toggl.", run.Id, exception.GetType().Name);
                 await sender.Send(new MarkImportFailureUsecase(run.Id, "ImportSource", null), cancellationToken);
             }
         }

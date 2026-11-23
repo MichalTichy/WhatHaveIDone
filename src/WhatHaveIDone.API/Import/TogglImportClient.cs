@@ -59,8 +59,9 @@ public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider p
             // The live Reports API accepts 0 for unrounded entries and rejects booleans.
             ["rounding"] = 0
         };
-        if (call.FirstId is { } firstId) body["first_id"] = firstId;
+        // Toggl can return an empty page if both cursor fields are sent for date ordering.
         if (call.FirstRow is { } firstRow) body["first_row_number"] = firstRow;
+        else if (call.FirstId is { } firstId) body["first_id"] = firstId;
 
         using var response = await SendAsync(token, HttpMethod.Post,
             $"reports/api/v3/workspace/{call.WorkspaceId}/search/time_entries", body, run.RetryCount, cancellationToken);
@@ -93,13 +94,13 @@ public sealed class TogglImportClient(HttpClient http, IDataProtectionProvider p
             }
         }
 
-        var nextId = HeaderLong(response, "X-Next-ID");
         var nextRow = checked((int?)HeaderLong(response, "X-Next-Row-Number"));
+        var nextId = HeaderLong(response, "X-Next-ID");
         ImportCall? continuation = null;
         if (nextId.HasValue || nextRow.HasValue)
         {
             continuation = call with { FirstId = nextId, FirstRow = nextRow };
-            if (continuation == call || run.ConsumedCursors.Contains(continuation.CursorKey()))
+            if (continuation == call || (nextRow.HasValue && nextRow == call.FirstRow) || run.ConsumedCursors.Contains(continuation.CursorKey()))
                 throw new TogglImportException("ImportSource");
         }
         else if (run.RequestedFrom is { } from && call.From > from)
