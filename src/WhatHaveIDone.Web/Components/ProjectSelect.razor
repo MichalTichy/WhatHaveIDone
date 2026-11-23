@@ -1,27 +1,25 @@
 <div class="project-search">
-    <label for="@selectId">@Strings.Project</label>
-    <select id="@selectId" @bind:get="Value" @bind:set="SelectAsync">
-        @foreach (var option in Options)
-        {
-            <option value="@option.Value" @key="option.Value">@option.Text</option>
-        }
-    </select>
-    <details>
-        <summary>@Strings.Search</summary>
-        <BbInput Class="app-input" AriaLabel="@Strings.Search" Placeholder="@Strings.Search" UpdateTiming="UpdateTiming.Immediate"
-                 Value="@search" ValueChanged="UpdateSearch" />
-        @if (search.Trim().Length > 0 && Matches.Count == 0)
-        {
-            <p class="muted">@Strings.NoProjects</p>
-        }
-        else if (search.Trim().Length > 0)
-        {
-            <div class="project-search-results">
-                @foreach (var option in Matches)
+    <label for="@triggerId">@Strings.Project</label>
+    <div class="project-search-control">
+        <button type="button" class="secondary project-search-trigger" id="@triggerId" popovertarget="@listId"
+                aria-haspopup="listbox" @ref="trigger" @onclick="FocusSearchAsync">
+            <span>@SelectedText</span><span aria-hidden="true">&#9662;</span>
+        </button>
+        @Action
+    </div>
+    <div class="project-search-popover" id="@listId" popover="auto" @ref="popover">
+        <BbCommand @bind-SearchQuery="search" OnValueChange="SelectAsync">
+            <BbCommandInput Placeholder="@Strings.Search" DisableDebounce="true" aria-label="@Strings.Search" />
+            <BbCommandList>
+                <BbCommandEmpty>@Strings.NoProjects</BbCommandEmpty>
+                @foreach (var option in Options)
                 {
-                    <button type="button" class="text-action" @key="option.Value" @onclick="() => SelectAsync(option.Value)">@option.Text</button>
+                    <BbCommandItem @key="option.Value" Value="@("project:" + option.Value)" SearchText="@option.Text">
+                        <span class="project-option-check" aria-hidden="true">@(option.Value == Value ? "✓" : "")</span>
+                        @option.Text
+                    </BbCommandItem>
                 }
-            </div>
-        }
-    </details>
+            </BbCommandList>
+        </BbCommand>
+    </div>
 </div>

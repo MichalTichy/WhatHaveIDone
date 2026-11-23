@@ -1,10 +1,14 @@
 using BlazorBlueprint.Primitives;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace WhatHaveIDone.Web.Components;
 
 public partial class ProjectSelect
 {
+    [Inject]
+    private IJSRuntime Js { get; set; } = null!;
+
     [Parameter, EditorRequired]
     public IReadOnlyList<SelectOption<string>> Options { get; set; } = [];
 
@@ -14,17 +18,24 @@ public partial class ProjectSelect
     [Parameter]
     public EventCallback<string?> ValueChanged { get; set; }
 
-    private readonly string selectId = "project-" + Guid.NewGuid().ToString("N");
+    [Parameter]
+    public RenderFragment? Action { get; set; }
+
+    private readonly string triggerId = "project-" + Guid.NewGuid().ToString("N");
+    private readonly string listId = "project-list-" + Guid.NewGuid().ToString("N");
+    private ElementReference popover, trigger;
     private string search = "";
-    private IReadOnlyList<SelectOption<string>> Matches => Options
-        .Where(option => option.Text.Contains(search.Trim(), StringComparison.CurrentCultureIgnoreCase))
-        .ToList();
+    private string? SelectedText => Options.FirstOrDefault(option => option.Value == Value)?.Text;
 
-    private void UpdateSearch(string? value) => search = value ?? "";
-
-    private async Task SelectAsync(string? value)
+    private async Task FocusSearchAsync()
     {
         search = "";
-        await ValueChanged.InvokeAsync(value);
+        await Js.InvokeVoidAsync("whid.focusPopoverSearch", popover, trigger);
+    }
+
+    private async Task SelectAsync(string selection)
+    {
+        await Js.InvokeVoidAsync("whid.closePopover", popover, trigger);
+        await ValueChanged.InvokeAsync(selection["project:".Length..]);
     }
 }
