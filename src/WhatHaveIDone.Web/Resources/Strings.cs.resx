@@ -9,4 +9,11 @@ Použij bezpečné nastavení tajných údajů nebo prostředí tohoto klienta. 
 Doplň stávající MCP konfiguraci a zachovej ostatní servery. Případně klienta restartuj nebo obnov připojení, vypiš nástroje a ověř spojení zavoláním get_settings. Pro test připojení nevytvářej, neměň ani nemaž časové záznamy.
 Server pracuje s mými časovými záznamy, projekty, použitými tagy, přehledy a časovačem. Navržené zápisy se mnou nejdříve projdi. Zatím nepodporuje drafty výkazů ani přihlášení přes OAuth.</value></data><data name="ImportRequestedRange" xml:space="preserve"><value>Požadované období</value></data><data name="ImportedDates" xml:space="preserve"><value>Datové rozpětí importovaných záznamů</value></data><data name="ImportFromDate" xml:space="preserve"><value>První datum (nepovinné)</value></data><data name="ImportThroughDate" xml:space="preserve"><value>Poslední datum (nepovinné)</value></data>  <data name="DeleteProjectConfirm" xml:space="preserve"><value>Smazat projekt {0}?</value></data>
   <data name="DeleteClientConfirm" xml:space="preserve"><value>Smazat klienta {0}?</value></data>
+<data name="NoMatchingOptions" xml:space="preserve"><value>Žádná odpovídající možnost.</value></data>
+  <data name="ThisWeek" xml:space="preserve"><value>Tento týden</value></data>
+  <data name="LastWeek" xml:space="preserve"><value>Minulý týden</value></data>
+  <data name="ThisMonth" xml:space="preserve"><value>Tento měsíc</value></data>
+  <data name="LastMonth" xml:space="preserve"><value>Minulý měsíc</value></data>
+  <data name="ThisYear" xml:space="preserve"><value>Tento rok</value></data>
+  <data name="LastYear" xml:space="preserve"><value>Minulý rok</value></data>
 </root>

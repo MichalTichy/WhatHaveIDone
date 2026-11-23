@@ -1,3 +1,4 @@
+using BlazorBlueprint.Primitives;
 using Microsoft.AspNetCore.Components;
 using WhatHaveIDone.API.Models;
 
@@ -11,7 +12,9 @@ public partial class ClientPicker
     [Parameter]
     public EventCallback<string?> ValueChanged { get; set; }
 
-    private readonly string selectId = "client-" + Guid.NewGuid().ToString("N");
+    private IReadOnlyList<SelectOption<string>> Options =>
+        User.Clients.Select(client => new SelectOption<string>(client.Id, client.Name)).ToArray();
+
     private string name = "";
     private bool adding;
     private void Toggle()
@@ -20,7 +23,6 @@ public partial class ClientPicker
         Error = null;
     }
 
-    private Task SelectAsync(ChangeEventArgs args) => ValueChanged.InvokeAsync(args.Value?.ToString());
     private Task CreateAsync() => RunAsync(async ct =>
     {
         var id = await Api.SaveClientAsync(new ClientModel { Name = name }, ct);

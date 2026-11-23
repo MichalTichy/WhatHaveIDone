@@ -9,4 +9,11 @@ Use this client’s supported secret/environment configuration. Explain how I ca
 Merge with my existing MCP settings and keep other servers. Restart or reconnect if necessary, then list the tools and call get_settings to verify the connection. Do not create, change or delete time entries to test the connection.
 This server accesses my time entries, projects, used tags, reports and timer. Review proposed writes with me. It does not yet support timesheet drafts or OAuth sign-in.</value></data><data name="ImportRequestedRange" xml:space="preserve"><value>Requested dates</value></data><data name="ImportedDates" xml:space="preserve"><value>Dates of imported entries</value></data><data name="ImportFromDate" xml:space="preserve"><value>First date (optional)</value></data><data name="ImportThroughDate" xml:space="preserve"><value>Last date (optional)</value></data>  <data name="DeleteProjectConfirm" xml:space="preserve"><value>Delete project {0}?</value></data>
   <data name="DeleteClientConfirm" xml:space="preserve"><value>Delete client {0}?</value></data>
+<data name="NoMatchingOptions" xml:space="preserve"><value>No matching options.</value></data>
+  <data name="ThisWeek" xml:space="preserve"><value>This week</value></data>
+  <data name="LastWeek" xml:space="preserve"><value>Last week</value></data>
+  <data name="ThisMonth" xml:space="preserve"><value>This month</value></data>
+  <data name="LastMonth" xml:space="preserve"><value>Last month</value></data>
+  <data name="ThisYear" xml:space="preserve"><value>This year</value></data>
+  <data name="LastYear" xml:space="preserve"><value>Last year</value></data>
 </root>

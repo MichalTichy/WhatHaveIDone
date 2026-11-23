@@ -1,10 +1,10 @@
 @inherits AppComponentBase
 <div class="project-picker">
-    <ProjectSelect Options="Options" Value="@(Value ?? string.Empty)" ValueChanged="SelectAsync">
+    <SearchableSelect Label="@Strings.Project" EmptyMessage="@Strings.NoProjects" Options="Options" Value="@(Value ?? string.Empty)" ValueChanged="SelectAsync">
         <Action>
             <button type="button" class="secondary" aria-label="@Strings.AddProject" aria-expanded="@adding" @onclick="Toggle">＋</button>
         </Action>
-    </ProjectSelect>
+    </SearchableSelect>
     <div class="suggestion-badges project-suggestions" role="group" aria-label="@Strings.ProjectSuggestions">
         <button type="button" class="suggestion-badge" aria-pressed="@(string.IsNullOrEmpty(Value) ? "true" : "false")" @onclick="() => ChooseAsync(null)">@Strings.NoProject</button>
         @foreach (var project in User.ProjectsByUsage.Where(p => !p.Archived && User.RecentProjectSeconds(p.Id) > 0).Take(3))

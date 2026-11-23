@@ -2,12 +2,18 @@ using BlazorBlueprint.Primitives;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace WhatHaveIDone.Web.Components;
+namespace WhatHaveIDone.Web.Components.Forms;
 
-public partial class ProjectSelect
+public partial class SearchableSelect
 {
     [Inject]
     private IJSRuntime Js { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public string? EmptyMessage { get; set; }
 
     [Parameter, EditorRequired]
     public IReadOnlyList<SelectOption<string>> Options { get; set; } = [];
@@ -21,8 +27,8 @@ public partial class ProjectSelect
     [Parameter]
     public RenderFragment? Action { get; set; }
 
-    private readonly string triggerId = "project-" + Guid.NewGuid().ToString("N");
-    private readonly string listId = "project-list-" + Guid.NewGuid().ToString("N");
+    private readonly string triggerId = "select-" + Guid.NewGuid().ToString("N");
+    private readonly string listId = "select-list-" + Guid.NewGuid().ToString("N");
     private ElementReference popover, trigger;
     private string search = "";
     private string? SelectedText => Options.FirstOrDefault(option => option.Value == Value)?.Text;
@@ -36,6 +42,6 @@ public partial class ProjectSelect
     private async Task SelectAsync(string selection)
     {
         await Js.InvokeVoidAsync("whid.closePopover", popover, trigger);
-        await ValueChanged.InvokeAsync(selection["project:".Length..]);
+        await ValueChanged.InvokeAsync(selection["option:".Length..]);
     }
 }

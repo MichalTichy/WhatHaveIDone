@@ -83,6 +83,7 @@ p { margin: 0 0 16px; }
 .form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
 .actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
 .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 26px 0 20px; }
+.field-actions { align-items: flex-end; }
 .tabs { display: inline-flex; gap: 3px; padding: 4px; background: #eae7ed; border-radius: 10px; }
 .tabs button { color: var(--app-muted); min-height: 36px; padding: 7px 18px; border-radius: 7px; font-size: 13px; }
 .tabs button.active { background: #fff; color: var(--ink); box-shadow: 0 1px 4px #332e3c12; }
@@ -333,16 +334,17 @@ p { margin: 0 0 16px; }
 
 .report-description .warning-text { margin-inline-start: .35rem; }
 
-.project-search-control { display: flex; align-items: stretch; gap: 6px; margin-top: 6px; }
-.project-search-control > button { flex-shrink: 0; }
-.project-search-control > .project-search-trigger {
+.searchable-select { min-width: 0; }
+.searchable-select-control { display: flex; align-items: stretch; gap: 6px; margin-top: 6px; }
+.searchable-select-control > button { flex-shrink: 0; }
+.searchable-select-control > .searchable-select-trigger {
     flex: 1;
     min-width: 0;
     justify-content: space-between;
     text-align: left;
 }
-.project-search-trigger > :first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.project-search-popover {
+.searchable-select-trigger > :first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.searchable-select-popover {
     position-area: bottom span-all;
     position-try-fallbacks: flip-block;
     justify-self: anchor-center;
@@ -356,12 +358,28 @@ p { margin: 0 0 16px; }
     border-radius: 12px;
     box-shadow: 0 8px 28px #332e3c25;
 }
-.project-search-popover:focus-within { border-color: var(--app-accent); }
-.project-search-popover :has(> input):focus-within { outline: none; box-shadow: none; }
-.project-search-popover input { margin: 0; border: 0; border-radius: 0; background: transparent; }
-.project-search-popover input:focus-visible { outline: none; }
-.project-option-check { display: inline-block; width: 1rem; color: #624799; }
+.searchable-select-popover:focus-within { border-color: var(--app-accent); }
+.searchable-select-popover :has(> input):focus-within { outline: none; box-shadow: none; }
+.searchable-select-popover input { margin: 0; border: 0; border-radius: 0; background: transparent; }
+.searchable-select-popover input:focus-visible { outline: none; }
+.searchable-select-check { display: inline-block; width: 1rem; color: #624799; }
 @supports not (position-area: bottom) {
-    .project-search-popover { inset: 20% 0 auto; width: min(26rem, calc(100vw - 24px)); margin: auto; }
+    .searchable-select-popover { inset: 20% 0 auto; width: min(26rem, calc(100vw - 24px)); margin: auto; }
 }
-.project-search-popover [data-project-active] { background: #f1ecf8; }
+.searchable-select-popover [data-select-active] { background: #f1ecf8; }
+.report-periods { grid-column: 1 / -1; }
+.report-periods [aria-pressed="true"] { background: var(--soft); border-color: var(--app-accent); }
+.report-pie { width: min(12rem, 100%); aspect-ratio: 1; border-radius: 50%; margin: 16px auto; }
+.report-calendar { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 24px; }
+.report-month h3 { margin: 0 0 8px; font-size: 1rem; }
+.report-month-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.report-weekday { text-align: center; color: var(--app-muted); font-size: .8rem; }
+button.report-day { padding: 0; min-height: 30px; border-radius: 5px; color: var(--ink); background: var(--soft); }
+.report-day[data-level="1"] { background: #dfd3f2; }
+.report-day[data-level="2"] { background: #bda8e2; }
+.report-day[data-level="3"] { background: #8d72c3; color: #211434; }
+.report-day[data-level="4"] { background: #624799; color: white; }
+.report-grid:has(.report-month:nth-child(3)) { align-items: start; }
+@media (min-width: 1100px) {
+    .report-grid:has(.report-month:nth-child(3)) { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+}

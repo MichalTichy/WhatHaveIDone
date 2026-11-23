@@ -1,3 +1,4 @@
+using BlazorBlueprint.Primitives;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using WhatHaveIDone.API.Models;
@@ -18,6 +19,22 @@ public partial class Settings
     private bool mcpSetupOpen;
     private string ApiUrl => Navigation.BaseUri;
     private string McpUrl => new Uri(new Uri(Navigation.BaseUri), "mcp").AbsoluteUri;
+
+    private static readonly IReadOnlyList<SelectOption<string>> SystemTimeZoneOptions = TimeZoneInfo.GetSystemTimeZones()
+        .Select(zone => new SelectOption<string>(zone.Id, zone.Id)).ToArray();
+
+    private IReadOnlyList<SelectOption<string>> TimeZoneOptions =>
+        SystemTimeZoneOptions.Any(option => option.Value == settings.TimeZone)
+            ? SystemTimeZoneOptions
+            : [new(settings.TimeZone, settings.TimeZone), .. SystemTimeZoneOptions];
+
+    private void SelectTimeZone(string? value)
+    {
+        if (!string.IsNullOrEmpty(value))
+        {
+            settings.TimeZone = value;
+        }
+    }
 
     protected override Task OnInitializedAsync() => LoadAsync();
     private Task LoadAsync() => RunAsync(async ct =>

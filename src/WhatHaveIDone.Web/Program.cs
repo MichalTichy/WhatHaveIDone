@@ -14,6 +14,7 @@ builder.Services.AddBlazorBlueprintComponents(configureTheme: options =>
     options.DetectSystemPreference = false;
     options.PersistToLocalStorage = false;
 });
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<ApiClient>();
 builder.Services.AddScoped<UserContext>();
 builder.Services.AddScoped<Feedback>();

@@ -1,0 +1,25 @@
+<div class="searchable-select">
+    <label for="@triggerId">@Label</label>
+    <div class="searchable-select-control">
+        <button type="button" class="secondary searchable-select-trigger" id="@triggerId" popovertarget="@listId"
+                aria-haspopup="listbox" @ref="trigger" @onclick="FocusSearchAsync">
+            <span>@SelectedText</span><span aria-hidden="true">&#9662;</span>
+        </button>
+        @Action
+    </div>
+    <div class="searchable-select-popover" id="@listId" popover="auto" @ref="popover">
+        <BbCommand @bind-SearchQuery="search" OnValueChange="SelectAsync">
+            <BbCommandInput Placeholder="@Strings.Search" DisableDebounce="true" aria-label="@Strings.Search" />
+            <BbCommandList>
+                <BbCommandEmpty>@(EmptyMessage ?? Strings.NoMatchingOptions)</BbCommandEmpty>
+                @foreach (var option in Options)
+                {
+                    <BbCommandItem @key="option.Value" Value="@("option:" + option.Value)" SearchText="@option.Text">
+                        <span class="searchable-select-check" aria-hidden="true">@(option.Value == Value ? "✓" : "")</span>
+                        @option.Text
+                    </BbCommandItem>
+                }
+            </BbCommandList>
+        </BbCommand>
+    </div>
+</div>

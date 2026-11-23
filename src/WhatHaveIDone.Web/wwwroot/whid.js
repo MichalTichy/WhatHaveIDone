@@ -26,9 +26,9 @@ window.whid={
  focusPopoverSearch(element,trigger){
   const input=element.querySelector('input');
   const highlight=option=>{
-   element.querySelector('[data-project-active]')?.removeAttribute('data-project-active');
+   element.querySelector('[data-select-active]')?.removeAttribute('data-select-active');
    if(!option){input.removeAttribute('aria-activedescendant');return;}
-   option.setAttribute('data-project-active','');
+   option.setAttribute('data-select-active','');
    input.setAttribute('aria-activedescendant',option.id);
    option.scrollIntoView({block:'nearest'});
   };
@@ -41,7 +41,7 @@ window.whid={
     event.stopPropagation();
     if(event.key==='Escape'){this.closePopover(element,trigger);return;}
     const options=[...element.querySelectorAll('[role="option"]:not([aria-disabled="true"])')].filter(option=>option.getClientRects().length);
-    const active=options.findIndex(option=>option.hasAttribute('data-project-active'));
+    const active=options.findIndex(option=>option.hasAttribute('data-select-active'));
     if(event.key==='Enter'){(options[active]??options[0])?.click();return;}
     const next=event.key==='ArrowDown'?Math.min(active+1,options.length-1):active<0?options.length-1:Math.max(active-1,0);
     highlight(options[next]);
