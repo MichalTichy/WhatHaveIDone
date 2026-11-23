@@ -109,7 +109,14 @@ p { margin: 0 0 16px; }
 .timer-description .timer-description-input::placeholder { color: #7f7389; opacity: 1; }
 .timer-action { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: 50%; }
 .timer-action output { font-size: 31px; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: -1px; white-space: nowrap; }
-.timer-start { min-width: 100px; }
+.timer-start { min-width: 100px; flex-shrink: 0; white-space: nowrap; }
+.timer-start-icon {
+    width: 0;
+    height: 0;
+    flex: none;
+    border-block: 5px solid transparent;
+    border-inline-start: 8px solid currentColor;
+}
 .timer-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; margin-top: 20px; }
 .entries { padding: 0; overflow: hidden; border: 0; background: transparent; box-shadow: none; border-radius: 0; }
 .entry-day { display: flex; justify-content: space-between; padding: 20px 6px 12px; color: var(--app-muted); font-size: 12px; }
@@ -300,7 +307,7 @@ p { margin: 0 0 16px; }
     .timer-main.timer-composer { flex-wrap: nowrap; gap: 10px; padding-bottom: 0; border: 0; }
     .timer-composer .timer-description { flex-basis: auto; }
     .timer-card .timer-fields { margin-top: 12px; }
-    .timer-card .timer-start { min-width: auto; }
+    .timer-card .timer-start { align-self: flex-start; min-width: auto; margin-top: 4px; padding-inline: 12px; }
 
     .report-detail table, .report-detail tbody { display: block; }
     .report-detail thead {

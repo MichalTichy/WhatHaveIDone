@@ -16,4 +16,7 @@ This server accesses my time entries, projects, used tags, reports and timer. Re
   <data name="LastMonth" xml:space="preserve"><value>Last month</value></data>
   <data name="ThisYear" xml:space="preserve"><value>This year</value></data>
   <data name="LastYear" xml:space="preserve"><value>Last year</value></data>
+  <data name="InstallApp" xml:space="preserve"><value>Install the app</value></data>
+  <data name="InstallAppAndroid" xml:space="preserve"><value>Android (Chrome) · Open the browser menu and choose Install app.</value></data>
+  <data name="InstallAppIphone" xml:space="preserve"><value>iPhone (Safari) · Tap Share, choose Add to Home Screen, turn on Open as Web App if offered, and tap Add.</value></data>
 </root>

@@ -38,7 +38,9 @@
                     </button>
                 }
             </div>
-            <AppActionButton Class="timer-start" Disabled="Busy" OnClick="StartAsync">▶ @Strings.StartTimer</AppActionButton>
+            <AppActionButton Class="timer-start" Disabled="Busy" OnClick="StartAsync">
+                <span class="timer-start-icon" aria-hidden="true"></span><span>@Strings.StartTimer</span>
+            </AppActionButton>
         </div>
         @if (!narrow || showTimerFields)
         {

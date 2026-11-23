@@ -23,6 +23,15 @@ else if(loaded)
             @foreach(var token in tokens){<div class="token-row"><div class="grow"><strong>@token.Name</strong><small class="muted"> · …@token.Suffix · @UserTime.Local(token.CreatedAt,User.Settings.TimeZone).ToString("d")</small></div>@if(token.RevokedAt is null){<button class="secondary" disabled="@Busy" @onclick="() => RevokeAsync(token)">@Strings.Revoke</button>}else{<span class="muted">@Strings.Revoked · @UserTime.Local(token.RevokedAt.Value,User.Settings.TimeZone).ToString("d")</span>}</div>}
         </section>
         <section class="surface stack"><h2>@Strings.Import</h2><p class="muted">@Strings.ImportSettingsDescription</p><div><a class="button secondary" href="/import">@Strings.OpenImport</a></div></section>
+        <section class="surface">
+            <details>
+                <summary>@Strings.InstallApp</summary>
+                <ul>
+                    <li>@Strings.InstallAppAndroid</li>
+                    <li>@Strings.InstallAppIphone</li>
+                </ul>
+            </details>
+        </section>
         <section class="surface"><h2>@Strings.DataExport</h2><a class="button secondary" href="/reports">@Strings.ExportCsv</a></section>
     </div>
 }
