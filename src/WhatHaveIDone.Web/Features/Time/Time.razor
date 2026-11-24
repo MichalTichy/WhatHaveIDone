@@ -52,7 +52,19 @@
     }
 </section>
 <div class="toolbar"><div class="tabs"><button class="@(!calendarView ? "active" : "")" aria-pressed="@(!calendarView)" @onclick="ShowList">@Strings.List</button><button class="@(calendarView ? "active" : "")" aria-pressed="@calendarView" @onclick="ShowCalendar">@Strings.Calendar</button></div><AppActionButton OnClick="AddAsync">＋ @Strings.AddEntry</AppActionButton></div>
-<div class="period"><div class="actions"><button class="secondary" aria-label="@Strings.Previous" @onclick="PreviousAsync">‹</button><button class="secondary" @onclick="TodayAsync">@Strings.Today</button><button class="secondary" aria-label="@Strings.Next" @onclick="NextAsync">›</button><input aria-label="@Strings.Period" class="date-input" type="date" @bind="selectedDay" @bind:format="yyyy-MM-dd" @bind:after="LoadAsync" /></div><strong class="period-total"><span>@Strings.Total</span> @UserTime.Duration(TotalSeconds())</strong></div>
+<div class="period">
+    <div class="actions">
+        <div class="period-navigation">
+            <button class="secondary" aria-label="@Strings.PreviousWeek" title="@Strings.PreviousWeek" @onclick="() => MoveDayAsync(-7)">«</button>
+            <button class="secondary" aria-label="@Strings.PreviousDay" title="@Strings.PreviousDay" @onclick="() => MoveDayAsync(-1)">‹</button>
+            <button class="secondary" @onclick="TodayAsync">@Strings.Today</button>
+            <button class="secondary" aria-label="@Strings.NextDay" title="@Strings.NextDay" @onclick="() => MoveDayAsync(1)">›</button>
+            <button class="secondary" aria-label="@Strings.NextWeek" title="@Strings.NextWeek" @onclick="() => MoveDayAsync(7)">»</button>
+        </div>
+        <input aria-label="@Strings.Period" class="date-input" type="date" @bind="selectedDay" @bind:format="yyyy-MM-dd" @bind:after="LoadAsync" />
+    </div>
+    <strong class="period-total"><span>@Strings.Total</span> @UserTime.Duration(TotalSeconds())</strong>
+</div>
 @if (IsLoading && !loaded) { <Loading /> }
 else if (loaded)
 {

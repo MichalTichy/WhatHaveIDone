@@ -124,15 +124,9 @@ public partial class Time : IAsyncDisposable
         }
     }
 
-    private Task PreviousAsync()
+    private Task MoveDayAsync(int days)
     {
-        selectedDay = selectedDay.AddDays(narrow ? -1 : -7);
-        return LoadAsync();
-    }
-
-    private Task NextAsync()
-    {
-        selectedDay = selectedDay.AddDays(narrow ? 1 : 7);
+        selectedDay = selectedDay.AddDays(days);
         return LoadAsync();
     }
 
@@ -310,7 +304,7 @@ public partial class Time : IAsyncDisposable
                 coveredUntil = end;
         }
 
-        return rows.AsEnumerable().Reverse();
+        return rows;
     }
 
     private string GapTime(DateTimeOffset instant)

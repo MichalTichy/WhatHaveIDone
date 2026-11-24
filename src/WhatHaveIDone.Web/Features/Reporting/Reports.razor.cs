@@ -13,7 +13,6 @@ public partial class Reports
     private DateTimeOffset appliedFrom, appliedTo;
     private DateTime activityFrom, activityThrough;
     private Dictionary<DateTime, double> activity = [];
-    private double busiestDay;
     private string? projectPie;
 
     [Inject]
@@ -92,7 +91,6 @@ public partial class Reports
             activity = selected.Days.ToDictionary(
                 day => DateTime.ParseExact(day.Key, "yyyy-MM-dd", CultureInfo.InvariantCulture),
                 day => day.Seconds);
-            busiestDay = activity.Values.DefaultIfEmpty().Max();
             projectPie = ProjectPie(selected);
         });
     }
@@ -137,7 +135,14 @@ public partial class Reports
             .Select(day => month.AddDays(day - 1))
             .Where(day => day >= activityFrom && day <= activityThrough);
 
-    private int ActivityLevel(double seconds) => seconds <= 0 ? 0 : (int)Math.Ceiling(seconds / busiestDay * 4);
+    private static int ActivityLevel(double seconds) => (seconds / 3600) switch
+    {
+        <= 0 => 0,
+        < 3 => 1,
+        < 6 => 2,
+        < 8 => 3,
+        _ => 4
+    };
 
     private Task FilterDescriptionAsync(string value)
     {

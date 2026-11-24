@@ -93,6 +93,7 @@ p { margin: 0 0 16px; }
 .empty { padding: 48px 20px; text-align: center; color: var(--app-muted); }
 .period { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 18px; }
 .period>.actions { flex-wrap: nowrap; }
+.period-navigation { display: flex; gap: 6px; }
 .period .actions button { min-width: 44px; padding-inline: 12px; }
 .period .date-input { width: 166px; flex: 0 1 166px; margin: 0; }
 .period-total { font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.5px; }
@@ -381,11 +382,17 @@ p { margin: 0 0 16px; }
 .report-month h3 { margin: 0 0 8px; font-size: 1rem; }
 .report-month-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .report-weekday { text-align: center; color: var(--app-muted); font-size: .8rem; }
-button.report-day { padding: 0; min-height: 30px; border-radius: 5px; color: var(--ink); background: var(--soft); }
+button.report-day { padding: 0; min-height: 30px; border-radius: 5px; color: var(--ink); background: #fff; }
 .report-day[data-level="1"] { background: #dfd3f2; }
 .report-day[data-level="2"] { background: #bda8e2; }
-.report-day[data-level="3"] { background: #8d72c3; color: #211434; }
+.report-day[data-level="3"] { background: #9277c9; color: #211434; }
 .report-day[data-level="4"] { background: #624799; color: white; }
+@media (prefers-reduced-motion: no-preference) {
+    .report-day[data-level="4"] { animation: report-day-pulse 3s ease-in-out infinite alternate; }
+}
+@keyframes report-day-pulse {
+    to { background-color: #7558ad; }
+}
 .report-grid:has(.report-month:nth-child(3)) { align-items: start; }
 @media (min-width: 1100px) {
     .report-grid:has(.report-month:nth-child(3)) { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }

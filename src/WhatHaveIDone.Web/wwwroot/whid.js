@@ -19,10 +19,37 @@ window.whid={
  },
  tagKeys(element){element.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===',')event.preventDefault();});},
  openDialog(element,dotnet){
-  element._closeHandler=event=>{event.preventDefault();dotnet.invokeMethodAsync('RequestCloseAsync');};
-  element.addEventListener('cancel',element._closeHandler);element.showModal();
+  const requestClose=()=>dotnet.invokeMethodAsync('RequestCloseAsync');
+  const listeners=new AbortController();
+  const options={signal:listeners.signal};
+  element._dialogListeners?.abort();
+  element._dialogListeners=listeners;
+  element.addEventListener('cancel',event=>{
+   event.preventDefault();
+   requestClose();
+  },options);
+  if(element.classList.contains('drawer')){
+   const isBackdrop=event=>{
+    if(event.target!==element)return false;
+    const {left,right,top,bottom}=element.getBoundingClientRect();
+    return event.clientX<left||event.clientX>=right||event.clientY<top||event.clientY>=bottom;
+   };
+   let startedOnBackdrop=false;
+   element.addEventListener('pointerdown',event=>{
+    startedOnBackdrop=isBackdrop(event);
+   },options);
+   element.addEventListener('click',event=>{
+    const clickedBackdrop=startedOnBackdrop&&isBackdrop(event);
+    startedOnBackdrop=false;
+    if(clickedBackdrop)requestClose();
+   },options);
+  }
+  element.showModal();
  },
- closeDialog(element){element.removeEventListener('cancel',element._closeHandler);if(element.open)element.close();},
+ closeDialog(element){
+  element._dialogListeners?.abort();
+  if(element.open)element.close();
+ },
  focusPopoverSearch(element,trigger){
   const input=element.querySelector('input');
   const highlight=option=>{
