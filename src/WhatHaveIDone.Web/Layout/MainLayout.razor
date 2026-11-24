@@ -9,7 +9,13 @@
             <NavLink href="/projects" @onclick="CloseMenu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V5h7l2 3h9v11H3Z"/></svg>@Strings.Projects</NavLink>
             <NavLink href="/settings" @onclick="CloseMenu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg>@Strings.Settings</NavLink>
         </nav>
-        <div class="account"><span>@User.Session.Email</span><button class="quiet" @onclick="SignOutAsync">@Strings.SignOut</button></div>
+        <div class="account">
+            @if (installMode is not null)
+            {
+                <button class="quiet install-app" aria-expanded="@(installMode == "ios" ? installHintVisible.ToString().ToLowerInvariant() : null)" @onclick="InstallAsync"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4-4 4 4 4-4M5 20h14"/></svg>@Strings.InstallApp</button>
+                @if (installHintVisible) { <p class="install-hint">@Strings.InstallAppIphone</p> }
+            }
+            <span>@User.Session.Email</span><button class="quiet" @onclick="SignOutAsync">@Strings.SignOut</button></div>
     </aside>
     <div class="app-content"><header class="mobile-header"><button class="secondary" aria-expanded="@menuOpen" @onclick="ToggleMenu">☰ @Strings.Menu</button><span>@Strings.AppName</span></header>@if(updateAvailable){<div class="alert" role="status">@Strings.UpdateAvailable <button class="secondary" @onclick="UpdateAsync">@Strings.Reload</button></div>}<main>@Body</main></div>
 </div>

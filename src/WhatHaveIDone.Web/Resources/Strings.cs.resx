@@ -17,6 +17,5 @@ Server pracuje s mými časovými záznamy, projekty, použitými tagy, přehled
   <data name="ThisYear" xml:space="preserve"><value>Tento rok</value></data>
   <data name="LastYear" xml:space="preserve"><value>Minulý rok</value></data>
   <data name="InstallApp" xml:space="preserve"><value>Nainstalovat aplikaci</value></data>
-  <data name="InstallAppAndroid" xml:space="preserve"><value>Android (Chrome) · V nabídce prohlížeče zvolte Nainstalovat aplikaci.</value></data>
-  <data name="InstallAppIphone" xml:space="preserve"><value>iPhone (Safari) · Klepněte na Sdílet a Přidat na plochu, zapněte Otevřít jako webovou aplikaci, pokud je volba dostupná, a klepněte na Přidat.</value></data>
+  <data name="InstallAppIphone" xml:space="preserve"><value>Na iPhonu klepněte v Safari na Sdílet a zvolte Přidat na plochu.</value></data>
 </root>

@@ -68,6 +68,9 @@ label small, .muted { font-weight: 400; color: var(--app-muted); font-size: 12px
 .account { margin-top: auto; padding-top: 24px; font-size: 11px; overflow-wrap: anywhere; }
 .account>span { display: block; }
 .account button { margin-top: 8px; padding-left: 0; font-size: 12px; justify-content: flex-start; }
+.account .install-app { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; color: var(--app-muted); }
+.install-app .nav-icon { width: 16px; height: 16px; }
+.install-hint { margin: -4px 0 12px; color: var(--app-muted); font-size: 11px; }
 .app-content { flex: 1; min-width: 0; padding: 36px 44px; }
 .app-content main { max-width: 1300px; margin-inline: auto; }
 .mobile-header { display: none; }

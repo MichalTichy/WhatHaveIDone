@@ -88,5 +88,46 @@ window.whid={
  watchUpdates(dotnet){const handler=()=>dotnet.invokeMethodAsync('UpdateAvailableAsync');window.addEventListener('whid:update',handler);const id=crypto.randomUUID();this.watchers.set(id,{update:handler});return id;},
  unwatchUpdates(id){const item=this.watchers.get(id);if(item){window.removeEventListener('whid:update',item.update);this.watchers.delete(id);}},
  applyUpdate(){if(this.registration?.waiting){this.requestedUpdate=true;this.registration.waiting.postMessage('SKIP_WAITING');}else location.reload();},
+ installPrompt:null,
+ installMode(){
+  const installed=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  if(installed||!matchMedia('(pointer: coarse)').matches)return null;
+  if(this.installPrompt)return 'prompt';
+  // iOS has no install API; the menu shows the Add to Home Screen hint instead.
+  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  return ios?'ios':null;
+ },
+ watchInstall(dotnet){
+  const handler=()=>dotnet.invokeMethodAsync('InstallModeChangedAsync',this.installMode());
+  window.addEventListener('whid:install',handler);
+  const id=crypto.randomUUID();
+  this.watchers.set(id,{install:handler});
+  return id;
+ },
+ unwatchInstall(id){
+  const item=this.watchers.get(id);
+  if(item){
+   window.removeEventListener('whid:install',item.install);
+   this.watchers.delete(id);
+  }
+ },
+ async install(){
+  const prompt=this.installPrompt;
+  if(!prompt)return;
+  this.installPrompt=null;
+  await prompt.prompt();
+  await prompt.userChoice;
+  window.dispatchEvent(new Event('whid:install'));
+ },
  download(name,content){const url=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download=name;link.click();URL.revokeObjectURL(url);}
 };
+// Captured at load because Chrome can fire the event before Blazor renders the menu.
+window.addEventListener('beforeinstallprompt',event=>{
+ event.preventDefault();
+ whid.installPrompt=event;
+ window.dispatchEvent(new Event('whid:install'));
+});
+window.addEventListener('appinstalled',()=>{
+ whid.installPrompt=null;
+ window.dispatchEvent(new Event('whid:install'));
+});

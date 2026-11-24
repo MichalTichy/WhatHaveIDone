@@ -25,7 +25,8 @@ public partial class MainLayout : IAsyncDisposable
 
     private bool menuOpen, updateAvailable;
     private DotNetObjectReference<MainLayout>? self;
-    private string? updateWatcher;
+    private string? updateWatcher, installWatcher, installMode;
+    private bool installHintVisible;
     protected override void OnInitialized() => Feedback.Changed += OnFeedback;
     protected override void OnParametersSet()
     {
@@ -43,7 +44,9 @@ public partial class MainLayout : IAsyncDisposable
         self = DotNetObjectReference.Create(this);
         updateWatcher = await Js.InvokeAsync<string>("whid.watchUpdates", self);
         updateAvailable = await Js.InvokeAsync<bool>("whid.updateAvailable");
-        if (updateAvailable)
+        installWatcher = await Js.InvokeAsync<string>("whid.watchInstall", self);
+        installMode = await Js.InvokeAsync<string?>("whid.installMode");
+        if (updateAvailable || installMode is not null)
             StateHasChanged();
     }
 
@@ -52,6 +55,24 @@ public partial class MainLayout : IAsyncDisposable
     {
         updateAvailable = true;
         return InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public Task InstallModeChangedAsync(string? mode)
+    {
+        installMode = mode;
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private async Task InstallAsync()
+    {
+        if (installMode == "ios")
+        {
+            installHintVisible = !installHintVisible;
+            return;
+        }
+
+        await Js.InvokeVoidAsync("whid.install");
     }
 
     private async Task UpdateAsync() => await Js.InvokeVoidAsync("whid.applyUpdate");
@@ -85,6 +106,8 @@ public partial class MainLayout : IAsyncDisposable
         {
             if (updateWatcher is not null)
                 await Js.InvokeVoidAsync("whid.unwatchUpdates", updateWatcher);
+            if (installWatcher is not null)
+                await Js.InvokeVoidAsync("whid.unwatchInstall", installWatcher);
         }
         catch (JSDisconnectedException)
         {
