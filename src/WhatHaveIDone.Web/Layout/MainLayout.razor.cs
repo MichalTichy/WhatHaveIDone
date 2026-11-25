@@ -30,10 +30,15 @@ public partial class MainLayout : IAsyncDisposable
     protected override void OnInitialized() => Feedback.Changed += OnFeedback;
     protected override void OnParametersSet()
     {
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].TrimEnd('/');
         if (!User.Session.Authenticated)
+        {
             Navigation.NavigateTo("/login", replace: true);
-        else if (!User.Settings.OnboardingCompleted && !Navigation.ToBaseRelativePath(Navigation.Uri).StartsWith("import", StringComparison.Ordinal))
-            Navigation.NavigateTo("/import", replace: true);
+        }
+        else if (!User.Settings.OnboardingCompleted && path is not ("import" or "settings/import"))
+        {
+            Navigation.NavigateTo("/settings/import", replace: true);
+        }
     }
 
     private void OnFeedback() => _ = InvokeAsync(StateHasChanged);

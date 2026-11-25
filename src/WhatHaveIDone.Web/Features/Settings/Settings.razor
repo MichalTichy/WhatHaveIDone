@@ -1,7 +1,7 @@
 @page "/settings"
+@layout SettingsLayout
 @inherits AppComponentBase
-<PageTitle>@Strings.Settings · @Strings.AppName</PageTitle>
-<div class="page-header"><h1>@Strings.Settings</h1></div>
+<PageTitle>@Strings.Profile · @Strings.Settings · @Strings.AppName</PageTitle>
 @if(Error is not null){<div class="alert error" role="alert">@Error<button class="quiet" @onclick="LoadAsync">@Strings.Reload</button></div>}
 @if(!loaded && Busy){<Loading />}
 else if(loaded)
@@ -14,16 +14,6 @@ else if(loaded)
             <form class="surface stack" @onsubmit="ChangePasswordAsync" @onsubmit:preventDefault><h2>@Strings.ChangePassword</h2><div class="form-grid"><label>@Strings.CurrentPassword<input type="password" autocomplete="current-password" @bind="currentPassword" required /></label><label>@Strings.NewPassword<input type="password" autocomplete="new-password" @bind="newPassword" minlength="10" maxlength="128" required /></label></div><div><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.ChangePassword</AppActionButton></div></form>
         }
         else { <section class="surface"><h2>@Strings.SsoAccount</h2></section> }
-        <section class="surface stack"><div class="mcp-settings-heading"><h2>@Strings.ApiKeys</h2><button type="button" class="secondary" @onclick="() => mcpSetupOpen = true">@Strings.SetupMcp</button></div>
-            <p class="muted">@Strings.McpSettingsDescription</p>
-            @if(importActive){<p class="alert">@Strings.ImportWarning <a href="/import">@Strings.Import</a></p>}
-            <label>@Strings.ApiUrl<input readonly value="@ApiUrl" /></label><p class="muted">@Strings.IsInstructions</p>
-            <form class="actions field-actions" @onsubmit="CreateTokenAsync" @onsubmit:preventDefault><label class="grow">@Strings.Name<input @bind="tokenName" required maxlength="100" /></label><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.CreateKey</AppActionButton></form>
-            @if(newToken is not null){<div class="alert success"><p>@Strings.KeyOnce</p><p class="secret">@newToken</p><button class="secondary" @onclick="CopyAsync">@Strings.Copy</button></div>}
-            @foreach(var token in tokens){<div class="token-row"><div class="grow"><strong>@token.Name</strong><small class="muted"> · …@token.Suffix · @UserTime.Local(token.CreatedAt,User.Settings.TimeZone).ToString("d")</small></div>@if(token.RevokedAt is null){<button class="secondary" disabled="@Busy" @onclick="() => RevokeAsync(token)">@Strings.Revoke</button>}else{<span class="muted">@Strings.Revoked · @UserTime.Local(token.RevokedAt.Value,User.Settings.TimeZone).ToString("d")</span>}</div>}
-        </section>
-        <section class="surface stack"><h2>@Strings.Import</h2><p class="muted">@Strings.ImportSettingsDescription</p><div><a class="button secondary" href="/import">@Strings.OpenImport</a></div></section>
         <section class="surface"><h2>@Strings.DataExport</h2><a class="button secondary" href="/reports">@Strings.ExportCsv</a></section>
     </div>
 }
-@if (mcpSetupOpen) { <McpSetupDialog Endpoint="@McpUrl" Closed="() => mcpSetupOpen = false" /> }

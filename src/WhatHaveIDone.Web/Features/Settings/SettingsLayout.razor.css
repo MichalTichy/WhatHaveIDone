@@ -1,0 +1,32 @@
+.settings-pages {
+    max-width: 1000px;
+}
+
+.settings-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+    gap: 4px;
+    padding: 4px;
+    background: var(--soft);
+    border-radius: 12px;
+}
+
+.settings-navigation ::deep a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    min-height: 44px;
+    padding: 8px 16px;
+    border-radius: 9px;
+    color: var(--app-muted);
+    font-weight: 550;
+    text-decoration: none;
+}
+
+.settings-navigation ::deep a.active {
+    background: #fff;
+    color: var(--app-accent);
+    box-shadow: 0 1px 4px #332e3c12;
+}

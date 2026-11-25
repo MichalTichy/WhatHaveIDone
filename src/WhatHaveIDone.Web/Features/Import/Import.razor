@@ -1,7 +1,8 @@
 @page "/import"
+@page "/settings/import"
+@layout WhatHaveIDone.Web.Features.Settings.SettingsLayout
 @inherits AppComponentBase
 <PageTitle>@Strings.Import · @Strings.AppName</PageTitle>
-<div class="page-header"><h1>@Strings.Import</h1>@if(User.Settings.OnboardingCompleted){<a class="button secondary" href="/settings">@Strings.Settings</a>}</div>
 @if(Error is not null){<div class="alert error" role="alert">@Error <button @onclick="LoadAsync">@Strings.Retry</button></div>}
 @if(!loaded && Busy){<Loading />}
 else if(loaded)
