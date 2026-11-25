@@ -56,5 +56,6 @@ This server accesses my time entries, projects, used tags, reports and timer. Re
   <data name="SendFeedback" xml:space="preserve"><value>Send</value></data>
   <data name="FeedbackSent" xml:space="preserve"><value>Thank you for your feedback.</value></data>
   <data name="NoFeedback" xml:space="preserve"><value>No feedback yet.</value></data>
+  <data name="MarkFeedbackResolved" xml:space="preserve"><value>Mark as resolved</value></data>
   <data name="MoreFeedback" xml:space="preserve"><value>Load more</value></data>
 </root>

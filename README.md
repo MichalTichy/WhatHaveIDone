@@ -4,7 +4,7 @@ A personal time tracker built with .NET 10, Blazor WebAssembly, Blazor Blueprint
 
 The app includes account registration, single-tenant Microsoft Entra SSO, a timer, autosaving time entries, an editable calendar, projects and tags, reporting with CSV export, API keys, and background import from Toggl. The supported Toggl v9 endpoints provide compatibility for the planned Riganti IS integration.
 
-The sidebar Feedback button opens a simple text form and a shared feedback list. All signed-in users can submit and read feedback; posts contain text and a timestamp, without account details. Feedback is stored globally, separately from user-scoped tracking data.
+The sidebar Feedback button opens a simple text form and a shared feedback list. All signed-in users can submit and read feedback; posts contain text and a timestamp, without account details. Any signed-in user can mark a post as resolved, which removes it from the list. Feedback is stored globally, separately from user-scoped tracking data.
 
 ## Run locally with Aspire
 

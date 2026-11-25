@@ -49,6 +49,20 @@ public partial class FeedbackDialog
         });
     }
 
+    private async Task ResolveAsync(FeedbackModel post)
+    {
+        if (Busy)
+        {
+            return;
+        }
+        await RunAsync(async ct =>
+        {
+            await Api.ResolveFeedbackAsync(post.Id, ct);
+            // Resolved posts leave the shared list, so the next page offset stays aligned with the server.
+            posts?.Remove(post);
+        });
+    }
+
     private async Task SubmitAsync()
     {
         if (Busy)

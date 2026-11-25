@@ -5,4 +5,5 @@ public sealed class FeedbackPost : Document
 {
     public required string Text { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
+    public DateTimeOffset? ResolvedAt { get; set; }
 }

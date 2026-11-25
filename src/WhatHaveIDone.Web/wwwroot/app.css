@@ -63,6 +63,8 @@ label small, .muted { font-weight: 400; color: var(--app-muted); font-size: 12px
 .sidebar nav a:hover { background: #e7e4e8; }
 .feedback-post { border-bottom: 1px solid var(--line); padding-bottom: 12px; }
 .feedback-post p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.feedback-post-header { display: flex; align-items: center; gap: 8px; }
+.feedback-post-header button { min-height: 32px; padding: 4px 10px; font-size: 13px; }
 .sidebar nav a.active { background: #e4ddef; color: #61468f; font-weight: 600; }
 .nav-icon { width: 20px; height: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
 .nav-icon circle { fill: #efeeeb; }

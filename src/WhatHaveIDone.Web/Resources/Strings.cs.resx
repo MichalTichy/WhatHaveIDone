@@ -56,5 +56,6 @@ Server pracuje s mými časovými záznamy, projekty, použitými tagy, přehled
   <data name="SendFeedback" xml:space="preserve"><value>Odeslat</value></data>
   <data name="FeedbackSent" xml:space="preserve"><value>Děkujeme za zpětnou vazbu.</value></data>
   <data name="NoFeedback" xml:space="preserve"><value>Zatím žádná zpětná vazba.</value></data>
+  <data name="MarkFeedbackResolved" xml:space="preserve"><value>Označit jako vyřešené</value></data>
   <data name="MoreFeedback" xml:space="preserve"><value>Načíst další</value></data>
 </root>

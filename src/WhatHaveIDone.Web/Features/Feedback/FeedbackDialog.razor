@@ -12,7 +12,11 @@
                 @foreach (var post in posts)
                 {
                     <article class="feedback-post" @key="post.Id">
-                        <time class="muted" datetime="@post.CreatedAt.ToString("O")">@UserTime.Local(post.CreatedAt, User.Settings.TimeZone).ToString("g")</time>
+                        <div class="feedback-post-header">
+                            <time class="muted" datetime="@post.CreatedAt.ToString("O")">@UserTime.Local(post.CreatedAt, User.Settings.TimeZone).ToString("g")</time>
+                            <span class="spacer"></span>
+                            <button type="button" class="secondary" disabled="@Busy" @onclick="() => ResolveAsync(post)">@Strings.MarkFeedbackResolved</button>
+                        </div>
                         <p>@post.Text</p>
                     </article>
                 }
