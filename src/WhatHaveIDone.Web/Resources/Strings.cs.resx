@@ -48,4 +48,13 @@ Server pracuje s mými časovými záznamy, projekty, použitými tagy, přehled
   <data name="HolidayGoodFriday" xml:space="preserve"><value>Velký pátek</value></data>
   <data name="HolidayEasterMonday" xml:space="preserve"><value>Velikonoční pondělí</value></data>
   <data name="PredictionHours" xml:space="preserve"><value>{0} h {1:00} min</value></data>
+  <data name="ProductFeedback" xml:space="preserve"><value>Zpětná vazba</value></data>
+  <data name="FeedbackShared" xml:space="preserve"><value>Zpětná vazba je viditelná všem přihlášeným uživatelům.</value></data>
+  <data name="FeedbackText" xml:space="preserve"><value>Vaše zpětná vazba</value></data>
+  <data name="ViewFeedback" xml:space="preserve"><value>Zobrazit feedback</value></data>
+  <data name="WriteFeedback" xml:space="preserve"><value>Napsat feedback</value></data>
+  <data name="SendFeedback" xml:space="preserve"><value>Odeslat</value></data>
+  <data name="FeedbackSent" xml:space="preserve"><value>Děkujeme za zpětnou vazbu.</value></data>
+  <data name="NoFeedback" xml:space="preserve"><value>Zatím žádná zpětná vazba.</value></data>
+  <data name="MoreFeedback" xml:space="preserve"><value>Načíst další</value></data>
 </root>

@@ -15,8 +15,10 @@
                 <button class="quiet install-app" aria-expanded="@(installMode == "ios" ? installHintVisible.ToString().ToLowerInvariant() : null)" @onclick="InstallAsync"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m-4-4 4 4 4-4M5 20h14"/></svg>@Strings.InstallApp</button>
                 @if (installHintVisible) { <p class="install-hint">@Strings.InstallAppIphone</p> }
             }
+            <button type="button" class="quiet feedback-link" @onclick="OpenFeedback">@Strings.ProductFeedback</button>
             <span>@User.Session.Email</span><button class="quiet" @onclick="SignOutAsync">@Strings.SignOut</button></div>
     </aside>
     <div class="app-content"><header class="mobile-header"><button class="secondary" aria-expanded="@menuOpen" @onclick="ToggleMenu">☰ @Strings.Menu</button><span>@Strings.AppName</span></header>@if(updateAvailable){<div class="alert" role="status">@Strings.UpdateAvailable <button class="secondary" @onclick="UpdateAsync">@Strings.Reload</button></div>}<main>@Body</main></div>
 </div>
+@if (feedbackOpen) { <WhatHaveIDone.Web.Features.Feedback.FeedbackDialog Closed="CloseFeedback" /> }
 @if (Feedback.Message is { } message) { <div class="toast" role="status">@message<button aria-label="@Strings.Close" @onclick="Feedback.Clear">×</button></div> }
