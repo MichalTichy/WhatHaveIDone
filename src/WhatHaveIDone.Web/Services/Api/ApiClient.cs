@@ -29,6 +29,13 @@ public sealed class ApiClient(HttpClient http)
     public Task<bool> ChangePasswordAsync(ChangePasswordInput input, CancellationToken ct) => SendAsync<bool>(HttpMethod.Post, "account/password", ct, input);
 
     public Task<SettingsModel> GetSettingsAsync(CancellationToken ct) => GetAsync<SettingsModel>("settings", ct);
+    public Task<MonthlyPredictionModel> GetMonthlyPredictionAsync(CancellationToken ct) => GetAsync<MonthlyPredictionModel>("prediction", ct);
+    public Task<PredictionSettingsModel> SavePredictionSettingsAsync(PredictionSettingsModel input, CancellationToken ct)
+        => SendAsync<PredictionSettingsModel>(HttpMethod.Put, "prediction/settings", ct, input);
+    public Task<WorkCalendarModel> GetWorkCalendarAsync(int year, int month, CancellationToken ct)
+        => GetAsync<WorkCalendarModel>($"prediction/calendar/{year}/{month}", ct);
+    public Task<bool> SaveWorkdayAsync(SaveWorkdayRequest input, CancellationToken ct)
+        => SendAsync<bool>(HttpMethod.Put, "prediction/calendar/day", ct, input);
     public Task<bool> SaveSettingsAsync(SettingsModel settings, CancellationToken ct) => SendAsync<bool>(HttpMethod.Put, "settings", ct, settings);
     public Task<bool> CompleteOnboardingAsync(CancellationToken ct) => SendAsync<bool>(HttpMethod.Post, "onboarding/complete", ct);
 

@@ -70,6 +70,26 @@ internal sealed class DevelopmentDataInitializer(
 
         var zone = TimeZoneInfo.FindSystemTimeZoneById(profile.TimeZone);
         var today = TimeZoneInfo.ConvertTime(now, zone).Date;
+        // Synthetic history makes the opt-in prediction usable on a freshly seeded account.
+        for (var age = 1; age <= 84; age++)
+        {
+            var day = today.AddDays(-age);
+            if (WhatHaveIDone.Logic.Predictions.WorkCalendarRules.DefaultPercent(DateOnly.FromDateTime(day)) == 0)
+            {
+                continue;
+            }
+            var start = new DateTimeOffset(TimeZoneInfo.ConvertTimeToUtc(day.AddHours(9), zone));
+            var entry = new TimeEntry
+            {
+                Id = $"demo-history-{DateOnly.FromDateTime(day):yyyy-MM-dd}",
+                CompatibilityId = profile.AllocateId(),
+                Description = "Project work",
+                ProjectId = app.Id,
+                Start = start,
+                End = start.AddHours(6 + age % 3 * .5)
+            };
+            await entries.AddAsync(entry, cancellationToken, tenantId: UserId);
+        }
         var samples = new[]
         {
             (Id: "demo-planning", Description: "Plan the next release", ProjectId: (string?)app.Id, Tag: (string?)"planning", Start: today.AddHours(9), End: today.AddHours(10.5)),

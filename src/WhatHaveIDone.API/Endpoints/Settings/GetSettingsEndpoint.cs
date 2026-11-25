@@ -36,6 +36,7 @@ internal sealed class GetSettingsEndpoint(IReadOnlyRepository<UserProfile> profi
             TimeZone = profile.TimeZone,
             Language = profile.Language,
             FirstDayOfWeek = profile.FirstDayOfWeek,
+            PredictionEnabled = profile.PredictionEnabled,
             OnboardingCompleted = profile.OnboardingCompletedAt.HasValue
         }, ct);
     }

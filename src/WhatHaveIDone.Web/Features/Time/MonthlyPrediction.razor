@@ -1,0 +1,22 @@
+@inherits AppComponentBase
+<div class="monthly-prediction" aria-live="polite" aria-busy="@IsLoading">
+    @if (IsLoading)
+    {
+        <span class="prediction-skeleton" role="status" aria-label="@Strings.LoadingPrediction"></span>
+    }
+    else if (Error is not null)
+    {
+        <span class="prediction-error">@Error <button class="quiet" @onclick="LoadAsync">@Strings.Retry</button></span>
+    }
+    else if (prediction is { Enabled: true } result)
+    {
+        @if (result.PredictedSeconds.HasValue)
+        {
+            <span title="@Strings.PredictionExplanation">@string.Format(Strings.MonthPrediction, result.Month.ToString("MMMM")) <strong>@Hours(result.PredictedSeconds.Value)</strong></span>
+        }
+        else
+        {
+            <span title="@Strings.PredictionHistoryExplanation">@Strings.PredictionNotEnoughHistory</span>
+        }
+    }
+</div>

@@ -28,6 +28,7 @@ public partial class Time : IAsyncDisposable
     private DotNetObjectReference<Time>? self;
     private string? watcher;
     private bool calendarCreated;
+    private int predictionRevision;
     protected override async Task OnInitializedAsync()
     {
         selectedDay = UserTime.Local(now, User.Settings.TimeZone).Date;
@@ -57,6 +58,7 @@ public partial class Time : IAsyncDisposable
             runningEntry = result.running;
             loaded = true;
             calendarDirty = true;
+            predictionRevision++;
         });
     }
 
@@ -115,7 +117,10 @@ public partial class Time : IAsyncDisposable
             {
                 now = DateTimeOffset.UtcNow;
                 if (now.Second == 0)
+                {
                     calendarDirty = true;
+                    predictionRevision++;
+                }
                 await InvokeAsync(StateHasChanged);
             }
         }

@@ -13,9 +13,11 @@ public sealed class TrackingStorageConfiguration : IStorageConfiguration
         options.DatabaseSchemaName = "tracking";
         options.Schema.For<ImportRun>().MultiTenanted().UseOptimisticConcurrency(true);
         options.Schema.For<UserProfile>().MultiTenanted().UseOptimisticConcurrency(true);
+        options.Schema.For<WorkCalendarMonth>().MultiTenanted().UseOptimisticConcurrency(true);
         options.Schema.For<Client>().MultiTenanted().UseOptimisticConcurrency(true)
             .UniqueIndex(UniqueIndexType.Computed, "client_compatibility", TenancyScope.PerTenant, x => x.CompatibilityId);
         options.Schema.For<TimeEntry>().MultiTenanted().UseOptimisticConcurrency(true)
+            .Index(x => x.End, index => { index.Name = "entry_prediction_end"; index.TenancyScope = TenancyScope.PerTenant; })
             .UniqueIndex(UniqueIndexType.Computed, "entry_compatibility", TenancyScope.PerTenant, x => x.CompatibilityId);
         options.Schema.For<Project>().MultiTenanted().UseOptimisticConcurrency(true)
             .UniqueIndex(UniqueIndexType.Computed, "project_compatibility", TenancyScope.PerTenant, x => x.CompatibilityId);
