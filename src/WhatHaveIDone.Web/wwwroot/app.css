@@ -61,6 +61,8 @@ label small, .muted { font-weight: 400; color: var(--app-muted); font-size: 12px
 .sidebar nav { display: grid; gap: 5px; margin-top: 36px; }
 .sidebar nav a { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 10px 12px; border-radius: 9px; color: #6d6673; text-decoration: none; }
 .sidebar nav a:hover { background: #e7e4e8; }
+.feedback-post { border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.feedback-post p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .sidebar nav a.active { background: #e4ddef; color: #61468f; font-weight: 600; }
 .nav-icon { width: 20px; height: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
 .nav-icon circle { fill: #efeeeb; }
@@ -68,6 +70,8 @@ label small, .muted { font-weight: 400; color: var(--app-muted); font-size: 12px
 .account { margin-top: auto; padding-top: 24px; font-size: 11px; overflow-wrap: anywhere; }
 .account>span { display: block; }
 .account button { margin-top: 8px; padding-left: 0; font-size: 12px; justify-content: flex-start; }
+.account .feedback-link { display: block; margin: 0 0 8px; color: var(--app-accent); }
+.account .feedback-link:hover { text-decoration: underline; }
 .account .install-app { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; color: var(--app-muted); }
 .install-app .nav-icon { width: 16px; height: 16px; }
 .install-hint { margin: -4px 0 12px; color: var(--app-muted); font-size: 11px; }
