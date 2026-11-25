@@ -1,0 +1,7 @@
+.monthly-prediction { color: var(--app-muted); font-size: 12px; margin-top: 4px; min-height: 22px; font-variant-numeric: tabular-nums; }
+.monthly-prediction strong { color: var(--app-accent); margin-left: 5px; font-weight: 600; }
+.prediction-skeleton { display: inline-block; width: 190px; height: 17px; border-radius: 5px; background: #eae6ef; animation: prediction-pulse 1.3s ease-in-out infinite alternate; }
+.prediction-error { display: inline-block; max-width: 280px; }
+.prediction-error button { min-height: 28px; padding: 2px 6px; font-size: 12px; }
+@keyframes prediction-pulse { to { opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .prediction-skeleton { animation: none; } }

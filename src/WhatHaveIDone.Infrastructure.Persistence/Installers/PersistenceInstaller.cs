@@ -16,6 +16,7 @@ public class PersistenceInstaller : IInstaller
     {
         var connectionString = configuration.GetConnectionString("DB") ?? throw new InvalidOperationException("Configure ConnectionStrings:DB.");
         services.AddNpgsqlDataSource(connectionString);
+        services.AddScoped<WhatHaveIDone.Logic.Predictions.IDailyTrackedTimeRepository, DailyTrackedTimeRepository>();
         services.AddScoped<CurrentTenancyProvider>();
         services.AddScoped<ICurrentTenancyProvider>(sp => sp.GetRequiredService<CurrentTenancyProvider>());
         services.AddSingleton<IStorageConfiguration, TrackingStorageConfiguration>();

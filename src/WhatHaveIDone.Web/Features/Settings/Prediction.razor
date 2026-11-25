@@ -1,0 +1,84 @@
+@page "/settings/prediction"
+@layout SettingsLayout
+@inherits AppComponentBase
+<PageTitle>@Strings.Prediction · @Strings.Settings · @Strings.AppName</PageTitle>
+<section class="surface stack prediction-settings">
+    <div>
+        <h2>@Strings.Prediction</h2>
+        <p class="muted">@Strings.PredictionExplanation</p>
+    </div>
+    <label class="prediction-toggle">
+        <input type="checkbox" role="switch" @bind="enabled" @bind:after="ToggleAsync" disabled="@Busy" />
+        <span>@Strings.EnablePrediction</span>
+    </label>
+    @if (Error is not null)
+    {
+        <div class="alert error" role="alert">@Error <button class="quiet" @onclick="ReloadAsync">@Strings.Reload</button></div>
+    }
+</section>
+<section class="surface stack work-calendar" aria-busy="@IsLoading">
+    <div class="calendar-heading">
+        <div><h2>@Strings.WorkCalendar</h2><p class="muted">@Strings.WorkCalendarExplanation</p></div>
+        <div class="calendar-navigation">
+            <button class="secondary" disabled="@(Busy || month.Year <= 1900 && month.Month == 1)" aria-label="@Strings.PreviousMonth" @onclick="() => MoveMonthAsync(-1)">‹</button>
+            <strong>@MonthLabel</strong>
+            <button class="secondary" disabled="@(Busy || month.Year >= 9998 && month.Month == 12)" aria-label="@Strings.NextMonth" @onclick="() => MoveMonthAsync(1)">›</button>
+        </div>
+    </div>
+    @if (IsLoading)
+    {
+        <Loading />
+    }
+    else if (calendar is not null)
+    {
+        <div class="calendar-grid">
+            @foreach (var label in WeekdayLabels)
+            {
+                <span class="weekday">@label</span>
+            }
+            @for (var i = 0; i < LeadingDays; i++)
+            {
+                <span aria-hidden="true"></span>
+            }
+            @foreach (var day in calendar.Days)
+            {
+                <button type="button" class="workday @(day.Percent == 0 ? "off" : "") @(day.IsOverride ? "overridden" : "") @(day.Date == today ? "today" : "")"
+                        title="@DayLabel(day)" aria-label="@DayLabel(day)" disabled="@Busy" @onclick="() => Edit(day)">
+                    <span class="day-number">@day.Date.Day</span>
+                    <strong>@(day.Percent)%</strong>
+                    @if (day.Holiday is not null)
+                    {
+                        <span class="holiday">@HolidayName(day.Holiday)</span>
+                    }
+                    @if (day.IsOverride)
+                    {
+                        <span class="override-dot" aria-hidden="true"></span>
+                    }
+                </button>
+            }
+        </div>
+        <p class="muted calendar-legend">@Strings.WorkCalendarLegend</p>
+    }
+</section>
+@if (editingDay is { } selected)
+{
+        <dialog class="help-dialog surface workday-editor" @ref="dialog" aria-labelledby="workday-title">
+            <h2 id="workday-title">@selected.Date.ToString("D")</h2>
+            @if (selected.Holiday is not null)
+            {
+                <p>@HolidayName(selected.Holiday)</p>
+            }
+            <label class="stack" for="workday-capacity">@Strings.WorkCapacity <strong>@editPercent %</strong></label>
+            <input @ref="slider" id="workday-capacity" type="range" min="0" max="100" step="25" @bind="editPercent" @bind:event="oninput" disabled="@Busy" />
+            <p class="muted">@Strings.WorkCapacityExplanation</p>
+            @if (Error is not null)
+            {
+                <div class="alert error" role="alert">@Error <button class="quiet" disabled="@Busy" @onclick="LoadAsync">@Strings.Reload</button></div>
+            }
+            <div class="actions">
+                <AppActionButton Disabled="Busy" OnClick="() => SaveDayAsync(false)">@Strings.Save</AppActionButton>
+                <AppActionButton Variant="ButtonVariant.Secondary" Disabled="Busy" OnClick="() => SaveDayAsync(true)">@Strings.RestoreDefault</AppActionButton>
+                <button class="quiet" disabled="@Busy" @onclick="RequestCloseAsync">@Strings.Cancel</button>
+            </div>
+        </dialog>
+}

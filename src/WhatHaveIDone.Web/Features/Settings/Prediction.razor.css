@@ -1,0 +1,27 @@
+.prediction-settings { margin-bottom: 20px; }
+.prediction-toggle { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.prediction-toggle input { width: 20px; height: 20px; accent-color: var(--app-accent); }
+.calendar-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.calendar-navigation { display: flex; align-items: center; gap: 12px; }
+.calendar-navigation strong { min-width: 145px; text-align: center; text-transform: capitalize; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px; }
+.weekday { color: var(--app-muted); text-align: center; padding: 8px 0; }
+.workday { position: relative; min-height: 96px; display: flex; flex-direction: column; align-items: start; justify-content: start; gap: 4px; padding: 10px; background: var(--soft); border: 1px solid transparent; color: var(--ink); }
+.day-number { font-size: 13px; }
+.workday strong { font-size: 16px; font-weight: 550; }
+.workday.off { background: #f6f4f7; color: var(--app-muted); }
+.workday.overridden { border-color: #b4a2cf; }
+.workday.today .day-number { color: var(--app-accent); font-weight: 750; text-decoration: underline; text-underline-offset: 3px; }
+.holiday { font-size: 10px; text-align: left; line-height: 1.2; overflow-wrap: anywhere; }
+.override-dot { position: absolute; right: 7px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--app-accent); }
+.calendar-legend { font-size: 12px; }
+.workday-editor { width: min(460px, calc(100vw - 32px)); padding: 24px; }
+.workday-editor input[type=range] { width: 100%; accent-color: var(--app-accent); padding: 0; }
+.workday-editor .actions { flex-wrap: wrap; }
+@media (max-width: 600px) {
+    .calendar-grid { gap: 4px; }
+    .workday { padding: 5px; min-height: 75px; }
+    .workday strong { font-size: 12px; white-space: nowrap; }
+    .day-number { font-size: 11px; }
+    .holiday { display: none; }
+}

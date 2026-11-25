@@ -18,4 +18,34 @@ This server accesses my time entries, projects, used tags, reports and timer. Re
   <data name="LastYear" xml:space="preserve"><value>Last year</value></data>
   <data name="InstallApp" xml:space="preserve"><value>Install the app</value></data>
   <data name="InstallAppIphone" xml:space="preserve"><value>On iPhone, tap Share in Safari and choose Add to Home Screen.</value></data>
+  <data name="Prediction" xml:space="preserve"><value>Prediction</value></data>
+  <data name="PredictionExplanation" xml:space="preserve"><value>Estimate the month-end total using the last 12 weeks, giving more weight to recent days. Czech public holidays and your working calendar are included.</value></data>
+  <data name="EnablePrediction" xml:space="preserve"><value>Show the month-end estimate on the Time page</value></data>
+  <data name="WorkCalendar" xml:space="preserve"><value>Working calendar</value></data>
+  <data name="WorkCalendarExplanation" xml:space="preserve"><value>Click a day to adjust its working capacity. Weekends and Czech public holidays default to time off.</value></data>
+  <data name="WorkCalendarLegend" xml:space="preserve"><value>100% = a full working day · 50% = half a day · 0% = time off. An outlined day has a custom setting.</value></data>
+  <data name="PreviousMonth" xml:space="preserve"><value>Previous month</value></data>
+  <data name="NextMonth" xml:space="preserve"><value>Next month</value></data>
+  <data name="WorkCapacity" xml:space="preserve"><value>Working capacity</value></data>
+  <data name="WorkCapacityExplanation" xml:space="preserve"><value>The percentage changes the estimate, never your recorded hours.</value></data>
+  <data name="RestoreDefault" xml:space="preserve"><value>Restore default</value></data>
+  <data name="CustomCapacity" xml:space="preserve"><value>Custom capacity</value></data>
+  <data name="LoadingPrediction" xml:space="preserve"><value>Loading month-end estimate</value></data>
+  <data name="MonthPrediction" xml:space="preserve"><value>Estimate for {0}:</value></data>
+  <data name="PredictionNotEnoughHistory" xml:space="preserve"><value>Not enough history for an estimate</value></data>
+  <data name="PredictionHistoryExplanation" xml:space="preserve"><value>Record at least two weeks of history with nonzero working capacity to get an estimate.</value></data>
+  <data name="HolidayNewYear" xml:space="preserve"><value>New Year's Day</value></data>
+  <data name="HolidayLabourDay" xml:space="preserve"><value>Labour Day</value></data>
+  <data name="HolidayLiberationDay" xml:space="preserve"><value>Liberation Day</value></data>
+  <data name="HolidayCyrilMethodius" xml:space="preserve"><value>Saints Cyril and Methodius</value></data>
+  <data name="HolidayJanHus" xml:space="preserve"><value>Jan Hus Day</value></data>
+  <data name="HolidayStatehoodDay" xml:space="preserve"><value>Czech Statehood Day</value></data>
+  <data name="HolidayIndependenceDay" xml:space="preserve"><value>Independent Czechoslovak State Day</value></data>
+  <data name="HolidayFreedomDay" xml:space="preserve"><value>Freedom and Democracy Day</value></data>
+  <data name="HolidayChristmasEve" xml:space="preserve"><value>Christmas Eve</value></data>
+  <data name="HolidayChristmasDay" xml:space="preserve"><value>Christmas Day</value></data>
+  <data name="HolidayStStephen" xml:space="preserve"><value>St Stephen's Day</value></data>
+  <data name="HolidayGoodFriday" xml:space="preserve"><value>Good Friday</value></data>
+  <data name="HolidayEasterMonday" xml:space="preserve"><value>Easter Monday</value></data>
+  <data name="PredictionHours" xml:space="preserve"><value>{0} h {1:00} min</value></data>
 </root>

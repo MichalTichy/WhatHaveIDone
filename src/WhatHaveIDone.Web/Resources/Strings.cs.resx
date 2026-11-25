@@ -18,4 +18,34 @@ Server pracuje s mými časovými záznamy, projekty, použitými tagy, přehled
   <data name="LastYear" xml:space="preserve"><value>Minulý rok</value></data>
   <data name="InstallApp" xml:space="preserve"><value>Nainstalovat aplikaci</value></data>
   <data name="InstallAppIphone" xml:space="preserve"><value>Na iPhonu klepněte v Safari na Sdílet a zvolte Přidat na plochu.</value></data>
+  <data name="Prediction" xml:space="preserve"><value>Predikce</value></data>
+  <data name="PredictionExplanation" xml:space="preserve"><value>Odhad hodin na konci měsíce podle posledních 12 týdnů s větší vahou novějších dnů. Zohledňuje české svátky a váš pracovní kalendář.</value></data>
+  <data name="EnablePrediction" xml:space="preserve"><value>Zobrazovat odhad na konci měsíce na stránce Čas</value></data>
+  <data name="WorkCalendar" xml:space="preserve"><value>Pracovní kalendář</value></data>
+  <data name="WorkCalendarExplanation" xml:space="preserve"><value>Kliknutím na den upravíte jeho pracovní kapacitu. Víkendy a české svátky jsou výchozí volné dny.</value></data>
+  <data name="WorkCalendarLegend" xml:space="preserve"><value>100 % = celý pracovní den · 50 % = půl dne · 0 % = volno. Den s rámečkem má vlastní nastavení.</value></data>
+  <data name="PreviousMonth" xml:space="preserve"><value>Předchozí měsíc</value></data>
+  <data name="NextMonth" xml:space="preserve"><value>Další měsíc</value></data>
+  <data name="WorkCapacity" xml:space="preserve"><value>Pracovní kapacita</value></data>
+  <data name="WorkCapacityExplanation" xml:space="preserve"><value>Procenta ovlivňují odhad, nikoli skutečně zaznamenané hodiny.</value></data>
+  <data name="RestoreDefault" xml:space="preserve"><value>Obnovit výchozí</value></data>
+  <data name="CustomCapacity" xml:space="preserve"><value>Vlastní kapacita</value></data>
+  <data name="LoadingPrediction" xml:space="preserve"><value>Načítání měsíčního odhadu</value></data>
+  <data name="MonthPrediction" xml:space="preserve"><value>Odhad za {0}:</value></data>
+  <data name="PredictionNotEnoughHistory" xml:space="preserve"><value>Pro odhad zatím není dost historie</value></data>
+  <data name="PredictionHistoryExplanation" xml:space="preserve"><value>Pro odhad potřebujeme alespoň dva týdny historie a nenulovou pracovní kapacitu.</value></data>
+  <data name="HolidayNewYear" xml:space="preserve"><value>Nový rok</value></data>
+  <data name="HolidayLabourDay" xml:space="preserve"><value>Svátek práce</value></data>
+  <data name="HolidayLiberationDay" xml:space="preserve"><value>Den vítězství</value></data>
+  <data name="HolidayCyrilMethodius" xml:space="preserve"><value>Cyril a Metoděj</value></data>
+  <data name="HolidayJanHus" xml:space="preserve"><value>Den upálení mistra Jana Husa</value></data>
+  <data name="HolidayStatehoodDay" xml:space="preserve"><value>Den české státnosti</value></data>
+  <data name="HolidayIndependenceDay" xml:space="preserve"><value>Vznik Československa</value></data>
+  <data name="HolidayFreedomDay" xml:space="preserve"><value>Den boje za svobodu a demokracii</value></data>
+  <data name="HolidayChristmasEve" xml:space="preserve"><value>Štědrý den</value></data>
+  <data name="HolidayChristmasDay" xml:space="preserve"><value>1. svátek vánoční</value></data>
+  <data name="HolidayStStephen" xml:space="preserve"><value>2. svátek vánoční</value></data>
+  <data name="HolidayGoodFriday" xml:space="preserve"><value>Velký pátek</value></data>
+  <data name="HolidayEasterMonday" xml:space="preserve"><value>Velikonoční pondělí</value></data>
+  <data name="PredictionHours" xml:space="preserve"><value>{0} h {1:00} min</value></data>
 </root>
