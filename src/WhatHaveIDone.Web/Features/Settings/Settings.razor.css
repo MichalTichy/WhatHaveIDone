@@ -1,0 +1,29 @@
+.settings-tabs {
+    max-width: 1000px;
+}
+
+.settings-tabs ::deep .settings-tabs-list {
+    display: flex;
+    width: 100%;
+    height: auto;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+    gap: 4px;
+    padding: 4px;
+    background: var(--soft);
+    border-radius: 12px;
+}
+
+.settings-tabs ::deep [role="tab"] {
+    flex: 1 1 auto;
+    min-height: 44px;
+    white-space: normal;
+    color: var(--app-muted);
+}
+
+.settings-tabs ::deep [role="tab"][data-state="active"] {
+    background: #fff;
+    color: var(--app-accent);
+    box-shadow: 0 1px 4px #332e3c12;
+}

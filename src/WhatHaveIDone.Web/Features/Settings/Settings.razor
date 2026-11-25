@@ -6,24 +6,39 @@
 @if(!loaded && Busy){<Loading />}
 else if(loaded)
 {
-    <div class="settings-sections">
-        <form class="surface stack" @onsubmit="SaveSettingsAsync" @onsubmit:preventDefault><h2>@Strings.Profile</h2><p>@User.Session.Email</p><div class="form-grid"><label>@Strings.Language<select @bind="settings.Language"><option value="cs">Čeština</option><option value="en">English</option></select></label><label>@Strings.WeekStart<select @bind="settings.FirstDayOfWeek"><option value="1">@Strings.Monday</option><option value="0">@Strings.Sunday</option></select></label><SearchableSelect Label="@Strings.TimeZone" Options="TimeZoneOptions" Value="@settings.TimeZone" ValueChanged="SelectTimeZone" />
-            </div><div><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.Save</AppActionButton></div></form>
-        @if(User.Session.HasPassword)
-        {
-            <form class="surface stack" @onsubmit="ChangePasswordAsync" @onsubmit:preventDefault><h2>@Strings.ChangePassword</h2><div class="form-grid"><label>@Strings.CurrentPassword<input type="password" autocomplete="current-password" @bind="currentPassword" required /></label><label>@Strings.NewPassword<input type="password" autocomplete="new-password" @bind="newPassword" minlength="10" maxlength="128" required /></label></div><div><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.ChangePassword</AppActionButton></div></form>
-        }
-        else { <section class="surface"><h2>@Strings.SsoAccount</h2></section> }
-        <section class="surface stack"><div class="mcp-settings-heading"><h2>@Strings.ApiKeys</h2><button type="button" class="secondary" @onclick="() => mcpSetupOpen = true">@Strings.SetupMcp</button></div>
-            <p class="muted">@Strings.McpSettingsDescription</p>
-            @if(importActive){<p class="alert">@Strings.ImportWarning <a href="/import">@Strings.Import</a></p>}
-            <label>@Strings.ApiUrl<input readonly value="@ApiUrl" /></label><p class="muted">@Strings.IsInstructions</p>
-            <form class="actions field-actions" @onsubmit="CreateTokenAsync" @onsubmit:preventDefault><label class="grow">@Strings.Name<input @bind="tokenName" required maxlength="100" /></label><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.CreateKey</AppActionButton></form>
-            @if(newToken is not null){<div class="alert success"><p>@Strings.KeyOnce</p><p class="secret">@newToken</p><button class="secondary" @onclick="CopyAsync">@Strings.Copy</button></div>}
-            @foreach(var token in tokens){<div class="token-row"><div class="grow"><strong>@token.Name</strong><small class="muted"> · …@token.Suffix · @UserTime.Local(token.CreatedAt,User.Settings.TimeZone).ToString("d")</small></div>@if(token.RevokedAt is null){<button class="secondary" disabled="@Busy" @onclick="() => RevokeAsync(token)">@Strings.Revoke</button>}else{<span class="muted">@Strings.Revoked · @UserTime.Local(token.RevokedAt.Value,User.Settings.TimeZone).ToString("d")</span>}</div>}
-        </section>
-        <section class="surface stack"><h2>@Strings.Import</h2><p class="muted">@Strings.ImportSettingsDescription</p><div><a class="button secondary" href="/import">@Strings.OpenImport</a></div></section>
-        <section class="surface"><h2>@Strings.DataExport</h2><a class="button secondary" href="/reports">@Strings.ExportCsv</a></section>
+    <div class="settings-tabs">
+        <BbTabs DefaultValue="account">
+            <BbTabsList Class="settings-tabs-list" aria-label="@Strings.Settings">
+                <BbTabsTrigger Value="account">@Strings.Profile</BbTabsTrigger>
+                <BbTabsTrigger Value="api-keys">@Strings.ApiKeys</BbTabsTrigger>
+                <BbTabsTrigger Value="import">@Strings.Import</BbTabsTrigger>
+            </BbTabsList>
+            <BbTabsContent Value="account">
+                <div class="settings-sections">
+                    <form class="surface stack" @onsubmit="SaveSettingsAsync" @onsubmit:preventDefault><h2>@Strings.Profile</h2><p>@User.Session.Email</p><div class="form-grid"><label>@Strings.Language<select @bind="settings.Language"><option value="cs">Čeština</option><option value="en">English</option></select></label><label>@Strings.WeekStart<select @bind="settings.FirstDayOfWeek"><option value="1">@Strings.Monday</option><option value="0">@Strings.Sunday</option></select></label><SearchableSelect Label="@Strings.TimeZone" Options="TimeZoneOptions" Value="@settings.TimeZone" ValueChanged="SelectTimeZone" />
+                        </div><div><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.Save</AppActionButton></div></form>
+                    @if(User.Session.HasPassword)
+                    {
+                        <form class="surface stack" @onsubmit="ChangePasswordAsync" @onsubmit:preventDefault><h2>@Strings.ChangePassword</h2><div class="form-grid"><label>@Strings.CurrentPassword<input type="password" autocomplete="current-password" @bind="currentPassword" required /></label><label>@Strings.NewPassword<input type="password" autocomplete="new-password" @bind="newPassword" minlength="10" maxlength="128" required /></label></div><div><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.ChangePassword</AppActionButton></div></form>
+                    }
+                    else { <section class="surface"><h2>@Strings.SsoAccount</h2></section> }
+                    <section class="surface"><h2>@Strings.DataExport</h2><a class="button secondary" href="/reports">@Strings.ExportCsv</a></section>
+                </div>
+            </BbTabsContent>
+            <BbTabsContent Value="api-keys">
+                <section class="surface stack"><div class="mcp-settings-heading"><h2>@Strings.ApiKeys</h2><button type="button" class="secondary" @onclick="() => mcpSetupOpen = true">@Strings.SetupMcp</button></div>
+                    <p class="muted">@Strings.McpSettingsDescription</p>
+                    @if(importActive){<p class="alert">@Strings.ImportWarning <a href="/import">@Strings.Import</a></p>}
+                    <label>@Strings.ApiUrl<input readonly value="@ApiUrl" /></label><p class="muted">@Strings.IsInstructions</p>
+                    <form class="actions field-actions" @onsubmit="CreateTokenAsync" @onsubmit:preventDefault><label class="grow">@Strings.Name<input @bind="tokenName" required maxlength="100" /></label><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@Strings.CreateKey</AppActionButton></form>
+                    @if(newToken is not null){<div class="alert success"><p>@Strings.KeyOnce</p><p class="secret">@newToken</p><button class="secondary" @onclick="CopyAsync">@Strings.Copy</button></div>}
+                    @foreach(var token in tokens){<div class="token-row"><div class="grow"><strong>@token.Name</strong><small class="muted"> · …@token.Suffix · @UserTime.Local(token.CreatedAt,User.Settings.TimeZone).ToString("d")</small></div>@if(token.RevokedAt is null){<button class="secondary" disabled="@Busy" @onclick="() => RevokeAsync(token)">@Strings.Revoke</button>}else{<span class="muted">@Strings.Revoked · @UserTime.Local(token.RevokedAt.Value,User.Settings.TimeZone).ToString("d")</span>}</div>}
+                </section>
+            </BbTabsContent>
+            <BbTabsContent Value="import">
+                <section class="surface stack"><h2>@Strings.Import</h2><p class="muted">@Strings.ImportSettingsDescription</p><div><a class="button secondary" href="/import">@Strings.OpenImport</a></div></section>
+            </BbTabsContent>
+        </BbTabs>
     </div>
 }
 @if (mcpSetupOpen) { <McpSetupDialog Endpoint="@McpUrl" Closed="() => mcpSetupOpen = false" /> }
