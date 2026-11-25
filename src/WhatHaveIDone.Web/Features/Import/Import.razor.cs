@@ -22,6 +22,12 @@ public partial class Import : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        if (Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].TrimEnd('/') == "import")
+        {
+            Navigation.NavigateTo("/settings/import", replace: true);
+            return;
+        }
+
         await LoadAsync();
         polling = PollAsync();
     }

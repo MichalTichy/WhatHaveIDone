@@ -1,6 +1,4 @@
 using BlazorBlueprint.Primitives;
-using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using WhatHaveIDone.API.Models;
 using WhatHaveIDone.Web.Resources;
 
@@ -8,17 +6,9 @@ namespace WhatHaveIDone.Web.Features.Settings;
 
 public partial class Settings
 {
-    [Inject]
-    private IJSRuntime Js { get; set; } = null!;
-
     private SettingsModel settings = new();
-    private List<ApiTokenModel> tokens = [];
-    private string currentPassword = "", newPassword = "", tokenName = "Riganti IS";
-    private string? newToken;
-    private bool loaded, importActive;
-    private bool mcpSetupOpen;
-    private string ApiUrl => Navigation.BaseUri;
-    private string McpUrl => new Uri(new Uri(Navigation.BaseUri), "mcp").AbsoluteUri;
+    private string currentPassword = "", newPassword = "";
+    private bool loaded;
 
     private static readonly IReadOnlyList<SelectOption<string>> SystemTimeZoneOptions = TimeZoneInfo.GetSystemTimeZones()
         .Select(zone => new SelectOption<string>(zone.Id, zone.Id)).ToArray();
@@ -43,9 +33,6 @@ public partial class Settings
         settings = User.Settings with
         {
         };
-        tokens = await Api.GetTokensAsync(ct);
-        var imports = await Api.GetImportsAsync(ct);
-        importActive = imports.Any(i => i.Status.IsActive() && i.Status != ImportStatus.AwaitingConfirmation);
         loaded = true;
     });
 
@@ -71,27 +58,4 @@ public partial class Settings
         currentPassword = newPassword = "";
         Feedback.Show(Strings.Saved);
     });
-
-    private Task CreateTokenAsync() => RunAsync(async ct =>
-    {
-        newToken = (await Api.CreateTokenAsync(new CreateApiKeyRequest(tokenName), ct)).Token;
-        tokens = await Api.GetTokensAsync(ct);
-    });
-
-    private Task CopyAsync() => RunAsync(async ct =>
-    {
-        await Js.InvokeVoidAsync("whid.copy", ct, newToken);
-        Feedback.Show(Strings.Copied);
-    });
-
-    private async Task RevokeAsync(ApiTokenModel token)
-    {
-        if (!await Js.InvokeAsync<bool>("confirm", Cancellation, Strings.RevokeConfirm))
-            return;
-        await RunAsync(async ct =>
-        {
-            await Api.RevokeTokenAsync(token.Id, ct);
-            tokens = await Api.GetTokensAsync(ct);
-        });
-    }
 }

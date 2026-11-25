@@ -1,0 +1,14 @@
+@layout MainLayout
+@inherits LayoutComponentBase
+<div class="page-header"><h1>@(User.Settings.OnboardingCompleted ? Strings.Settings : Strings.Import)</h1></div>
+<div class="settings-pages">
+    @if (User.Settings.OnboardingCompleted)
+    {
+        <nav class="settings-navigation" aria-label="@Strings.Settings">
+            <NavLink href="/settings" Match="NavLinkMatch.All">@Strings.Profile</NavLink>
+            <NavLink href="/settings/api-keys">@Strings.ApiKeys</NavLink>
+            <NavLink href="/settings/import">@Strings.Import</NavLink>
+        </nav>
+    }
+    @Body
+</div>
