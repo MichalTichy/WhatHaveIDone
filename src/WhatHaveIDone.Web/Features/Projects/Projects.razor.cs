@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using WhatHaveIDone.API.Models;
+using WhatHaveIDone.Web.Components.Forms;
 using WhatHaveIDone.Web.Resources;
 
 namespace WhatHaveIDone.Web.Features.Projects;
@@ -13,8 +14,6 @@ public partial class Projects : IAsyncDisposable
     private string search = "";
     private bool archived, loaded, openPending;
     private ProjectModel? editing;
-    private ClientModel? editingClient;
-    private bool addingClient;
     private ElementReference dialog;
     private DotNetObjectReference<Projects>? self;
     private IEnumerable<ProjectModel> Visible => User.Projects.Where(p => p.Archived == archived && p.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase));
@@ -30,7 +29,8 @@ public partial class Projects : IAsyncDisposable
     {
         editing = new()
         {
-            ClientId = User.DefaultClientId
+            ClientId = User.DefaultClientId,
+            Color = ProjectColors.Suggest(User, null)
         };
         openPending = true;
         Error = null;
@@ -44,31 +44,6 @@ public partial class Projects : IAsyncDisposable
         openPending = true;
         Error = null;
     }
-
-    private void AddClient()
-    {
-        editingClient = new();
-        addingClient = true;
-        Error = null;
-    }
-
-    private void RenameClient(ClientModel client)
-    {
-        editingClient = client with
-        {
-        };
-        addingClient = false;
-        Error = null;
-    }
-
-    private Task SaveClientAsync() => RunAsync(async ct =>
-    {
-        if (editingClient is null)
-            return;
-        await Api.SaveClientAsync(editingClient, ct);
-        await User.ReloadAsync(ct);
-        editingClient = null;
-    });
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -102,19 +77,6 @@ public partial class Projects : IAsyncDisposable
         {
             await Api.DeleteProjectAsync(project.Id, project.Version, ct);
             await CloseAsync();
-            await User.ReloadAsync(ct);
-        });
-    }
-
-    private async Task DeleteClientAsync(ClientModel client)
-    {
-        if (!await Js.InvokeAsync<bool>("confirm", Cancellation, string.Format(Strings.DeleteClientConfirm, client.Name)))
-            return;
-        await RunAsync(async ct =>
-        {
-            await Api.DeleteClientAsync(client.Id, client.Version, ct);
-            if (editingClient?.Id == client.Id)
-                editingClient = null;
             await User.ReloadAsync(ct);
         });
     }

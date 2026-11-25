@@ -2,6 +2,7 @@ using BlazorBlueprint.Primitives;
 using Microsoft.AspNetCore.Components;
 using WhatHaveIDone.Web.Resources;
 using WhatHaveIDone.API.Models;
+using WhatHaveIDone.Web.Components.Forms;
 
 namespace WhatHaveIDone.Web.Features.Time;
 
@@ -23,6 +24,7 @@ public partial class ProjectPicker
     {
         adding = !adding;
         clientId = User.DefaultClientId;
+        color = ProjectColors.Suggest(User, null);
         Error = null;
     }
 

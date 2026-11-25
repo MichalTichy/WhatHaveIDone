@@ -1,0 +1,45 @@
+@page "/settings/clients"
+@layout SettingsLayout
+@inherits AppComponentBase
+<PageTitle>@Strings.Clients · @Strings.Settings · @Strings.AppName</PageTitle>
+@if (Error is not null)
+{
+    <div class="alert error" role="alert">@Error<button class="quiet" @onclick="LoadAsync">@Strings.Reload</button></div>
+}
+@if (!loaded && Busy)
+{
+    <Loading />
+}
+else if (loaded)
+{
+    <section class="surface stack">
+        <h2>@Strings.Clients</h2>
+        <div class="client-list">
+            @foreach (var client in User.Clients)
+            {
+                <div class="project-row">
+                    <span class="grow">@client.Name@if (client.IsDefault) { <small class="muted"> · @Strings.DefaultClient</small> }</span>
+                    <button type="button" class="secondary" disabled="@Busy" @onclick="() => Rename(client)">@Strings.Rename</button>
+                    @if (!client.IsDefault)
+                    {
+                        <button type="button" class="danger" disabled="@Busy" @onclick="() => DeleteAsync(client)">@Strings.Delete</button>
+                    }
+                </div>
+            }
+        </div>
+        @if (editing is not null)
+        {
+            <form class="stack client-form" @onsubmit="SaveAsync" @onsubmit:preventDefault>
+                <label>@Strings.ClientName<input @bind="editing.Name" required maxlength="200" /></label>
+                <div class="actions">
+                    <AppActionButton Type="ButtonType.Submit" Disabled="Busy">@(adding ? Strings.AddClient : Strings.Save)</AppActionButton>
+                    <button type="button" class="secondary" disabled="@Busy" @onclick="() => editing = null">@Strings.Cancel</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div><button type="button" class="secondary" @onclick="Add">＋ @Strings.AddClient</button></div>
+        }
+    </section>
+}

@@ -7,34 +7,12 @@
 @if (!loaded && Busy) { <Loading /> }
 else if (loaded)
 {
-    <details class="surface client-management">
-        <summary>@Strings.Clients</summary>
-        <div class="client-list">
-            @foreach(var client in User.Clients)
-            {
-                <div class="project-row"><span class="grow">@client.Name @if(client.IsDefault){<small class="muted">· @Strings.DefaultClient</small>}</span><button type="button" class="secondary" disabled="@Busy" @onclick="() => RenameClient(client)">@Strings.Rename</button>
-                    @if (!client.IsDefault)
-                    {
-                        <button type="button" class="danger" disabled="@Busy" @onclick="() => DeleteClientAsync(client)">@Strings.Delete</button>
-                    }
-                </div>
-            }
-            @if(editingClient is not null)
-            {
-                <form class="stack client-form" @onsubmit="SaveClientAsync" @onsubmit:preventDefault>
-                    <label>@Strings.ClientName<input @bind="editingClient.Name" required maxlength="200" /></label>
-                    <div class="actions"><AppActionButton Type="ButtonType.Submit" Disabled="Busy">@(addingClient ? Strings.AddClient : Strings.Save)</AppActionButton><button type="button" class="secondary" disabled="@Busy" @onclick="() => editingClient = null">@Strings.Cancel</button></div>
-                </form>
-            }
-            else { <button type="button" class="secondary" @onclick="AddClient">＋ @Strings.AddClient</button> }
-        </div>
-    </details>
     <section class="surface">@if (!Visible.Any()){<p class="empty">@Strings.NoProjects</p>}@foreach(var project in Visible)
     { <div class="project-row"><span class="swatch" style="--project-color:@project.Color"></span><button class="entry-open grow" @onclick="() => Edit(project)"><strong>@project.Name</strong><small>@User.ClientName(project.ClientId)</small></button><button class="secondary" disabled="@Busy" @onclick="() => ToggleArchiveAsync(project)">@(project.Archived ? Strings.Restore : Strings.Archive)</button></div> }</section>
 }
 @if (editing is not null)
 {
-    <dialog class="drawer" @ref="dialog" aria-labelledby="project-title"><form class="drawer-content" @onsubmit="SaveAsync" @onsubmit:preventDefault><header class="drawer-header"><h2 id="project-title">@Strings.Project</h2><button type="button" class="secondary" aria-label="@Strings.Close" @onclick="CloseAsync">×</button></header><div class="drawer-body"><label>@Strings.Name<BbInput Class="app-input" UpdateTiming="UpdateTiming.Immediate" AriaLabel="@Strings.Name" Value="@editing.Name" ValueChanged="value => editing.Name = value ?? string.Empty" /></label><ClientPicker @bind-Value="editing.ClientId" /><ProjectColorPicker @bind-Value="editing.Color" />@if(Error is not null){<p class="alert error" role="alert">@Error</p>}</div><footer class="drawer-footer">
+    <dialog class="drawer" @ref="dialog" aria-labelledby="project-title"><form class="drawer-content" @onsubmit="SaveAsync" @onsubmit:preventDefault><header class="drawer-header"><h2 id="project-title">@Strings.Project</h2><button type="button" class="secondary" aria-label="@Strings.Close" @onclick="CloseAsync">×</button></header><div class="drawer-body"><label>@Strings.Name<BbInput Class="app-input" UpdateTiming="UpdateTiming.Immediate" AriaLabel="@Strings.Name" Value="@editing.Name" ValueChanged="value => editing.Name = value ?? string.Empty" /></label><ClientPicker @bind-Value="editing.ClientId" /><ProjectColorPicker @bind-Value="editing.Color" ProjectId="@editing.Id" />@if(Error is not null){<p class="alert error" role="alert">@Error</p>}</div><footer class="drawer-footer">
         @if (!string.IsNullOrEmpty(editing.Id))
         {
             <button type="button" class="danger" disabled="@Busy" @onclick="DeleteProjectAsync">@Strings.Delete</button>

@@ -209,10 +209,10 @@ p { margin: 0 0 16px; }
 .color-grid { display: grid; grid-template-columns: repeat(8,minmax(0,36px)); gap: 8px; margin-bottom: 14px; }
 .color-option { background: var(--project-color); border-radius: 7px; width: 100%; aspect-ratio: 1; min-height: 28px; padding: 0; color: #fff; text-shadow: 0 1px 3px #0008; font-size: 22px; }
 .color-option[aria-pressed='true'] { outline: 2px solid var(--ink); outline-offset: 2px; }
+.color-suggestion { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.color-suggestion .swatch { width: 16px; height: 16px; border-radius: 5px; background: var(--project-color); }
+.color-suggestion[aria-pressed='true'] { outline: 2px solid var(--ink); outline-offset: 2px; }
 .color-picker input { max-width: 180px; font-family: monospace; }
-.entry-more { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 12px; }
-.entry-more summary { cursor: pointer; color: var(--app-muted); padding: 8px 0; }
-.entry-more button { margin-top: 8px; }
 .help-dialog { position: fixed; inset: 0; margin: auto; max-height: calc(100dvh - 32px); overflow: auto; padding: 0; border: 1px solid var(--line); border-radius: 16px; width: min(560px,calc(100% - 32px)); color: var(--ink); }
 .help-steps { padding-left: 22px; display: grid; gap: 14px; margin: 0; list-style: decimal; }
 .text-action { border: 0; background: transparent; min-height: 32px; padding: 4px 0; border-radius: 3px; color: #624799; text-align: left; justify-content: flex-start; font-weight: inherit; }
@@ -221,10 +221,6 @@ p { margin: 0 0 16px; }
 .report-bucket:hover:not(:disabled) { background: #f8f6fb; filter: none; }
 .report-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .report-tags .tag-pill { padding: 6px 10px; min-height: 32px; }
-.client-management { margin-bottom: 16px; }
-.client-management>summary { font-weight: 550; cursor: pointer; padding: 4px 0; }
-.client-list { margin-top: 12px; }
-.client-list>.secondary { margin-top: 14px; }
 .client-form { margin-top: 16px; max-width: 500px; }
 .suggestion-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; min-width: 0; }
 .suggestion-badge { min-height: 32px; padding: 5px 10px; gap: 6px; border-radius: 7px; font-size: 11px; font-weight: 450; background: #f8f6fb; border: 1px solid #eae5f0; color: #776887; max-width: 100%; overflow-wrap: anywhere; white-space: normal; text-align: left; justify-content: flex-start; }
