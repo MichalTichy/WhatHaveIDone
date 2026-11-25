@@ -18,4 +18,13 @@ This server accesses my time entries, projects, used tags, reports and timer. Re
   <data name="LastYear" xml:space="preserve"><value>Last year</value></data>
   <data name="InstallApp" xml:space="preserve"><value>Install the app</value></data>
   <data name="InstallAppIphone" xml:space="preserve"><value>On iPhone, tap Share in Safari and choose Add to Home Screen.</value></data>
+  <data name="ProductFeedback" xml:space="preserve"><value>Feedback</value></data>
+  <data name="FeedbackShared" xml:space="preserve"><value>Feedback is visible to all signed-in users.</value></data>
+  <data name="FeedbackText" xml:space="preserve"><value>Your feedback</value></data>
+  <data name="ViewFeedback" xml:space="preserve"><value>View feedback</value></data>
+  <data name="WriteFeedback" xml:space="preserve"><value>Write feedback</value></data>
+  <data name="SendFeedback" xml:space="preserve"><value>Send</value></data>
+  <data name="FeedbackSent" xml:space="preserve"><value>Thank you for your feedback.</value></data>
+  <data name="NoFeedback" xml:space="preserve"><value>No feedback yet.</value></data>
+  <data name="MoreFeedback" xml:space="preserve"><value>Load more</value></data>
 </root>

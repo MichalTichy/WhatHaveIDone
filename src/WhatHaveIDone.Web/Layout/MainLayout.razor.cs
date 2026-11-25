@@ -24,6 +24,15 @@ public partial class MainLayout : IAsyncDisposable
     private IJSRuntime Js { get; set; } = null!;
 
     private bool menuOpen, updateAvailable;
+    private bool feedbackOpen;
+
+    private void OpenFeedback()
+    {
+        CloseMenu();
+        feedbackOpen = true;
+    }
+
+    private void CloseFeedback() => feedbackOpen = false;
     private DotNetObjectReference<MainLayout>? self;
     private string? updateWatcher, installWatcher, installMode;
     private bool installHintVisible;

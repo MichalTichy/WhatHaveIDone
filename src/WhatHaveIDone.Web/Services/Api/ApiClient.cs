@@ -23,6 +23,8 @@ public sealed class ApiClient(HttpClient http)
     public void SetLanguage(string value) => language = value;
 
     public string SsoUrl => "/auth/sso";
+    public Task<List<FeedbackModel>> GetFeedbackAsync(int skip, CancellationToken ct) => GetAsync<List<FeedbackModel>>($"feedback?skip={skip}", ct);
+    public Task<string> SubmitFeedbackAsync(SubmitFeedback input, CancellationToken ct) => SendAsync<string>(HttpMethod.Post, "feedback", ct, input);
     public Task<string> RegisterAsync(AccountInput input, CancellationToken ct) => SendAsync<string>(HttpMethod.Post, "account/register", ct, input);
     public Task<string> LoginAsync(AccountInput input, CancellationToken ct) => SendAsync<string>(HttpMethod.Post, "account/login", ct, input);
     public Task<bool> LogoutAsync(CancellationToken ct) => SendAsync<bool>(HttpMethod.Post, "account/logout", ct);

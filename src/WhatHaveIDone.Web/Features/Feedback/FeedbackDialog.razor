@@ -1,0 +1,34 @@
+@inherits AppComponentBase
+<dialog class="help-dialog" @ref="dialog" aria-labelledby="feedback-title">
+    <header class="drawer-header"><h2 id="feedback-title">@Strings.ProductFeedback</h2><button type="button" class="secondary" aria-label="@Strings.Close" @onclick="RequestCloseAsync">×</button></header>
+    <div class="drawer-body">
+        <p class="muted">@Strings.FeedbackShared</p>
+        @if (showPosts)
+        {
+            @if (IsLoading) { <Loading /> }
+            @if (posts is not null)
+            {
+                @if (posts.Count == 0) { <p>@Strings.NoFeedback</p> }
+                @foreach (var post in posts)
+                {
+                    <article class="feedback-post" @key="post.Id">
+                        <time class="muted" datetime="@post.CreatedAt.ToString("O")">@UserTime.Local(post.CreatedAt, User.Settings.TimeZone).ToString("g")</time>
+                        <p>@post.Text</p>
+                    </article>
+                }
+                @if (hasMore) { <button class="secondary" disabled="@IsLoading" @onclick="LoadMoreAsync">@Strings.MoreFeedback</button> }
+            }
+        }
+        else
+        {
+            <label for="feedback-text">@Strings.FeedbackText</label>
+            <textarea id="feedback-text" rows="6" maxlength="5000" @bind="text" @bind:event="oninput" disabled="@Busy"></textarea>
+        }
+        @if (Error is not null) { <p role="alert" class="alert error">@Error</p> }
+    </div>
+    <footer class="drawer-footer">
+        <button type="button" class="secondary" disabled="@(Busy || IsLoading)" @onclick="TogglePostsAsync">@(showPosts ? Strings.WriteFeedback : Strings.ViewFeedback)</button>
+        <span class="spacer"></span>
+        @if (!showPosts) { <AppActionButton Disabled="@(Busy || string.IsNullOrWhiteSpace(text))" OnClick="SubmitAsync">@Strings.SendFeedback</AppActionButton> }
+    </footer>
+</dialog>

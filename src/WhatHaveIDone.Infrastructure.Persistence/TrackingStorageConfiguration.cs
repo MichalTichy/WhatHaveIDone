@@ -11,6 +11,8 @@ public sealed class TrackingStorageConfiguration : IStorageConfiguration
     public void Configure(StoreOptions options)
     {
         options.DatabaseSchemaName = "tracking";
+        // Shared product feedback is the explicit exception to user-scoped tracking data.
+        options.Schema.For<FeedbackPost>().SingleTenanted().UseOptimisticConcurrency(true);
         options.Schema.For<ImportRun>().MultiTenanted().UseOptimisticConcurrency(true);
         options.Schema.For<UserProfile>().MultiTenanted().UseOptimisticConcurrency(true);
         options.Schema.For<Client>().MultiTenanted().UseOptimisticConcurrency(true)

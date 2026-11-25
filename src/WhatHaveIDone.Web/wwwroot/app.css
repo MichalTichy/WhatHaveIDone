@@ -59,8 +59,10 @@ label small, .muted { font-weight: 400; color: var(--app-muted); font-size: 12px
 .brand-name { max-width: 126px; }
 .brand-caption { font-size: 11px; color: var(--app-muted); margin: 12px 0 0; }
 .sidebar nav { display: grid; gap: 5px; margin-top: 36px; }
-.sidebar nav a { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 10px 12px; border-radius: 9px; color: #6d6673; text-decoration: none; }
-.sidebar nav a:hover { background: #e7e4e8; }
+.sidebar nav a, .sidebar nav button { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 10px 12px; border-radius: 9px; color: #6d6673; text-decoration: none; text-align: left; }
+.sidebar nav a:hover, .sidebar nav button:hover { background: #e7e4e8; }
+.feedback-post { border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.feedback-post p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .sidebar nav a.active { background: #e4ddef; color: #61468f; font-weight: 600; }
 .nav-icon { width: 20px; height: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
 .nav-icon circle { fill: #efeeeb; }
