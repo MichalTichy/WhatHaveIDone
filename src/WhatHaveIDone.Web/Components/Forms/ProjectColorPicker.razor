@@ -1,7 +1,12 @@
+@inherits AppComponentBase
 <fieldset class="color-picker">
     <legend>@Strings.Color</legend>
+    <button type="button" class="color-suggestion secondary" style="--project-color:@Suggested" aria-pressed="@string.Equals(Value, Suggested, StringComparison.OrdinalIgnoreCase)"
+            title="@Strings.SuggestedColorHint" @onclick="() => ValueChanged.InvokeAsync(Suggested)">
+        <span class="swatch" aria-hidden="true"></span>@Strings.SuggestedColor
+    </button>
     <div class="color-grid">
-        @foreach (var color in Palette)
+        @foreach (var color in ProjectColors.Palette)
         {
             <button type="button" class="color-option" style="--project-color:@color" aria-label="@string.Format(Strings.SelectColor, color)"
                     aria-pressed="@string.Equals(Value, color, StringComparison.OrdinalIgnoreCase)" @onclick="() => ValueChanged.InvokeAsync(color)">
