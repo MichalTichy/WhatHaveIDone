@@ -70,4 +70,5 @@ Server pracuje s mými časovými záznamy, projekty, použitými tagy, přehled
   <data name="StatisticMedianWorkedDay" xml:space="preserve"><value>Medián za den s prací</value></data>
   <data name="StatisticLongestWorkedStreak" xml:space="preserve"><value>Nejdelší série dnů s prací</value></data>
   <data name="StatisticDays" xml:space="preserve"><value>{0:N0} d</value></data>
+  <data name="MonthTotal" xml:space="preserve"><value>Celkem za {0}</value></data>
 </root>

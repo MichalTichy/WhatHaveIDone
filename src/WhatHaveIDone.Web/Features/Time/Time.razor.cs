@@ -13,6 +13,8 @@ public partial class Time : IAsyncDisposable
     private IJSRuntime Js { get; set; } = null!;
 
     private List<TimeEntryModel> entries = [];
+    private List<TimeEntryModel> monthlyEntries = [];
+    private DateTimeOffset monthFrom, monthTo;
     private TimeEntryModel? runningEntry, editingEntry;
     private string description = "";
     private string? projectId;
@@ -38,23 +40,36 @@ public partial class Time : IAsyncDisposable
 
     private void SetRange()
     {
-        var start = narrow ? selectedDay.Date : selectedDay.Date.AddDays(-((7 + (int)selectedDay.DayOfWeek - User.Settings.FirstDayOfWeek) % 7));
+        var start = narrow ? selectedDay.Date : selectedDay.Date.AddDays(-6);
+        var end = selectedDay.Date.AddDays(1);
+        if (calendarView && !narrow)
+        {
+            start = selectedDay.Date.AddDays(-((7 + (int)selectedDay.DayOfWeek - User.Settings.FirstDayOfWeek) % 7));
+            end = start.AddDays(7);
+        }
         from = UserTime.Instant(start, User.Settings.TimeZone);
-        to = UserTime.Instant(start.AddDays(narrow ? 1 : 7), User.Settings.TimeZone);
+        to = UserTime.Instant(end, User.Settings.TimeZone);
     }
 
     private Task LoadAsync()
     {
         SetRange();
         var range = (From: from, To: to);
+        var monthStart = new DateTime(selectedDay.Year, selectedDay.Month, 1);
+        var monthlyRange = (From: UserTime.Instant(monthStart, User.Settings.TimeZone),
+            To: UserTime.Instant(monthStart.AddMonths(1), User.Settings.TimeZone));
         return ExecuteLoadAsync(async ct =>
         {
             var selected = await Api.GetTimeEntriesAsync(range.From, range.To, ct);
+            var monthly = await Api.GetTimeEntriesAsync(monthlyRange.From, monthlyRange.To, ct);
             var running = await Api.GetTimerAsync(ct);
-            return (selected, running);
+            return (selected, monthly, running);
         }, result =>
         {
             entries = result.selected;
+            monthlyEntries = result.monthly;
+            monthFrom = monthlyRange.From;
+            monthTo = monthlyRange.To;
             runningEntry = result.running;
             loaded = true;
             calendarDirty = true;
@@ -145,12 +160,13 @@ public partial class Time : IAsyncDisposable
     {
         await DisposeCalendarAsync();
         calendarView = false;
+        await LoadAsync();
     }
 
-    private void ShowCalendar()
+    private async Task ShowCalendar()
     {
         calendarView = true;
-        calendarDirty = true;
+        await LoadAsync();
     }
 
     private Task StartAsync() => RunAsync(async ct =>
@@ -320,7 +336,7 @@ public partial class Time : IAsyncDisposable
     }
 
     private double DaySeconds(DateTime day, IEnumerable<TimeEntryModel> daily) => daily.Sum(e => UserTime.Seconds(e.Start, e.End, now, UserTime.Instant(day, User.Settings.TimeZone), UserTime.Instant(day.AddDays(1), User.Settings.TimeZone)));
-    private double TotalSeconds() => entries.Sum(e => UserTime.Seconds(e.Start, e.End, now, from, to));
+    private double TotalSeconds() => monthlyEntries.Sum(e => UserTime.Seconds(e.Start, e.End, now, monthFrom, monthTo));
     private bool Overlaps(TimeEntryModel entry) => entries.Any(e => e.Id != entry.Id && e.Start < (entry.End ?? now) && (e.End ?? now) > entry.Start);
     private async Task DisposeCalendarAsync()
     {
