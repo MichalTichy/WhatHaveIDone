@@ -58,4 +58,16 @@ Server pracuje s mými časovými záznamy, projekty, použitými tagy, přehled
   <data name="NoFeedback" xml:space="preserve"><value>Zatím žádná zpětná vazba.</value></data>
   <data name="MarkFeedbackResolved" xml:space="preserve"><value>Označit jako vyřešené</value></data>
   <data name="MoreFeedback" xml:space="preserve"><value>Načíst další</value></data>
+  <data name="ReportStatistics" xml:space="preserve"><value>Statistiky</value></data>
+  <data name="ReportStatisticsPastDays" xml:space="preserve"><value>Pouze dny před dneškem ve vybraném období a s aktivními filtry. Dny volna jsou víkendy a české svátky.</value></data>
+  <data name="StatisticAverageWorkedDay" xml:space="preserve"><value>Průměr za den s prací</value></data>
+  <data name="StatisticShortWorkedDays" xml:space="preserve"><value>Dny s prací pod 2 h</value></data>
+  <data name="StatisticShortWorkedDaysOff" xml:space="preserve"><value>Z toho o víkendu nebo svátku</value></data>
+  <data name="StatisticLongWorkedDays" xml:space="preserve"><value>Dny s 8+ h</value></data>
+  <data name="StatisticWorkdaysWithoutEntries" xml:space="preserve"><value>Pracovní dny bez záznamu</value></data>
+  <data name="StatisticOffDayTime" xml:space="preserve"><value>Čas o víkendech a svátcích</value></data>
+  <data name="StatisticOffDayTimePercentage" xml:space="preserve"><value>Podíl času ve dnech volna</value></data>
+  <data name="StatisticMedianWorkedDay" xml:space="preserve"><value>Medián za den s prací</value></data>
+  <data name="StatisticLongestWorkedStreak" xml:space="preserve"><value>Nejdelší série dnů s prací</value></data>
+  <data name="StatisticDays" xml:space="preserve"><value>{0:N0} d</value></data>
 </root>

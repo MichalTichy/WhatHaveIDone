@@ -398,7 +398,3 @@ button.report-day { padding: 0; min-height: 30px; border-radius: 5px; color: var
 @keyframes report-day-pulse {
     to { background-color: #7558ad; }
 }
-.report-grid:has(.report-month:nth-child(3)) { align-items: start; }
-@media (min-width: 1100px) {
-    .report-grid:has(.report-month:nth-child(3)) { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
-}

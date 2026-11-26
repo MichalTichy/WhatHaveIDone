@@ -1,2 +1,3 @@
 namespace WhatHaveIDone.API.Models;
-public sealed record ReportModel(DateTimeOffset CalculatedAt, double TotalSeconds, List<ReportBucket> Projects, List<ReportBucket> Days, List<TimeEntryModel> Entries);
+public sealed record ReportModel(DateTimeOffset CalculatedAt, double TotalSeconds, List<ReportBucket> Projects,
+    List<ReportBucket> Days, List<TimeEntryModel> Entries, IReadOnlyList<DataStatistics> Statistics);

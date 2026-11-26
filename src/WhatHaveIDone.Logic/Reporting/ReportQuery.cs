@@ -8,7 +8,8 @@ using WhatHaveIDone.Models;
 
 namespace WhatHaveIDone.Logic.Reporting;
 
-public sealed class ReportQuery(IReadOnlyRepository<TimeEntry> entries, IReadOnlyRepository<UserProfile> profiles, TimeProvider clock)
+public sealed class ReportQuery(IReadOnlyRepository<TimeEntry> entries, IReadOnlyRepository<UserProfile> profiles,
+    TimeProvider clock, IStatisticsProvider statisticsProvider)
 {
     public async Task<ReportModel> RunAsync(DateTimeOffset from, DateTimeOffset to, string? project, string? tag, string? text, CancellationToken cancellationToken)
     {
@@ -18,7 +19,7 @@ public sealed class ReportQuery(IReadOnlyRepository<TimeEntry> entries, IReadOnl
         var now = clock.GetUtcNow();
         var projects = selected.GroupBy(e => e.ProjectId ?? "none").Select(g => new ReportBucket(g.Key, g.Sum(e => Seconds(e, from, to, now)))).OrderByDescending(g => g.Seconds).ToList();
         var zone = TimeZoneInfo.FindSystemTimeZoneById(profile.TimeZone);
-        var days = new Dictionary<string,double>();
+        var days = new Dictionary<DateOnly, double>();
         foreach (var entry in selected)
         {
             var clippedStart = entry.Start > from ? entry.Start : from;
@@ -29,10 +30,16 @@ public sealed class ReportQuery(IReadOnlyRepository<TimeEntry> entries, IReadOnl
                 var start = DayStart(day, zone); var end = DayStart(day.AddDays(1), zone);
                 var seconds = Seconds(entry, start > from ? start : from, end < to ? end : to, now);
                 if (seconds <= 0) continue;
-                var key = day.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture); days[key] = days.GetValueOrDefault(key) + seconds;
+                var key = DateOnly.FromDateTime(day); days[key] = days.GetValueOrDefault(key) + seconds;
             }
         }
-        return new ReportModel(now, projects.Sum(g => g.Seconds), projects, days.OrderBy(d=>d.Key).Select(d=>new ReportBucket(d.Key,d.Value)).ToList(), selected);
+        var statistics = statisticsProvider.Calculate(days,
+            DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(from, zone).DateTime),
+            DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(to.AddTicks(-1), zone).DateTime),
+            DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, zone).DateTime), cancellationToken);
+        return new ReportModel(now, projects.Sum(g => g.Seconds), projects,
+            days.OrderBy(d => d.Key).Select(d => new ReportBucket(d.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), d.Value)).ToList(),
+            selected, statistics);
     }
     public static double Seconds(TimeEntryModel entry, DateTimeOffset from, DateTimeOffset to, DateTimeOffset now)
         => to <= from ? 0 : Math.Max(0, ((entry.End ?? now) < to ? entry.End ?? now : to).Subtract(entry.Start > from ? entry.Start : from).TotalSeconds);

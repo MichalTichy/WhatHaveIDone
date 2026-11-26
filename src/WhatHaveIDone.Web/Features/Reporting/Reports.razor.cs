@@ -135,6 +135,38 @@ public partial class Reports
             .Select(day => month.AddDays(day - 1))
             .Where(day => day >= activityFrom && day <= activityThrough);
 
+    private double MonthSeconds(DateTime month) => ActivityDays(month).Sum(day => activity.GetValueOrDefault(day));
+
+    private static string StatisticLabel(StatisticKind name) => name switch
+    {
+        StatisticKind.AverageWorkedDay => Strings.StatisticAverageWorkedDay,
+        StatisticKind.ShortWorkedDays => Strings.StatisticShortWorkedDays,
+        StatisticKind.ShortWorkedDaysOff => Strings.StatisticShortWorkedDaysOff,
+        StatisticKind.LongWorkedDays => Strings.StatisticLongWorkedDays,
+        StatisticKind.WorkdaysWithoutEntries => Strings.StatisticWorkdaysWithoutEntries,
+        StatisticKind.OffDayTime => Strings.StatisticOffDayTime,
+        StatisticKind.OffDayTimePercentage => Strings.StatisticOffDayTimePercentage,
+        StatisticKind.MedianWorkedDay => Strings.StatisticMedianWorkedDay,
+        StatisticKind.LongestWorkedStreak => Strings.StatisticLongestWorkedStreak,
+        _ => throw new ArgumentOutOfRangeException(nameof(name))
+    };
+
+    private static string StatisticValue(DataStatistics statistic)
+    {
+        if (statistic.Value is not { } value)
+        {
+            return "—";
+        }
+
+        return statistic.Unit switch
+        {
+            StatisticUnit.Seconds => UserTime.Duration(value),
+            StatisticUnit.Days => string.Format(Strings.StatisticDays, value),
+            StatisticUnit.Percentage => value.ToString("N1", CultureInfo.CurrentCulture) + " %",
+            _ => throw new ArgumentOutOfRangeException(nameof(statistic))
+        };
+    }
+
     private static int ActivityLevel(double seconds) => (seconds / 3600) switch
     {
         <= 0 => 0,

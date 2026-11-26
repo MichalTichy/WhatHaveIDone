@@ -58,4 +58,16 @@ This server accesses my time entries, projects, used tags, reports and timer. Re
   <data name="NoFeedback" xml:space="preserve"><value>No feedback yet.</value></data>
   <data name="MarkFeedbackResolved" xml:space="preserve"><value>Mark as resolved</value></data>
   <data name="MoreFeedback" xml:space="preserve"><value>Load more</value></data>
+  <data name="ReportStatistics" xml:space="preserve"><value>Statistics</value></data>
+  <data name="ReportStatisticsPastDays" xml:space="preserve"><value>Only days before today, using the selected period and filters. Weekends and Czech public holidays count as days off.</value></data>
+  <data name="StatisticAverageWorkedDay" xml:space="preserve"><value>Average per day with work</value></data>
+  <data name="StatisticShortWorkedDays" xml:space="preserve"><value>Days with work under 2 h</value></data>
+  <data name="StatisticShortWorkedDaysOff" xml:space="preserve"><value>Of these, weekends or holidays</value></data>
+  <data name="StatisticLongWorkedDays" xml:space="preserve"><value>Days with 8+ h</value></data>
+  <data name="StatisticWorkdaysWithoutEntries" xml:space="preserve"><value>Workdays without entries</value></data>
+  <data name="StatisticOffDayTime" xml:space="preserve"><value>Time on weekends and holidays</value></data>
+  <data name="StatisticOffDayTimePercentage" xml:space="preserve"><value>Share of time on days off</value></data>
+  <data name="StatisticMedianWorkedDay" xml:space="preserve"><value>Median per day with work</value></data>
+  <data name="StatisticLongestWorkedStreak" xml:space="preserve"><value>Longest streak of days with work</value></data>
+  <data name="StatisticDays" xml:space="preserve"><value>{0:N0} d</value></data>
 </root>

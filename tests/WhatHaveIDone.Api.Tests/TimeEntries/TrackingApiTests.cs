@@ -116,6 +116,8 @@ public sealed class TrackingApiTests(IntegrationFixture fixture)
         await owner.PostAsync<TimeEntryModel>("time-entries",input);
         var query="from=2026-03-28T23%3A00%3A00Z&to=2026-03-29T22%3A00%3A00Z&tag=filter&text=dst";
         var report=await owner.GetAsync<ReportModel>("reports?"+query);Assert.Equal(23*3600,report.TotalSeconds);Assert.Single(report.Days);Assert.Equal(report.TotalSeconds,report.Days[0].Seconds);
+        Assert.Equal(23 * 3600, report.Statistics.Single(s => s.Name == StatisticKind.AverageWorkedDay).Value);
+        Assert.Equal(1, report.Statistics.Single(s => s.Name == StatisticKind.LongWorkedDays).Value);
         var csv=await owner.Http.GetStringAsync("/api/v1/reports.csv?"+query);Assert.Contains("82800",csv);Assert.Contains("DST",csv);
     }
     [Fact] public async Task ZeroLengthEntriesAtThePeriodBoundaryRemainVisibleAsync()

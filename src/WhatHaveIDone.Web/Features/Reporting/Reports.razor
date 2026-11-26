@@ -21,7 +21,7 @@ else if(report is not null)
 {
     @if (!detail)
     {
-        <div class="report-grid">
+        <div class="report-grid report-overview">
             <section class="surface">
                 <h2>@Strings.ByProject</h2>
                 @if (projectPie is not null)
@@ -49,7 +49,10 @@ else if(report is not null)
                     @foreach (var month in ActivityMonths())
                     {
                         <div class="report-month" @key="month">
-                            <h3>@month.ToString("Y")</h3>
+                            <div class="report-month-heading">
+                                <h3>@month.ToString("Y")</h3>
+                                <strong title="@Strings.Total">@UserTime.Duration(MonthSeconds(month))</strong>
+                            </div>
                             <div class="report-month-grid">
                                 @foreach (var weekday in WeekdayLabels())
                                 {
@@ -68,6 +71,19 @@ else if(report is not null)
                         </div>
                     }
                 </div>
+            </section>
+            <section class="surface report-statistics">
+                <h2>@Strings.ReportStatistics</h2>
+                <p class="muted">@Strings.ReportStatisticsPastDays</p>
+                <dl>
+                    @foreach (var statistic in report.Statistics)
+                    {
+                        <div class="report-statistic @(statistic.Name == StatisticKind.ShortWorkedDaysOff ? "report-statistic-subset" : "")">
+                            <dt>@StatisticLabel(statistic.Name)</dt>
+                            <dd>@StatisticValue(statistic)</dd>
+                        </div>
+                    }
+                </dl>
             </section>
         </div>
     }

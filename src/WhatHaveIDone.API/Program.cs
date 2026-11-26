@@ -42,6 +42,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddMediatR(o => o.RegisterServicesFromAssemblyContaining<SaveTimeEntryUsecase>());
 builder.Services.AddScoped<TagCatalog>();
 builder.Services.AddScoped<ReportQuery>();
+builder.Services.AddScoped<IStatisticsProvider, StatisticsProvider>();
 builder.Services.AddScoped<WhatHaveIDone.Logic.Predictions.PredictionService>();
 builder.Services.AddHttpClient<TogglImportClient>(http=>{http.BaseAddress=new Uri("https://api.track.toggl.com/");http.Timeout=TimeSpan.FromSeconds(60);});
 if(builder.Configuration.GetValue<bool?>("Import:WorkerEnabled")!=false)builder.Services.AddHostedService<ImportWorker>();
