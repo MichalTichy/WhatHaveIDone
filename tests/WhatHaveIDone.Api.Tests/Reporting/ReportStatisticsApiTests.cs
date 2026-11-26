@@ -67,4 +67,32 @@ public sealed class ReportStatisticsApiTests(IntegrationFixture fixture)
         Assert.Single(pastOnly.Days);
         Assert.Equal(report.Statistics, pastOnly.Statistics);
     }
+    [Fact]
+    public async Task PreviousStatisticsUseLocalCalendarDaysAcrossDstAndKeepFiltersAndTenancyAsync()
+    {
+        using var owner = await fixture.CreateOwnerAsync();
+        using var other = await fixture.CreateOwnerAsync();
+        var settings = await owner.GetAsync<SettingsModel>("settings");
+        await owner.PutAsync<bool>("settings", settings with { TimeZone = "Europe/Prague" });
+        var store = fixture.App.Services.GetRequiredService<IDocumentStore>();
+        foreach (var tenant in new[] { owner.Owner, other.Owner })
+        {
+            await using var session = store.LightweightSession(tenant);
+            session.Insert(new TimeEntry { Id = "selected", CompatibilityId = 200,
+                Start = DateTimeOffset.Parse("2026-03-28T23:00:00Z"), End = DateTimeOffset.Parse("2026-03-29T22:00:00Z"), Tags = ["compare"] });
+            session.Insert(new TimeEntry { Id = "ignored", CompatibilityId = 201,
+                Start = DateTimeOffset.Parse("2026-03-28T23:00:00Z"), End = DateTimeOffset.Parse("2026-03-29T22:00:00Z"), Tags = ["other"] });
+            session.Insert(new TimeEntry { Id = "current", CompatibilityId = 202,
+                Start = DateTimeOffset.Parse("2026-03-30T08:00:00Z"), End = DateTimeOffset.Parse("2026-03-30T10:00:00Z"), Tags = ["compare"] });
+            await session.SaveChangesAsync();
+        }
+        var report = await owner.GetAsync<ReportModel>("reports?from=2026-03-30T00:00:00%2B02:00&to=2026-03-31T00:00:00%2B02:00&tag=compare");
+        Assert.Equal(7200, report.TotalSeconds);
+        Assert.Single(report.Entries);
+        Assert.Equal(new DateOnly(2026, 3, 29), report.Comparison!.From);
+        Assert.Equal(report.Comparison.From, report.Comparison.Through);
+        Assert.Equal(23 * 3600, report.Comparison.Statistics.Single(s => s.Name == StatisticKind.TotalTrackedTime).Value);
+        Assert.Equal(1, report.Comparison.Statistics.Single(s => s.Name == StatisticKind.WorkedDays).Value);
+    }
+
 }

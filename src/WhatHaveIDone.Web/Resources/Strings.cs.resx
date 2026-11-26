@@ -88,4 +88,8 @@ Server pracuje s mými časovými záznamy, projekty, použitými tagy, přehled
   <data name="StatisticNoEntriesDescription" xml:space="preserve"><value>Pracovní dny bez času odpovídajícího vybraným filtrům. Nemusí jít o dovolenou.</value></data>
   <data name="StatisticFreeWorkdaysDescription" xml:space="preserve"><value>Pracovní dny bez vykázané práce nebo s méně než dvěma hodinami práce. Zahrnuje i předchozí řádek.</value></data>
   <data name="StatisticStreakDescription" xml:space="preserve"><value>Po sobě jdoucí kalendářní dny s prací ve vybraném období, bez dneška a budoucnosti.</value></data>
+  <data name="StatisticComparisonPeriod" xml:space="preserve"><value>Změna oproti {0:d} – {1:d}</value></data>
+  <data name="StatisticNoChange" xml:space="preserve"><value>Beze změny</value></data>
+  <data name="StatisticComparisonUnavailable" xml:space="preserve"><value>Nelze porovnat</value></data>
+  <data name="StatisticPercentagePoints" xml:space="preserve"><value>{0} p. b.</value></data>
 </root>

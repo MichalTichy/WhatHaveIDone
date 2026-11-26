@@ -215,6 +215,33 @@ public partial class Reports
         };
     }
 
+    private string StatisticChange(DataStatistics statistic)
+    {
+        var previous = report!.Comparison?.Statistics.FirstOrDefault(s => s.Name == statistic.Name);
+        if (statistic.Value is not { } current || previous?.Value is not { } before)
+        {
+            return Strings.StatisticComparisonUnavailable;
+        }
+
+        var difference = current - before;
+        // Compare at the displayed precision so small differences do not become “+0 min”.
+        var rounded = statistic.Unit switch
+        {
+            StatisticUnit.Seconds => Math.Round(difference / 60, MidpointRounding.AwayFromZero),
+            StatisticUnit.Percentage => Math.Round(difference, 1, MidpointRounding.AwayFromZero),
+            _ => difference
+        };
+        if (rounded == 0)
+        {
+            return Strings.StatisticNoChange;
+        }
+
+        var magnitude = statistic.Unit == StatisticUnit.Percentage
+            ? string.Format(Strings.StatisticPercentagePoints, Math.Abs(rounded).ToString("N1", CultureInfo.CurrentCulture))
+            : StatisticValue(statistic with { Value = statistic.Unit == StatisticUnit.Seconds ? Math.Abs(rounded) * 60 : Math.Abs(rounded) });
+        return (rounded > 0 ? "+" : "−") + magnitude;
+    }
+
     private static string StatisticDuration(double seconds)
     {
         var minutes = (long)Math.Round(seconds / 60, MidpointRounding.AwayFromZero);

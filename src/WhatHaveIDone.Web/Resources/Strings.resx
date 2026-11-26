@@ -88,4 +88,8 @@ This server accesses my time entries, projects, used tags, reports and timer. Re
   <data name="StatisticNoEntriesDescription" xml:space="preserve"><value>Workdays with no time matching the selected filters. This does not necessarily mean leave.</value></data>
   <data name="StatisticFreeWorkdaysDescription" xml:space="preserve"><value>Workdays with zero recorded work or less than two hours. Includes the days without work above.</value></data>
   <data name="StatisticStreakDescription" xml:space="preserve"><value>Consecutive calendar days with work within the selected period, excluding today and future days.</value></data>
+  <data name="StatisticComparisonPeriod" xml:space="preserve"><value>Change vs. {0:d} – {1:d}</value></data>
+  <data name="StatisticNoChange" xml:space="preserve"><value>No change</value></data>
+  <data name="StatisticComparisonUnavailable" xml:space="preserve"><value>Comparison unavailable</value></data>
+  <data name="StatisticPercentagePoints" xml:space="preserve"><value>{0} pp</value></data>
 </root>

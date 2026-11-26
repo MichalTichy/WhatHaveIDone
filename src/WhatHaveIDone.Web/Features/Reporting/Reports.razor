@@ -76,12 +76,22 @@ else if(report is not null)
                 <h2>@Strings.ReportStatistics</h2>
                 <p class="muted report-statistics-period">@StatisticsPeriod</p>
                 <p class="muted">@Strings.ReportStatisticsScope</p>
+                @if (report.Comparison is { } comparison)
+                {
+                    <p class="muted report-comparison-period">@string.Format(Strings.StatisticComparisonPeriod, comparison.From, comparison.Through)</p>
+                }
                 <dl class="report-statistics-summary">
                     @foreach (var statistic in SummaryStatistics())
                     {
                         <div>
                             <dt>@StatisticLabel(statistic.Name)</dt>
-                            <dd>@StatisticValue(statistic)</dd>
+                            <dd>
+                                <span>@StatisticValue(statistic)</span>
+                                @if (report.Comparison is not null)
+                                {
+                                    <small class="statistic-change">@StatisticChange(statistic)</small>
+                                }
+                            </dd>
                         </div>
                     }
                 </dl>
@@ -94,7 +104,13 @@ else if(report is not null)
                             {
                                 <div class="report-statistic @(IsSubStatistic(statistic.Name) ? "report-statistic-subset" : "")">
                                     <dt title="@StatisticDescription(statistic.Name)">@StatisticLabel(statistic.Name)</dt>
-                                    <dd>@StatisticValue(statistic)</dd>
+                                    <dd>
+                                        <span>@StatisticValue(statistic)</span>
+                                        @if (report.Comparison is not null)
+                                        {
+                                            <small class="statistic-change">@StatisticChange(statistic)</small>
+                                        }
+                                    </dd>
                                 </div>
                             }
                         </dl>

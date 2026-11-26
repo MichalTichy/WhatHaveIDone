@@ -19,6 +19,34 @@ public sealed class ReportQuery(IReadOnlyRepository<TimeEntry> entries, IReadOnl
         var now = clock.GetUtcNow();
         var projects = selected.GroupBy(e => e.ProjectId ?? "none").Select(g => new ReportBucket(g.Key, g.Sum(e => Seconds(e, from, to, now)))).OrderByDescending(g => g.Seconds).ToList();
         var zone = TimeZoneInfo.FindSystemTimeZoneById(profile.TimeZone);
+        var days = DailyTotals(selected, from, to, now, zone, cancellationToken);
+        var localFrom = TimeZoneInfo.ConvertTime(from, zone).DateTime;
+        var localTo = TimeZoneInfo.ConvertTime(to, zone).DateTime;
+        var today = TimeZoneInfo.ConvertTime(now, zone).Date;
+        var statistics = statisticsProvider.Calculate(days,
+            DateOnly.FromDateTime(localFrom), DateOnly.FromDateTime(localTo.AddTicks(-1)),
+            DateOnly.FromDateTime(today), cancellationToken);
+        StatisticsComparison? comparison = null;
+        if (StatisticsComparisonPeriod.Previous(localFrom, localTo, today) is { } previous)
+        {
+            var previousFrom = DayStart(previous.From, zone);
+            var previousTo = DayStart(previous.To, zone);
+            var previousEntries = await entries.ListAsync(
+                new TimeEntriesSpecification(previousFrom, previousTo, project, tag, text), cancellationToken);
+            var previousDays = DailyTotals(previousEntries, previousFrom, previousTo, now, zone, cancellationToken);
+            var previousFirst = DateOnly.FromDateTime(previous.From);
+            var previousLast = DateOnly.FromDateTime(previous.To.AddTicks(-1));
+            comparison = new StatisticsComparison(previousFirst, previousLast,
+                statisticsProvider.Calculate(previousDays, previousFirst, previousLast, DateOnly.FromDateTime(today), cancellationToken));
+        }
+        return new ReportModel(now, projects.Sum(g => g.Seconds), projects,
+            days.OrderBy(d => d.Key).Select(d => new ReportBucket(d.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), d.Value)).ToList(),
+            selected, statistics, comparison);
+    }
+
+    private static Dictionary<DateOnly, double> DailyTotals(IEnumerable<TimeEntryModel> selected,
+        DateTimeOffset from, DateTimeOffset to, DateTimeOffset now, TimeZoneInfo zone, CancellationToken cancellationToken)
+    {
         var days = new Dictionary<DateOnly, double>();
         foreach (var entry in selected)
         {
@@ -33,14 +61,9 @@ public sealed class ReportQuery(IReadOnlyRepository<TimeEntry> entries, IReadOnl
                 var key = DateOnly.FromDateTime(day); days[key] = days.GetValueOrDefault(key) + seconds;
             }
         }
-        var statistics = statisticsProvider.Calculate(days,
-            DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(from, zone).DateTime),
-            DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(to.AddTicks(-1), zone).DateTime),
-            DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, zone).DateTime), cancellationToken);
-        return new ReportModel(now, projects.Sum(g => g.Seconds), projects,
-            days.OrderBy(d => d.Key).Select(d => new ReportBucket(d.Key.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), d.Value)).ToList(),
-            selected, statistics);
+        return days;
     }
+
     public static double Seconds(TimeEntryModel entry, DateTimeOffset from, DateTimeOffset to, DateTimeOffset now)
         => to <= from ? 0 : Math.Max(0, ((entry.End ?? now) < to ? entry.End ?? now : to).Subtract(entry.Start > from ? entry.Start : from).TotalSeconds);
     private static DateTimeOffset DayStart(DateTime local, TimeZoneInfo zone)
