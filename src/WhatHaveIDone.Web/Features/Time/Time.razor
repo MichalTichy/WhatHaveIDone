@@ -78,7 +78,7 @@ else if (loaded)
     else if (entries.Count == 0) { <section class="surface empty">@Strings.EmptyTime</section> }
     else
     {
-        <section class="surface entries">@foreach(var day in Days())
+        <section class="surface entries">@foreach(var day in Days().Reverse())
         {
             var daily = DayEntries(day).ToList();
             @if (daily.Count > 0)
