@@ -40,9 +40,15 @@ public partial class Time : IAsyncDisposable
 
     private void SetRange()
     {
-        var start = narrow ? selectedDay.Date : selectedDay.Date.AddDays(-((7 + (int)selectedDay.DayOfWeek - User.Settings.FirstDayOfWeek) % 7));
+        var start = narrow ? selectedDay.Date : selectedDay.Date.AddDays(-6);
+        var end = selectedDay.Date.AddDays(1);
+        if (calendarView && !narrow)
+        {
+            start = selectedDay.Date.AddDays(-((7 + (int)selectedDay.DayOfWeek - User.Settings.FirstDayOfWeek) % 7));
+            end = start.AddDays(7);
+        }
         from = UserTime.Instant(start, User.Settings.TimeZone);
-        to = UserTime.Instant(start.AddDays(narrow ? 1 : 7), User.Settings.TimeZone);
+        to = UserTime.Instant(end, User.Settings.TimeZone);
     }
 
     private Task LoadAsync()
@@ -154,12 +160,13 @@ public partial class Time : IAsyncDisposable
     {
         await DisposeCalendarAsync();
         calendarView = false;
+        await LoadAsync();
     }
 
-    private void ShowCalendar()
+    private async Task ShowCalendar()
     {
         calendarView = true;
-        calendarDirty = true;
+        await LoadAsync();
     }
 
     private Task StartAsync() => RunAsync(async ct =>
