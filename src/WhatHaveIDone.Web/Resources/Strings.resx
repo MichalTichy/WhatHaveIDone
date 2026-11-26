@@ -58,4 +58,5 @@ This server accesses my time entries, projects, used tags, reports and timer. Re
   <data name="NoFeedback" xml:space="preserve"><value>No feedback yet.</value></data>
   <data name="MarkFeedbackResolved" xml:space="preserve"><value>Mark as resolved</value></data>
   <data name="MoreFeedback" xml:space="preserve"><value>Load more</value></data>
+  <data name="MonthTotal" xml:space="preserve"><value>Total for {0}</value></data>
 </root>

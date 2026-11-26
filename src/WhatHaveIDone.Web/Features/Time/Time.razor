@@ -64,7 +64,17 @@
         <input aria-label="@Strings.Period" class="date-input" type="date" @bind="selectedDay" @bind:format="yyyy-MM-dd" @bind:after="LoadAsync" />
     </div>
     <div style="text-align: right">
-        <strong class="period-total"><span>@Strings.Total</span> @UserTime.Duration(TotalSeconds())</strong>
+        <strong class="period-total">
+            <span>@string.Format(Strings.MonthTotal, selectedDay.ToString("MMMM yyyy"))</span>
+            @if (IsLoading)
+            {
+                <span role="status" aria-label="@Strings.Loading">…</span>
+            }
+            else if (loaded && Error is null)
+            {
+                @UserTime.Duration(TotalSeconds())
+            }
+        </strong>
         @if (User.Settings.PredictionEnabled)
         {
             <MonthlyPrediction Revision="predictionRevision" />

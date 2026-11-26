@@ -58,4 +58,5 @@ Server pracuje s mými časovými záznamy, projekty, použitými tagy, přehled
   <data name="NoFeedback" xml:space="preserve"><value>Zatím žádná zpětná vazba.</value></data>
   <data name="MarkFeedbackResolved" xml:space="preserve"><value>Označit jako vyřešené</value></data>
   <data name="MoreFeedback" xml:space="preserve"><value>Načíst další</value></data>
+  <data name="MonthTotal" xml:space="preserve"><value>Celkem za {0}</value></data>
 </root>
