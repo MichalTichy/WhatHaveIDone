@@ -27,11 +27,17 @@ public sealed class StatisticsTests
         var result = Calculate(days, from, today.AddDays(10), today);
 
         Assert.Equal(12.5 * 3600 / 5, result[StatisticKind.AverageWorkedDay]);
+        Assert.Equal(12.5 * 3600, result[StatisticKind.TotalTrackedTime]);
+        Assert.Equal(5, result[StatisticKind.WorkedDays]);
+        Assert.Equal(2, result[StatisticKind.WorkedDaysOff]);
+        Assert.Equal(11 * 3600 / 3, result[StatisticKind.AverageWorkedWorkday]);
+        Assert.Equal(0.75 * 3600, result[StatisticKind.AverageWorkedDayOff]);
         Assert.Equal(3600, result[StatisticKind.MedianWorkedDay]);
         Assert.Equal(3, result[StatisticKind.ShortWorkedDays]);
         Assert.Equal(2, result[StatisticKind.ShortWorkedDaysOff]);
         Assert.Equal(1, result[StatisticKind.LongWorkedDays]);
         Assert.Equal(1, result[StatisticKind.WorkdaysWithoutEntries]);
+        Assert.Equal(2, result[StatisticKind.WorkdaysWithUnderTwoHours]);
         Assert.Equal(1.5 * 3600, result[StatisticKind.OffDayTime]);
         Assert.Equal(12, result[StatisticKind.OffDayTimePercentage]);
         Assert.Equal(3, result[StatisticKind.LongestWorkedStreak]);
@@ -44,10 +50,14 @@ public sealed class StatisticsTests
         var result = Calculate(new Dictionary<DateOnly, double>(), from, from.AddDays(4), from.AddDays(10));
 
         Assert.Equal(1, result[StatisticKind.WorkdaysWithoutEntries]);
+        Assert.Equal(1, result[StatisticKind.WorkdaysWithUnderTwoHours]);
         Assert.Null(result[StatisticKind.AverageWorkedDay]);
+        Assert.Null(result[StatisticKind.AverageWorkedWorkday]);
+        Assert.Null(result[StatisticKind.AverageWorkedDayOff]);
         Assert.Null(result[StatisticKind.MedianWorkedDay]);
-        Assert.All(result.Where(s => s.Key is not (StatisticKind.WorkdaysWithoutEntries
-            or StatisticKind.AverageWorkedDay or StatisticKind.MedianWorkedDay)), s => Assert.Equal(0, s.Value));
+        Assert.All(result.Where(s => s.Key is not (StatisticKind.WorkdaysWithoutEntries or StatisticKind.WorkdaysWithUnderTwoHours
+            or StatisticKind.AverageWorkedDay or StatisticKind.AverageWorkedWorkday
+            or StatisticKind.AverageWorkedDayOff or StatisticKind.MedianWorkedDay)), s => Assert.Equal(0, s.Value));
     }
 
     [Theory]
@@ -60,6 +70,8 @@ public sealed class StatisticsTests
             today.AddDays(offset), today.AddDays(20), today);
 
         Assert.Null(result[StatisticKind.AverageWorkedDay]);
+        Assert.Null(result[StatisticKind.AverageWorkedWorkday]);
+        Assert.Null(result[StatisticKind.AverageWorkedDayOff]);
         Assert.Null(result[StatisticKind.MedianWorkedDay]);
         Assert.All(result.Where(s => s.Value.HasValue), s => Assert.Equal(0, s.Value));
     }
@@ -81,6 +93,7 @@ public sealed class StatisticsTests
         Assert.Equal(5 * 3600, result[StatisticKind.MedianWorkedDay]);
         Assert.Equal(5 * 3600, result[StatisticKind.AverageWorkedDay]);
         Assert.Equal(0, result[StatisticKind.ShortWorkedDays]);
+        Assert.Equal(0, result[StatisticKind.WorkdaysWithUnderTwoHours]);
         Assert.Equal(1, result[StatisticKind.LongWorkedDays]);
         Assert.Equal(2, result[StatisticKind.LongestWorkedStreak]);
     }
@@ -104,6 +117,21 @@ public sealed class StatisticsTests
         cancellation.Cancel();
         var day = new DateOnly(2026, 11, 23);
         Assert.Throws<OperationCanceledException>(() => provider.Calculate(new Dictionary<DateOnly, double>(), day, day, day.AddDays(1), cancellation.Token));
+    }
+
+    [Theory]
+    [InlineData(16, true)] // Monday.
+    [InlineData(17, false)] // Czech holiday on Tuesday.
+    [InlineData(21, false)] // Saturday.
+    public void SubAveragesCountOnlyDaysWithWorkAndLeaveAbsentGroupUndefined(int dayOfMonth, bool isWorkday)
+    {
+        var day = new DateOnly(2026, 11, dayOfMonth);
+        var days = new Dictionary<DateOnly, double> { [day] = 3 * 3600, [day.AddDays(1)] = 0 };
+        var result = Calculate(days, day, day.AddDays(1), day.AddDays(2));
+
+        Assert.Equal(3 * 3600, result[StatisticKind.AverageWorkedDay]);
+        Assert.Equal(isWorkday ? 3 * 3600 : null, result[StatisticKind.AverageWorkedWorkday]);
+        Assert.Equal(isWorkday ? null : 3 * 3600, result[StatisticKind.AverageWorkedDayOff]);
     }
 
     private Dictionary<StatisticKind, double?> Calculate(IReadOnlyDictionary<DateOnly, double> days,

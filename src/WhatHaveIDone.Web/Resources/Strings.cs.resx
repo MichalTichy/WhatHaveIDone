@@ -59,16 +59,33 @@ Server pracuje s mými časovými záznamy, projekty, použitými tagy, přehled
   <data name="MarkFeedbackResolved" xml:space="preserve"><value>Označit jako vyřešené</value></data>
   <data name="MoreFeedback" xml:space="preserve"><value>Načíst další</value></data>
   <data name="ReportStatistics" xml:space="preserve"><value>Statistiky</value></data>
-  <data name="ReportStatisticsPastDays" xml:space="preserve"><value>Pouze dny před dneškem ve vybraném období a s aktivními filtry. Dny volna jsou víkendy a české svátky.</value></data>
-  <data name="StatisticAverageWorkedDay" xml:space="preserve"><value>Průměr za den s prací</value></data>
+  <data name="StatisticAverageWorkedDay" xml:space="preserve"><value>Průměr</value></data>
   <data name="StatisticShortWorkedDays" xml:space="preserve"><value>Dny s prací pod 2 h</value></data>
   <data name="StatisticShortWorkedDaysOff" xml:space="preserve"><value>Z toho o víkendu nebo svátku</value></data>
   <data name="StatisticLongWorkedDays" xml:space="preserve"><value>Dny s 8+ h</value></data>
-  <data name="StatisticWorkdaysWithoutEntries" xml:space="preserve"><value>Pracovní dny bez záznamu</value></data>
-  <data name="StatisticOffDayTime" xml:space="preserve"><value>Čas o víkendech a svátcích</value></data>
-  <data name="StatisticOffDayTimePercentage" xml:space="preserve"><value>Podíl času ve dnech volna</value></data>
-  <data name="StatisticMedianWorkedDay" xml:space="preserve"><value>Medián za den s prací</value></data>
-  <data name="StatisticLongestWorkedStreak" xml:space="preserve"><value>Nejdelší série dnů s prací</value></data>
-  <data name="StatisticDays" xml:space="preserve"><value>{0:N0} d</value></data>
+  <data name="StatisticWorkdaysWithoutEntries" xml:space="preserve"><value>Bez vykázané práce</value></data>
+  <data name="StatisticOffDayTime" xml:space="preserve"><value>Odpracovaný čas</value></data>
+  <data name="StatisticOffDayTimePercentage" xml:space="preserve"><value>Podíl z celkového času</value></data>
+  <data name="StatisticMedianWorkedDay" xml:space="preserve"><value>Typický den (medián)</value></data>
+  <data name="StatisticLongestWorkedStreak" xml:space="preserve"><value>Nejdelší série dnů</value></data>
   <data name="MonthTotal" xml:space="preserve"><value>Celkem za {0}</value></data>
+  <data name="StatisticAverageWorkedWorkday" xml:space="preserve"><value>V pracovních dnech</value></data>
+  <data name="StatisticAverageWorkedDayOff" xml:space="preserve"><value>O víkendech a svátcích</value></data>
+  <data name="StatisticWorkdaysWithUnderTwoHours" xml:space="preserve"><value>Včetně dnů s prací pod 2 h</value></data>
+  <data name="StatisticTotalTrackedTime" xml:space="preserve"><value>Odpracovaný čas</value></data>
+  <data name="StatisticWorkedDays" xml:space="preserve"><value>Dnů s prací</value></data>
+  <data name="StatisticWorkedDaysOff" xml:space="preserve"><value>Dny s prací</value></data>
+  <data name="ReportStatisticsScope" xml:space="preserve"><value>Podle aktivních filtrů. Pracovní dny jsou po–pá mimo české svátky.</value></data>
+  <data name="ReportStatisticsPeriod" xml:space="preserve"><value>{0:d} – {1:d}</value></data>
+  <data name="ReportStatisticsNoPastDays" xml:space="preserve"><value>Ve vybraném období nejsou žádné uplynulé dny.</value></data>
+  <data name="StatisticGroupDayLength" xml:space="preserve"><value>Délka dne s prací</value></data>
+  <data name="StatisticGroupDayDistribution" xml:space="preserve"><value>Krátké a dlouhé dny</value></data>
+  <data name="StatisticGroupFreeWorkdays" xml:space="preserve"><value>Volné pracovní dny</value></data>
+  <data name="StatisticGroupDaysOff" xml:space="preserve"><value>Víkendy a svátky</value></data>
+  <data name="StatisticGroupStreak" xml:space="preserve"><value>Práce bez přestávky</value></data>
+  <data name="StatisticHoursMinutes" xml:space="preserve"><value>{0:N0} h {1:00} min</value></data>
+  <data name="StatisticMedianDescription" xml:space="preserve"><value>Polovina dnů s prací má tuto nebo kratší dobu.</value></data>
+  <data name="StatisticNoEntriesDescription" xml:space="preserve"><value>Pracovní dny bez času odpovídajícího vybraným filtrům. Nemusí jít o dovolenou.</value></data>
+  <data name="StatisticFreeWorkdaysDescription" xml:space="preserve"><value>Pracovní dny bez vykázané práce nebo s méně než dvěma hodinami práce. Zahrnuje i předchozí řádek.</value></data>
+  <data name="StatisticStreakDescription" xml:space="preserve"><value>Po sobě jdoucí kalendářní dny s prací ve vybraném období, bez dneška a budoucnosti.</value></data>
 </root>

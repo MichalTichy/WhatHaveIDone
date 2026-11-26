@@ -10,5 +10,11 @@ public enum StatisticKind
     OffDayTime,
     OffDayTimePercentage,
     MedianWorkedDay,
-    LongestWorkedStreak
+    LongestWorkedStreak,
+    AverageWorkedWorkday,
+    AverageWorkedDayOff,
+    TotalTrackedTime,
+    WorkedDays,
+    WorkedDaysOff,
+    WorkdaysWithUnderTwoHours
 }

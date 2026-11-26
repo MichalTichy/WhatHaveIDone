@@ -59,16 +59,33 @@ This server accesses my time entries, projects, used tags, reports and timer. Re
   <data name="MarkFeedbackResolved" xml:space="preserve"><value>Mark as resolved</value></data>
   <data name="MoreFeedback" xml:space="preserve"><value>Load more</value></data>
   <data name="ReportStatistics" xml:space="preserve"><value>Statistics</value></data>
-  <data name="ReportStatisticsPastDays" xml:space="preserve"><value>Only days before today, using the selected period and filters. Weekends and Czech public holidays count as days off.</value></data>
-  <data name="StatisticAverageWorkedDay" xml:space="preserve"><value>Average per day with work</value></data>
+  <data name="StatisticAverageWorkedDay" xml:space="preserve"><value>Average</value></data>
   <data name="StatisticShortWorkedDays" xml:space="preserve"><value>Days with work under 2 h</value></data>
   <data name="StatisticShortWorkedDaysOff" xml:space="preserve"><value>Of these, weekends or holidays</value></data>
   <data name="StatisticLongWorkedDays" xml:space="preserve"><value>Days with 8+ h</value></data>
-  <data name="StatisticWorkdaysWithoutEntries" xml:space="preserve"><value>Workdays without entries</value></data>
-  <data name="StatisticOffDayTime" xml:space="preserve"><value>Time on weekends and holidays</value></data>
-  <data name="StatisticOffDayTimePercentage" xml:space="preserve"><value>Share of time on days off</value></data>
-  <data name="StatisticMedianWorkedDay" xml:space="preserve"><value>Median per day with work</value></data>
-  <data name="StatisticLongestWorkedStreak" xml:space="preserve"><value>Longest streak of days with work</value></data>
-  <data name="StatisticDays" xml:space="preserve"><value>{0:N0} d</value></data>
+  <data name="StatisticWorkdaysWithoutEntries" xml:space="preserve"><value>Without recorded work</value></data>
+  <data name="StatisticOffDayTime" xml:space="preserve"><value>Tracked time</value></data>
+  <data name="StatisticOffDayTimePercentage" xml:space="preserve"><value>Share of all tracked time</value></data>
+  <data name="StatisticMedianWorkedDay" xml:space="preserve"><value>Typical day (median)</value></data>
+  <data name="StatisticLongestWorkedStreak" xml:space="preserve"><value>Longest streak of days</value></data>
   <data name="MonthTotal" xml:space="preserve"><value>Total for {0}</value></data>
+  <data name="StatisticAverageWorkedWorkday" xml:space="preserve"><value>On workdays</value></data>
+  <data name="StatisticAverageWorkedDayOff" xml:space="preserve"><value>On weekends and holidays</value></data>
+  <data name="StatisticWorkdaysWithUnderTwoHours" xml:space="preserve"><value>Including days with work under 2 h</value></data>
+  <data name="StatisticTotalTrackedTime" xml:space="preserve"><value>Tracked time</value></data>
+  <data name="StatisticWorkedDays" xml:space="preserve"><value>Days with work</value></data>
+  <data name="StatisticWorkedDaysOff" xml:space="preserve"><value>Days with work</value></data>
+  <data name="ReportStatisticsScope" xml:space="preserve"><value>Based on the active filters. Workdays are Monday–Friday excluding Czech public holidays.</value></data>
+  <data name="ReportStatisticsPeriod" xml:space="preserve"><value>{0:d} – {1:d}</value></data>
+  <data name="ReportStatisticsNoPastDays" xml:space="preserve"><value>No past days in the selected period.</value></data>
+  <data name="StatisticGroupDayLength" xml:space="preserve"><value>Length of a day with work</value></data>
+  <data name="StatisticGroupDayDistribution" xml:space="preserve"><value>Short and long days</value></data>
+  <data name="StatisticGroupFreeWorkdays" xml:space="preserve"><value>Workdays off</value></data>
+  <data name="StatisticGroupDaysOff" xml:space="preserve"><value>Weekends and public holidays</value></data>
+  <data name="StatisticGroupStreak" xml:space="preserve"><value>Consecutive days with work</value></data>
+  <data name="StatisticHoursMinutes" xml:space="preserve"><value>{0:N0} h {1:00} min</value></data>
+  <data name="StatisticMedianDescription" xml:space="preserve"><value>Half of the days with work have this duration or less.</value></data>
+  <data name="StatisticNoEntriesDescription" xml:space="preserve"><value>Workdays with no time matching the selected filters. This does not necessarily mean leave.</value></data>
+  <data name="StatisticFreeWorkdaysDescription" xml:space="preserve"><value>Workdays with zero recorded work or less than two hours. Includes the days without work above.</value></data>
+  <data name="StatisticStreakDescription" xml:space="preserve"><value>Consecutive calendar days with work within the selected period, excluding today and future days.</value></data>
 </root>

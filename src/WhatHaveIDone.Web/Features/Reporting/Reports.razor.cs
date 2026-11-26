@@ -137,9 +137,57 @@ public partial class Reports
 
     private double MonthSeconds(DateTime month) => ActivityDays(month).Sum(day => activity.GetValueOrDefault(day));
 
+    private static bool IsSubStatistic(StatisticKind name) => name is
+        StatisticKind.AverageWorkedWorkday or StatisticKind.AverageWorkedDayOff or StatisticKind.ShortWorkedDaysOff;
+
+    private string StatisticsPeriod
+    {
+        get
+        {
+            var yesterday = UserTime.Local(report!.CalculatedAt, User.Settings.TimeZone).Date.AddDays(-1);
+            var through = activityThrough < yesterday ? activityThrough : yesterday;
+            return activityFrom <= through
+                ? string.Format(Strings.ReportStatisticsPeriod, activityFrom, through)
+                : Strings.ReportStatisticsNoPastDays;
+        }
+    }
+
+    private static bool IsSummaryStatistic(StatisticKind name) => name is StatisticKind.TotalTrackedTime or StatisticKind.WorkedDays;
+
+    private IEnumerable<DataStatistics> SummaryStatistics() => report!.Statistics.Where(s => IsSummaryStatistic(s.Name));
+
+    private IEnumerable<IGrouping<string, DataStatistics>> StatisticGroups() => report!.Statistics
+        .Where(s => !IsSummaryStatistic(s.Name))
+        .GroupBy(s => s.Name switch
+        {
+            StatisticKind.AverageWorkedDay or StatisticKind.AverageWorkedWorkday
+                or StatisticKind.AverageWorkedDayOff or StatisticKind.MedianWorkedDay => Strings.StatisticGroupDayLength,
+            StatisticKind.ShortWorkedDays or StatisticKind.ShortWorkedDaysOff
+                or StatisticKind.LongWorkedDays => Strings.StatisticGroupDayDistribution,
+            StatisticKind.WorkdaysWithoutEntries or StatisticKind.WorkdaysWithUnderTwoHours => Strings.StatisticGroupFreeWorkdays,
+            StatisticKind.WorkedDaysOff or StatisticKind.OffDayTime or StatisticKind.OffDayTimePercentage => Strings.StatisticGroupDaysOff,
+            StatisticKind.LongestWorkedStreak => Strings.StatisticGroupStreak,
+            _ => throw new ArgumentOutOfRangeException(nameof(s.Name))
+        });
+
+    private static string? StatisticDescription(StatisticKind name) => name switch
+    {
+        StatisticKind.MedianWorkedDay => Strings.StatisticMedianDescription,
+        StatisticKind.WorkdaysWithoutEntries => Strings.StatisticNoEntriesDescription,
+        StatisticKind.WorkdaysWithUnderTwoHours => Strings.StatisticFreeWorkdaysDescription,
+        StatisticKind.LongestWorkedStreak => Strings.StatisticStreakDescription,
+        _ => null
+    };
+
     private static string StatisticLabel(StatisticKind name) => name switch
     {
         StatisticKind.AverageWorkedDay => Strings.StatisticAverageWorkedDay,
+        StatisticKind.AverageWorkedWorkday => Strings.StatisticAverageWorkedWorkday,
+        StatisticKind.AverageWorkedDayOff => Strings.StatisticAverageWorkedDayOff,
+        StatisticKind.TotalTrackedTime => Strings.StatisticTotalTrackedTime,
+        StatisticKind.WorkedDays => Strings.StatisticWorkedDays,
+        StatisticKind.WorkedDaysOff => Strings.StatisticWorkedDaysOff,
+        StatisticKind.WorkdaysWithUnderTwoHours => Strings.StatisticWorkdaysWithUnderTwoHours,
         StatisticKind.ShortWorkedDays => Strings.StatisticShortWorkedDays,
         StatisticKind.ShortWorkedDaysOff => Strings.StatisticShortWorkedDaysOff,
         StatisticKind.LongWorkedDays => Strings.StatisticLongWorkedDays,
@@ -160,11 +208,17 @@ public partial class Reports
 
         return statistic.Unit switch
         {
-            StatisticUnit.Seconds => UserTime.Duration(value),
-            StatisticUnit.Days => string.Format(Strings.StatisticDays, value),
+            StatisticUnit.Seconds => StatisticDuration(value),
+            StatisticUnit.Days => value.ToString("N0", CultureInfo.CurrentCulture),
             StatisticUnit.Percentage => value.ToString("N1", CultureInfo.CurrentCulture) + " %",
             _ => throw new ArgumentOutOfRangeException(nameof(statistic))
         };
+    }
+
+    private static string StatisticDuration(double seconds)
+    {
+        var minutes = (long)Math.Round(seconds / 60, MidpointRounding.AwayFromZero);
+        return string.Format(Strings.StatisticHoursMinutes, minutes / 60, minutes % 60);
     }
 
     private static int ActivityLevel(double seconds) => (seconds / 3600) switch

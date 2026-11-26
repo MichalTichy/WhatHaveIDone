@@ -14,6 +14,7 @@ public sealed class StatisticsProvider : IStatisticsProvider
         var longDays = 0;
         var emptyWorkdays = 0;
         var offDaySeconds = 0d;
+        var workedDaysOff = 0;
         var streak = 0;
         var longestStreak = 0;
         var lastDayNumber = Math.Min(through.DayNumber, today.DayNumber - 1);
@@ -44,6 +45,7 @@ public sealed class StatisticsProvider : IStatisticsProvider
                 if (isOff)
                 {
                     offDaySeconds += seconds;
+                    workedDaysOff++;
                 }
             }
             else
@@ -59,17 +61,26 @@ public sealed class StatisticsProvider : IStatisticsProvider
         durations.Sort();
         var total = durations.Sum();
         double? average = durations.Count > 0 ? total / durations.Count : null;
+        var workedWorkdays = durations.Count - workedDaysOff;
+        double? workdayAverage = workedWorkdays > 0 ? (total - offDaySeconds) / workedWorkdays : null;
+        double? dayOffAverage = workedDaysOff > 0 ? offDaySeconds / workedDaysOff : null;
         double? median = durations.Count > 0
             ? (durations[(durations.Count - 1) / 2] + durations[durations.Count / 2]) / 2
             : null;
 
         return
         [
+            new(StatisticKind.TotalTrackedTime, total, StatisticUnit.Seconds),
+            new(StatisticKind.WorkedDays, durations.Count, StatisticUnit.Days),
             new(StatisticKind.AverageWorkedDay, average, StatisticUnit.Seconds),
+            new(StatisticKind.AverageWorkedWorkday, workdayAverage, StatisticUnit.Seconds),
+            new(StatisticKind.AverageWorkedDayOff, dayOffAverage, StatisticUnit.Seconds),
             new(StatisticKind.ShortWorkedDays, shortDays, StatisticUnit.Days),
             new(StatisticKind.ShortWorkedDaysOff, shortDaysOff, StatisticUnit.Days),
             new(StatisticKind.LongWorkedDays, longDays, StatisticUnit.Days),
             new(StatisticKind.WorkdaysWithoutEntries, emptyWorkdays, StatisticUnit.Days),
+            new(StatisticKind.WorkdaysWithUnderTwoHours, emptyWorkdays + shortDays - shortDaysOff, StatisticUnit.Days),
+            new(StatisticKind.WorkedDaysOff, workedDaysOff, StatisticUnit.Days),
             new(StatisticKind.OffDayTime, offDaySeconds, StatisticUnit.Seconds),
             new(StatisticKind.OffDayTimePercentage, total > 0 ? offDaySeconds / total * 100 : 0, StatisticUnit.Percentage),
             new(StatisticKind.MedianWorkedDay, median, StatisticUnit.Seconds),

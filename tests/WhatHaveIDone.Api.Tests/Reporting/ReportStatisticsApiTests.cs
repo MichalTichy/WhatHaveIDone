@@ -54,6 +54,8 @@ public sealed class ReportStatisticsApiTests(IntegrationFixture fixture)
         Assert.Equal(9.5 * 3600, report.TotalSeconds);
         Assert.Equal(3, report.Days.Count);
         Assert.Equal(1800, statistics[StatisticKind.AverageWorkedDay]);
+        Assert.Equal(1800, statistics[StatisticKind.TotalTrackedTime]);
+        Assert.Equal(1, statistics[StatisticKind.WorkedDays]);
         Assert.Equal(1800, statistics[StatisticKind.MedianWorkedDay]);
         Assert.Equal(1, statistics[StatisticKind.ShortWorkedDays]);
         Assert.Equal(0, statistics[StatisticKind.LongWorkedDays]);
